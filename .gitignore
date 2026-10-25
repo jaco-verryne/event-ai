@@ -1,0 +1,19 @@
+# Secrets
+.env
+token*.json
+credentials.json
+.streamlit/secrets.toml
+
+# Generated at start-up
+.chroma/
+*.duckdb
+*.duckdb.wal
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
