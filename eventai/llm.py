@@ -106,7 +106,13 @@ def _chat(messages: list[dict[str, str]], providers: Sequence[Provider]) -> str:
         except openai.RateLimitError:
             log.warning("%s returned a rate-limit error, trying the next provider", provider.name)
             continue
-        log.info("LLM call served by %s (%s)", provider.name, provider.model)
+        usage = getattr(response, "usage", None)
+        log.info(
+            "LLM call served by %s (%s), %s tokens",
+            provider.name,
+            provider.model,
+            getattr(usage, "total_tokens", "unknown"),
+        )
         return response.choices[0].message.content or ""
     raise DailyLimitReached("Each LLM provider returned a rate-limit error.")
 

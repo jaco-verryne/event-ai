@@ -28,11 +28,17 @@ def result_ids(con, sql):
     return {row[i] for row in cursor.fetchall() for i in id_columns}
 
 
+def tool_sets(q):
+    return [q["expected_tools"], *q.get("accepted_tools", [])]
+
+
 def test_twelve_questions_with_valid_fields():
     assert [q["id"] for q in QUESTIONS] == list(range(1, 13))
     for q in QUESTIONS:
-        assert q["expected_tools"] and set(q["expected_tools"]) <= TOOLS
-        assert ("reference_sql" in q) == ("query_sql" in q["expected_tools"]), q["id"]
+        for tools in tool_sets(q):
+            assert tools and set(tools) <= TOOLS, q["id"]
+        uses_sql = any("query_sql" in tools for tools in tool_sets(q))
+        assert ("reference_sql" in q) == uses_sql, q["id"]
         assert isinstance(q["expected_record_ids"], list)
         assert q["expected_facts"]
 

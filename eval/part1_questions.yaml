@@ -5,11 +5,16 @@
 #   For a question that uses both tools, expected_record_ids is a subset of the result IDs.
 # follow_up_of: the scorer sends that question and its answer as chat history first.
 # expected_facts: case-insensitive text that the answer must contain.
+# accepted_tools: other tool sets that also count as a correct tool choice. Q1 and Q2 accept
+#   either tool (Jaco, 25 Oct): page 7 expects search_text, but CLAUDE.md section 7.3 sends
+#   numbers and IDs to query_sql. The retrieval hit rate still tests search_text on both.
 
 - id: 1
   type: lookup
   question: What is the seated capacity of The Old Mill?
   expected_tools: [search_text]
+  accepted_tools: [[query_sql], [query_sql, search_text]]
+  reference_sql: SELECT venue_id, name, seated_capacity FROM venues WHERE name = 'The Old Mill'
   expected_record_ids: [V012]
   expected_facts: ["The Old Mill", "120"]
 
@@ -17,6 +22,10 @@
   type: lookup_by_code
   question: What does PKG-07 include?
   expected_tools: [search_text]
+  accepted_tools: [[query_sql], [query_sql, search_text]]
+  reference_sql: >-
+    SELECT package_id, name FROM package_items
+    WHERE package_id = 'PKG-07' AND kind = 'include'
   expected_record_ids: [PKG-07]
   expected_facts: ["drinks", "badges"]
 
