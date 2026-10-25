@@ -1,7 +1,3 @@
-from types import SimpleNamespace
-
-import httpx2
-import openai
 import pytest
 from pydantic import BaseModel
 
@@ -9,7 +5,6 @@ from eventai.config import Settings
 from eventai.llm import (
     DailyLimitReached,
     InvalidOutput,
-    Provider,
     build_providers,
     complete_json,
 )
@@ -20,37 +15,11 @@ class Pair(BaseModel):
     seats: int
 
 
-class FakeCompletions:
-    """Returns the next output from a list, or raises it when it is an exception."""
-
-    def __init__(self, outputs):
-        self.outputs = list(outputs)
-        self.calls = []
-
-    def create(self, **kwargs):
-        self.calls.append(kwargs)
-        out = self.outputs.pop(0)
-        if isinstance(out, Exception):
-            raise out
-        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=out))])
-
-
-def fake_provider(name, outputs):
-    completions = FakeCompletions(outputs)
-    client = SimpleNamespace(chat=SimpleNamespace(completions=completions))
-    return Provider(name, client, f"{name}-model"), completions
-
-
-def rate_limit():
-    response = httpx2.Response(429, request=httpx2.Request("POST", "http://test"))
-    return openai.RateLimitError("rate limit", response=response, body=None)
-
-
 QUESTION = [{"role": "user", "content": "Where?"}]
 GOOD = '{"city": "Leeds", "seats": 120}'
 
 
-def test_primary_provider_answers():
+def test_primary_provider_answers(fake_provider):
     groq, groq_calls = fake_provider("groq", [GOOD])
     router, router_calls = fake_provider("openrouter", [])
 
@@ -61,7 +30,7 @@ def test_primary_provider_answers():
     assert router_calls.calls == []
 
 
-def test_rate_limit_falls_back_to_next_provider():
+def test_rate_limit_falls_back_to_next_provider(fake_provider, rate_limit):
     groq, groq_calls = fake_provider("groq", [rate_limit()])
     router, router_calls = fake_provider("openrouter", [GOOD])
 
@@ -73,7 +42,7 @@ def test_rate_limit_falls_back_to_next_provider():
     assert router_calls.calls[0]["messages"] == groq_calls.calls[0]["messages"]
 
 
-def test_all_providers_rate_limited():
+def test_all_providers_rate_limited(fake_provider, rate_limit):
     groq, _ = fake_provider("groq", [rate_limit()])
     router, _ = fake_provider("openrouter", [rate_limit()])
 
@@ -81,7 +50,7 @@ def test_all_providers_rate_limited():
         complete_json(QUESTION, Pair, providers=[groq, router])
 
 
-def test_invalid_output_is_retried_once():
+def test_invalid_output_is_retried_once(fake_provider):
     groq, calls = fake_provider("groq", ['{"city": "Leeds"}', GOOD])
 
     result = complete_json(QUESTION, Pair, providers=[groq])
@@ -93,14 +62,14 @@ def test_invalid_output_is_retried_once():
     assert "not valid" in retry_messages[-1]["content"]
 
 
-def test_invalid_output_twice_raises():
+def test_invalid_output_twice_raises(fake_provider):
     groq, _ = fake_provider("groq", ["not json", '{"seats": "many"}'])
 
     with pytest.raises(InvalidOutput):
         complete_json(QUESTION, Pair, providers=[groq])
 
 
-def test_request_uses_temperature_zero_json_mode_and_schema():
+def test_request_uses_temperature_zero_json_mode_and_schema(fake_provider):
     groq, calls = fake_provider("groq", [GOOD])
 
     complete_json(QUESTION, Pair, providers=[groq])
@@ -113,7 +82,7 @@ def test_request_uses_temperature_zero_json_mode_and_schema():
     assert call["messages"][1:] == QUESTION
 
 
-def test_fenced_json_is_accepted():
+def test_fenced_json_is_accepted(fake_provider):
     groq, _ = fake_provider("groq", ["```json\n" + GOOD + "\n```"])
 
     assert complete_json(QUESTION, Pair, providers=[groq]).city == "Leeds"
