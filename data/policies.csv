@@ -1,0 +1,27 @@
+policy_id,area,applies_to,condition,rule,effective_from
+POL-CAN-01,cancellation,all,Cancellation 90 days or more before the event,The client loses the deposit. No other fee is due.,2026-01-01
+POL-CAN-02,cancellation,all,Cancellation 60 to 89 days before the event,25% of the package fee is due.,2026-01-01
+POL-CAN-03,cancellation,all,Cancellation 30 to 59 days before the event,50% of the package fee is due.,2026-01-01
+POL-CAN-04,cancellation,all,Cancellation fewer than 30 days before the event,100% of the package fee is due.,2026-01-01
+POL-CAN-05,cancellation,all,Cancellation by the company because the venue closes or an event outside our control occurs,"The client gets a full refund, or moves the event to a new date at no cost.",2026-01-01
+POL-CAN-06,cancellation,all,Days before the event for a cancellation,We count calendar days from the date we receive the written cancellation to the event date. The event date is not counted.,2026-01-01
+POL-DEP-01,deposit,all,Deposit at booking,A deposit of 25% of the package fee is due within 7 days of the booking confirmation.,2026-01-01
+POL-DEP-02,deposit,PKG-05,Deposit at booking for a Gala Dinner,A deposit of 40% of the package fee is due within 7 days of the booking confirmation.,2026-01-01
+POL-DEP-03,deposit,all,Refund of the deposit,The deposit is not refundable. Only POL-CAN-05 gives a refund of the deposit.,2026-01-01
+POL-PAY-01,payment,all,Balance of the package fee,The balance is due 6 weeks before the event.,2026-01-01
+POL-PAY-02,payment,all,Booking made less than 6 weeks before the event,The full package fee is due at booking.,2026-01-01
+POL-PAY-03,payment,all,Late payment,Statutory interest under UK late payment law applies to each late invoice.,2026-01-01
+POL-PAY-04,payment,all,Add-ons ordered after the final guest numbers,Payment for the add-ons is due on the day of the order.,2026-01-01
+POL-GST-01,guest numbers,all,Final guest numbers,Final guest numbers are due 10 working days before the event.,2026-01-01
+POL-GST-02,guest numbers,PKG-05,Final guest numbers for a Gala Dinner,Final guest numbers are due 21 days before the event. This rule replaces POL-GST-01 for PKG-05.,2026-04-01
+POL-GST-03,guest numbers,all,Guest numbers fall after the final numbers,The invoice uses the final guest numbers. No refund is due.,2026-01-01
+POL-GST-04,guest numbers,all,Guest numbers rise after the final numbers,"We accept more guests if the venue capacity allows it. Each extra guest costs the price per head plus 10%.",2026-01-01
+POL-DIE-01,dietary needs,all,Dietary needs and allergies,Send the dietary needs and allergies of each guest 14 days before the event.,2026-01-01
+POL-DIE-02,dietary needs,all,Dietary needs sent after the deadline,"The caterer tries to meet them, but cannot promise a separate meal.",2026-01-01
+POL-DIE-03,dietary needs,all,Severe allergy of a guest,The event manager speaks with the client before the event to agree a safe menu and serving plan.,2026-01-01
+POL-ACC-01,access,all,Guests who need step-free access,Choose a venue with step-free access. The venue list shows this for each venue.,2026-01-01
+POL-ACC-02,access,all,Access needs sent with the final guest numbers,"We arrange reserved seats, hearing loops and accessible parking where the venue has them, at no cost.",2026-01-01
+POL-ACC-03,access,all,Assistance dogs,Assistance dogs are welcome at each venue.,2026-01-01
+POL-DAT-01,data retention,all,Guest lists and contact details,We delete guest data 90 days after the event.,2026-01-01
+POL-DAT-02,data retention,all,Dietary and access information of guests,We delete this health information 30 days after the event.,2026-06-01
+POL-DAT-03,data retention,all,Invoices and payment records,We keep them for 6 years because UK tax law requires it.,2026-01-01

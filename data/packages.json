@@ -1,0 +1,197 @@
+{
+  "packages": [
+    {
+      "package_id": "PKG-01",
+      "name": "Conference Day",
+      "event_type": "conference",
+      "description": "A full-day package for business conferences. It covers the main room, food and drink through the day, and technical support for talks and panels.",
+      "min_guests": 30,
+      "max_guests": 500,
+      "price_per_head_gbp": 65,
+      "includes": [
+        "Main room hire for 8 hours",
+        "Projector, screen and microphones",
+        "Morning coffee and pastries",
+        "Two-course buffet lunch",
+        "Afternoon tea and biscuits",
+        "On-site technician",
+        "Event manager"
+      ],
+      "add_ons": [
+        {"name": "Live streaming", "price_gbp": 1200},
+        {"name": "Extra breakout room", "price_gbp": 350},
+        {"name": "Drinks reception, per guest", "price_gbp": 18}
+      ],
+      "lead_time_weeks": 6,
+      "suitable_venue_types": ["conference centre", "hotel", "theatre"]
+    },
+    {
+      "package_id": "PKG-02",
+      "name": "Team Retreat",
+      "event_type": "team building",
+      "description": "A day out of the office for teams that want to plan, learn and solve problems together. A facilitator runs hands-on sessions in small groups, with quiet space to think and talk.",
+      "min_guests": 10,
+      "max_guests": 80,
+      "price_per_head_gbp": 95,
+      "includes": [
+        "Exclusive use of a private space",
+        "Professional facilitator for the day",
+        "Three breakout areas",
+        "Flip charts, sticky notes and pens",
+        "Breakfast, lunch and afternoon snacks",
+        "Team challenge activity"
+      ],
+      "add_ons": [
+        {"name": "Personality profiling session", "price_gbp": 900},
+        {"name": "Evening dinner, per guest", "price_gbp": 42},
+        {"name": "Photographer for half a day", "price_gbp": 450}
+      ],
+      "lead_time_weeks": 4,
+      "suitable_venue_types": ["historic house", "converted mill", "warehouse", "hotel"]
+    },
+    {
+      "package_id": "PKG-03",
+      "name": "Summer Party",
+      "event_type": "party",
+      "description": "A relaxed summer party with seasonal food and drinks. It suits venues with space to enjoy long, light evenings.",
+      "min_guests": 40,
+      "max_guests": 400,
+      "price_per_head_gbp": 75,
+      "includes": [
+        "Welcome drink",
+        "Street food stations",
+        "Barbecue menu",
+        "DJ for 4 hours",
+        "Lawn games",
+        "Event manager"
+      ],
+      "add_ons": [
+        {"name": "Ice cream cart", "price_gbp": 600},
+        {"name": "Live band", "price_gbp": 2200},
+        {"name": "Unlimited soft drinks, per guest", "price_gbp": 8}
+      ],
+      "lead_time_weeks": 8,
+      "suitable_venue_types": ["rooftop bar", "warehouse", "historic house", "converted mill", "restaurant"]
+    },
+    {
+      "package_id": "PKG-04",
+      "name": "Christmas Party",
+      "event_type": "party",
+      "description": "A festive party with a three-course Christmas dinner, music and dancing. Available from late November to the end of December.",
+      "min_guests": 30,
+      "max_guests": 600,
+      "price_per_head_gbp": 89,
+      "includes": [
+        "Arrival drink",
+        "Three-course Christmas dinner",
+        "Half a bottle of wine per guest",
+        "Crackers and table decorations",
+        "DJ and dance floor",
+        "Event manager"
+      ],
+      "add_ons": [
+        {"name": "Photo booth", "price_gbp": 550},
+        {"name": "Casino tables", "price_gbp": 950},
+        {"name": "Late bar extension for 1 hour", "price_gbp": 400}
+      ],
+      "lead_time_weeks": 12,
+      "suitable_venue_types": ["hotel", "warehouse", "restaurant", "converted mill"]
+    },
+    {
+      "package_id": "PKG-05",
+      "name": "Gala Dinner",
+      "event_type": "formal dinner",
+      "description": "A formal black-tie evening with a four-course dinner, fine wines and live music. It suits charity events, anniversaries and company celebrations.",
+      "min_guests": 80,
+      "max_guests": 400,
+      "price_per_head_gbp": 145,
+      "includes": [
+        "Champagne reception",
+        "Four-course dinner",
+        "Wine pairing with each course",
+        "Live string quartet",
+        "Table centrepieces and printed menus",
+        "Master of ceremonies",
+        "Event manager"
+      ],
+      "add_ons": [
+        {"name": "Auctioneer for a charity auction", "price_gbp": 1500},
+        {"name": "Fireworks display", "price_gbp": 4500},
+        {"name": "Late bar extension for 1 hour", "price_gbp": 450}
+      ],
+      "lead_time_weeks": 16,
+      "suitable_venue_types": ["hotel", "historic house", "converted mill", "museum"]
+    },
+    {
+      "package_id": "PKG-06",
+      "name": "Product Launch",
+      "event_type": "launch",
+      "description": "An event to show a new product to press, partners and customers. It includes staging, lighting and a host to run the programme.",
+      "min_guests": 50,
+      "max_guests": 500,
+      "price_per_head_gbp": 85,
+      "includes": [
+        "Stage and lighting rig",
+        "Large LED screen",
+        "Sound system and microphones",
+        "Professional host",
+        "Canapés and drinks",
+        "Press check-in desk"
+      ],
+      "add_ons": [
+        {"name": "Live streaming", "price_gbp": 1200},
+        {"name": "Branded photo wall", "price_gbp": 700},
+        {"name": "Video highlights film", "price_gbp": 1800}
+      ],
+      "lead_time_weeks": 10,
+      "suitable_venue_types": ["warehouse", "gallery", "theatre", "rooftop bar"]
+    },
+    {
+      "package_id": "PKG-07",
+      "name": "Networking Reception",
+      "event_type": "reception",
+      "description": "An evening reception where guests meet and talk. A standing format with drinks, canapés and short welcome speeches.",
+      "min_guests": 30,
+      "max_guests": 300,
+      "price_per_head_gbp": 48,
+      "includes": [
+        "Two drinks per guest",
+        "Six canapés per guest",
+        "Microphone for welcome speeches",
+        "Name badges and check-in desk",
+        "Event manager"
+      ],
+      "add_ons": [
+        {"name": "Extra drinks, per guest", "price_gbp": 12},
+        {"name": "Jazz trio for 2 hours", "price_gbp": 850},
+        {"name": "Cloakroom attendant", "price_gbp": 180}
+      ],
+      "lead_time_weeks": 3,
+      "suitable_venue_types": ["rooftop bar", "gallery", "museum", "restaurant", "hotel"]
+    },
+    {
+      "package_id": "PKG-08",
+      "name": "Awards Evening",
+      "event_type": "awards",
+      "description": "An awards ceremony with dinner, a stage programme and a host. It suits industry awards and staff recognition evenings.",
+      "min_guests": 100,
+      "max_guests": 800,
+      "price_per_head_gbp": 120,
+      "includes": [
+        "Three-course dinner",
+        "Stage, lighting and big screens",
+        "Awards host",
+        "Trophy table and podium",
+        "Walk-on music for each winner",
+        "Event manager"
+      ],
+      "add_ons": [
+        {"name": "Engraved trophy, each", "price_gbp": 45},
+        {"name": "After-party DJ", "price_gbp": 650},
+        {"name": "Red carpet arrival", "price_gbp": 900}
+      ],
+      "lead_time_weeks": 14,
+      "suitable_venue_types": ["hotel", "theatre", "conference centre", "historic house"]
+    }
+  ]
+}

@@ -1,0 +1,516 @@
+# Fictional partner venues. generate_venues.py adds the numbers with a fixed seed.
+# `venue_id` and `fixed` set the values that the evaluation questions depend on.
+# Descriptions never use the word "outdoor": the Leeds summer-party question must find
+# courtyards, terraces and gardens by meaning.
+venues:
+  # London (20)
+  - name: The Bankside Rooms
+    city: London
+    venue_type: warehouse
+    description: Riverside warehouse with exposed timber beams and views of the Thames.
+  - name: Clerkenwell House
+    city: London
+    venue_type: historic house
+    description: Georgian townhouse with panelled drawing rooms and a quiet courtyard.
+  - name: The Meridian Hotel Westminster
+    city: London
+    venue_type: hotel
+    description: Grand hotel with a mirrored ballroom and a cocktail bar.
+  - name: Shoreditch Foundry
+    city: London
+    venue_type: warehouse
+    description: Former iron foundry with concrete floors and industrial lighting.
+  - name: The Archive Gallery
+    city: London
+    venue_type: gallery
+    description: Contemporary art gallery with white walls and a glass roof.
+  - name: Borough Lantern Theatre
+    city: London
+    venue_type: theatre
+    description: Small Victorian theatre with a balcony and a private bar.
+  - name: Thameside Conference Centre
+    city: London
+    venue_type: conference centre
+    description: Modern conference centre with a tiered auditorium and breakout rooms.
+  - name: The Skyline Bar Canary Wharf
+    city: London
+    venue_type: rooftop bar
+    description: Rooftop bar with glass walls and views across the docks.
+  - name: Museum of Printed Maps
+    city: London
+    venue_type: museum
+    description: Small museum of historic maps with a galleried reading room.
+  - name: Holborn Supper Club
+    city: London
+    venue_type: restaurant
+    description: Art Deco restaurant with a sunken dance floor and a private dining room.
+  - name: Kensington Lodge Hotel
+    city: London
+    venue_type: hotel
+    description: Boutique hotel with a garden room and a library.
+  - name: Fitzrovia Loft
+    city: London
+    venue_type: warehouse
+    description: Top-floor loft with skylights and a polished concrete floor.
+  - name: Deptford Rope Hall
+    city: London
+    venue_type: historic house
+    description: Long former rope-making hall with brick arches.
+  - name: The Camden Vault
+    city: London
+    venue_type: warehouse
+    description: Underground venue in brick railway arches with a small stage.
+  - name: Marylebone Assembly Hall
+    city: London
+    venue_type: conference centre
+    description: Restored assembly hall with a sprung floor and a gallery level.
+  - name: Battersea Engine Rooms
+    city: London
+    venue_type: warehouse
+    description: Former pump house with a vaulted roof and original machinery.
+  - name: Aldwych Velvet Theatre
+    city: London
+    venue_type: theatre
+    description: West End theatre with red velvet seats and an ornate foyer.
+  - name: Hackney Wick Studio Gallery
+    city: London
+    venue_type: gallery
+    description: Canal-side gallery in a former paint factory.
+  - name: The Mayfair Terrace
+    city: London
+    venue_type: rooftop bar
+    description: Rooftop bar with heated booths on a terrace above Mayfair.
+  - name: Museum of Clockmaking
+    city: London
+    venue_type: museum
+    description: Museum of clocks and watches with a Georgian staircase hall.
+
+  # Manchester (16). Three venues sit on the limit of the "150 seats and step-free" question.
+  - name: Old Mill Studios
+    city: Manchester
+    venue_type: converted mill
+    description: Film studios in a former cotton mill, with a sound stage and green rooms.
+    fixed: {seated_capacity: 150, step_free_access: false}
+  - name: Ancoats Engine House
+    city: Manchester
+    venue_type: converted mill
+    description: Restored engine house with cast-iron columns and arched windows.
+    fixed: {seated_capacity: 150, step_free_access: true}
+  - name: The Piccadilly Exchange Hotel
+    city: Manchester
+    venue_type: hotel
+    description: Hotel in a former cotton exchange, with a domed ballroom.
+    fixed: {seated_capacity: 220, step_free_access: true}
+  - name: Northern Quarter Print Rooms
+    city: Manchester
+    venue_type: gallery
+    description: Gallery in a former print shop with tiled walls.
+  - name: Castlefield Arches
+    city: Manchester
+    venue_type: warehouse
+    description: Venue in railway arches beside the canal basin.
+  - name: Deansgate Lecture Theatre
+    city: Manchester
+    venue_type: theatre
+    description: Victorian lecture theatre with curved wooden benches.
+  - name: Manchester Textile Museum
+    city: Manchester
+    venue_type: museum
+    description: Museum of textiles with working looms in the main gallery.
+  - name: Salford Quays Conference Centre
+    city: Manchester
+    venue_type: conference centre
+    description: Waterside conference centre with a large plenary hall.
+  - name: Spinningfields Sky Lounge
+    city: Manchester
+    venue_type: rooftop bar
+    description: Twentieth-floor lounge with views of the Pennines.
+  - name: The Albert Square Brasserie
+    city: Manchester
+    venue_type: restaurant
+    description: French brasserie with a mezzanine and a private room.
+  - name: Chorlton Reading Rooms
+    city: Manchester
+    venue_type: historic house
+    description: Former public library with stained glass and oak shelves.
+  - name: Ardwick Goods Shed
+    city: Manchester
+    venue_type: warehouse
+    description: Huge former railway goods shed with concrete pillars.
+  - name: Oxford Road Hotel
+    city: Manchester
+    venue_type: hotel
+    description: Quiet business hotel with a conservatory restaurant.
+    fixed: {seated_capacity: 145, step_free_access: true}
+  - name: Manchester Science Hall
+    city: Manchester
+    venue_type: museum
+    description: Science museum hall with an aircraft hanging from the roof.
+  - name: Didsbury Villa
+    city: Manchester
+    venue_type: historic house
+    description: Victorian villa with a conservatory and a croquet lawn.
+  - name: The Canal Street Supper Rooms
+    city: Manchester
+    venue_type: restaurant
+    description: Lively restaurant with a stage for live music.
+
+  # Leeds (14). The Gala Dinner question (120 guests) matches four venues; all
+  # other Leeds venues of a Gala Dinner type seat fewer than 120.
+  - name: The Old Mill
+    city: Leeds
+    venue_type: converted mill
+    description: Converted Victorian mill with exposed brick and a courtyard.
+    venue_id: V012
+    fixed: {seated_capacity: 120, standing_capacity: 180, day_rate_gbp: 2400, step_free_access: true, parking_spaces: 20}
+  - name: Headingley Assembly Rooms
+    city: Leeds
+    venue_type: historic house
+    description: Georgian assembly rooms with a chandeliered ballroom and a walled garden.
+    venue_id: V045
+    fixed: {seated_capacity: 180, parking_spaces: null}
+  - name: Kirkgate Grand Hotel
+    city: Leeds
+    venue_type: hotel
+    description: City-centre hotel with a large ballroom and a rooftop terrace above the river.
+    fixed: {seated_capacity: 260, parking_spaces: 0}
+  - name: Armley Museum of Industry
+    city: Leeds
+    venue_type: museum
+    description: Industrial museum with steam engines in a glass-roofed hall.
+    fixed: {seated_capacity: 90}
+  - name: Calder Works
+    city: Leeds
+    venue_type: warehouse
+    description: Raw brick warehouse with high ceilings and steel beams beside the canal.
+  - name: Skyline Twelve
+    city: Leeds
+    venue_type: rooftop bar
+    description: Twelfth-floor bar with a planted roof terrace and views across the city.
+  - name: Briggate Theatre Rooms
+    city: Leeds
+    venue_type: theatre
+    description: Edwardian theatre with a raked auditorium and a private bar.
+  - name: Headrow Conference Centre
+    city: Leeds
+    venue_type: conference centre
+    description: Modern conference centre with a large auditorium and ten meeting rooms.
+  - name: Roundhay Hall
+    city: Leeds
+    venue_type: historic house
+    description: Victorian mansion in parkland with an orangery and formal lawns.
+    fixed: {seated_capacity: 100}
+  - name: Corn Exchange Kitchen
+    city: Leeds
+    venue_type: restaurant
+    description: Restaurant under a domed Victorian roof, with a private dining room.
+  - name: Holbeck Print Gallery
+    city: Leeds
+    venue_type: gallery
+    description: White-walled gallery in a former print works, with movable walls.
+  - name: Wharf Street Hotel
+    city: Leeds
+    venue_type: hotel
+    description: Boutique hotel with dark wood panels, a library bar and meeting rooms.
+    fixed: {seated_capacity: 70}
+  - name: Canal Basin Lofts
+    city: Leeds
+    venue_type: warehouse
+    description: Loft spaces in a restored canal warehouse with a cobbled courtyard.
+  - name: Temple Flax Museum
+    city: Leeds
+    venue_type: museum
+    description: Former flax mill museum with an Egyptian-style front and a large exhibition hall.
+    fixed: {seated_capacity: 150, parking_spaces: 35}
+
+  # Birmingham (14)
+  - name: Jewellery Quarter Workshop
+    city: Birmingham
+    venue_type: warehouse
+    description: Former jewellery workshop with original benches and tools on display.
+  - name: Digbeth Biscuit Works
+    city: Birmingham
+    venue_type: warehouse
+    description: Former biscuit factory with large open floors.
+  - name: The Edgbaston Park Hotel
+    city: Birmingham
+    venue_type: hotel
+    description: Hotel in parkland with a ballroom and a view of the lake.
+  - name: Brindleyplace Conference Hall
+    city: Birmingham
+    venue_type: conference centre
+    description: Canal-side conference hall with modern meeting rooms.
+  - name: Birmingham Railway Museum
+    city: Birmingham
+    venue_type: museum
+    description: Museum of steam trains with a glass-roofed hall.
+  - name: The Mailbox Sky Bar
+    city: Birmingham
+    venue_type: rooftop bar
+    description: Rooftop bar above a former sorting office.
+  - name: Moseley Hall Rooms
+    city: Birmingham
+    venue_type: historic house
+    description: Georgian house with a walled garden and stables.
+  - name: Hurst Street Studio Theatre
+    city: Birmingham
+    venue_type: theatre
+    description: Studio theatre with flexible seating and a bar.
+  - name: Colmore Row Dining Rooms
+    city: Birmingham
+    venue_type: restaurant
+    description: Fine-dining restaurant in a former banking hall.
+  - name: Gun Quarter Gallery
+    city: Birmingham
+    venue_type: gallery
+    description: Gallery in a former gun barrel proof house.
+  - name: Handsworth Manor
+    city: Birmingham
+    venue_type: historic house
+    description: Tudor manor with oak beams and a great hall.
+  - name: The Bullring Exchange Hotel
+    city: Birmingham
+    venue_type: hotel
+    description: Business hotel with a flexible function suite.
+  - name: Eastside Conference Centre
+    city: Birmingham
+    venue_type: conference centre
+    description: Modern conference centre near the city park.
+  - name: Fazeley Street Mill
+    city: Birmingham
+    venue_type: converted mill
+    description: Converted canal-side mill with timber floors.
+
+  # Bristol (12)
+  - name: The Harbourside Sheds
+    city: Bristol
+    venue_type: warehouse
+    description: Harbour warehouse with a long brick hall and views of the docks.
+  - name: Clifton Assembly Rooms
+    city: Bristol
+    venue_type: historic house
+    description: Regency assembly rooms with a bow-fronted ballroom.
+  - name: Temple Quay Hotel
+    city: Bristol
+    venue_type: hotel
+    description: Modern hotel next to the station with a large function room.
+  - name: Bristol Museum of Ships
+    city: Bristol
+    venue_type: museum
+    description: Maritime museum with a hall of historic boats.
+  - name: Stokes Croft Gallery
+    city: Bristol
+    venue_type: gallery
+    description: Street art gallery in a former furniture store.
+  - name: Wapping Wharf Kitchen
+    city: Bristol
+    venue_type: restaurant
+    description: Waterside restaurant built from shipping containers.
+  - name: King Street Playhouse
+    city: Bristol
+    venue_type: theatre
+    description: Georgian theatre with a horseshoe auditorium.
+  - name: Brunel Conference Centre
+    city: Bristol
+    venue_type: conference centre
+    description: Conference centre in a former engine shed.
+  - name: Cabot Rooftop
+    city: Bristol
+    venue_type: rooftop bar
+    description: Rooftop bar with views of the harbour and the suspension bridge.
+  - name: Redland Hall
+    city: Bristol
+    venue_type: historic house
+    description: Victorian hall with stained glass and a large lawn.
+  - name: Bedminster Tobacco Works
+    city: Bristol
+    venue_type: converted mill
+    description: Former tobacco factory with exposed brick and a roof deck.
+  - name: Queen Square Hotel
+    city: Bristol
+    venue_type: hotel
+    description: Georgian hotel on a tree-lined square.
+
+  # Liverpool (12)
+  - name: Albert Dock Warehouse Rooms
+    city: Liverpool
+    venue_type: warehouse
+    description: Listed dock warehouse with brick vaults.
+  - name: The Liver Hotel
+    city: Liverpool
+    venue_type: hotel
+    description: Waterfront hotel with a ballroom and river views.
+  - name: Liverpool Museum of Music
+    city: Liverpool
+    venue_type: museum
+    description: Music museum with a stage and a recording studio.
+  - name: Baltic Triangle Gallery
+    city: Liverpool
+    venue_type: gallery
+    description: Gallery in a former bakery with large windows.
+  - name: Rope Walk Theatre
+    city: Liverpool
+    venue_type: theatre
+    description: Small theatre with a thrust stage.
+  - name: Pier Head Conference Centre
+    city: Liverpool
+    venue_type: conference centre
+    description: Waterfront conference centre with a large auditorium.
+  - name: Bold Street Kitchen
+    city: Liverpool
+    venue_type: restaurant
+    description: Busy restaurant with an open kitchen and a private room.
+  - name: Sefton Park Villa
+    city: Liverpool
+    venue_type: historic house
+    description: Victorian villa beside the park with a view of the palm house.
+  - name: Stanley Dock Mill
+    city: Liverpool
+    venue_type: converted mill
+    description: Converted tobacco warehouse with cast-iron columns.
+  - name: Mersey Sky Bar
+    city: Liverpool
+    venue_type: rooftop bar
+    description: Rooftop bar with views across the Mersey.
+  - name: Rodney Street Hotel
+    city: Liverpool
+    venue_type: hotel
+    description: Townhouse hotel with a basement bar.
+  - name: Canning Dock Shed
+    city: Liverpool
+    venue_type: warehouse
+    description: Open dock shed with steel roof trusses.
+
+  # Edinburgh (12)
+  - name: The Royal Mile Hall
+    city: Edinburgh
+    venue_type: historic house
+    description: Medieval hall with stone walls and a vaulted ceiling.
+  - name: Leith Bond Warehouse
+    city: Edinburgh
+    venue_type: warehouse
+    description: Former whisky bond with stone floors.
+  - name: Caledonian Grand Hotel
+    city: Edinburgh
+    venue_type: hotel
+    description: Grand hotel with a ballroom that faces the castle.
+  - name: Museum of Scottish Instruments
+    city: Edinburgh
+    venue_type: museum
+    description: Museum of musical instruments with a recital room.
+  - name: Stockbridge Gallery
+    city: Edinburgh
+    venue_type: gallery
+    description: Gallery in a Georgian terrace with tall windows.
+  - name: Grassmarket Supper Rooms
+    city: Edinburgh
+    venue_type: restaurant
+    description: Candlelit restaurant in a stone-vaulted cellar.
+  - name: Lothian Road Theatre
+    city: Edinburgh
+    venue_type: theatre
+    description: Modern theatre with a glass foyer.
+  - name: Haymarket Conference Centre
+    city: Edinburgh
+    venue_type: conference centre
+    description: Conference centre with a large plenary hall and meeting rooms.
+  - name: Calton Hill Roof Bar
+    city: Edinburgh
+    venue_type: rooftop bar
+    description: Rooftop bar with views of the hills and the sea.
+  - name: Dean Village Mill
+    city: Edinburgh
+    venue_type: converted mill
+    description: Converted grain mill beside the Water of Leith.
+  - name: Morningside Manor
+    city: Edinburgh
+    venue_type: historic house
+    description: Baronial mansion with a library and gardens.
+  - name: Charlotte Square Hotel
+    city: Edinburgh
+    venue_type: hotel
+    description: Georgian hotel with drawing rooms and a private dining room.
+
+  # Glasgow (10)
+  - name: Merchant City Hall
+    city: Glasgow
+    venue_type: historic house
+    description: Victorian trades hall with a domed ceiling.
+  - name: Clyde Shipyard Shed
+    city: Glasgow
+    venue_type: warehouse
+    description: Former shipyard shed with crane rails and a high roof.
+  - name: The Kelvin Hotel
+    city: Glasgow
+    venue_type: hotel
+    description: Hotel in a sandstone terrace with a ballroom.
+  - name: Glasgow Museum of Trams
+    city: Glasgow
+    venue_type: museum
+    description: Transport museum with historic trams in the main hall.
+  - name: Finnieston Gallery
+    city: Glasgow
+    venue_type: gallery
+    description: Gallery in a former engine works.
+  - name: Barras Music Hall
+    city: Glasgow
+    venue_type: theatre
+    description: Music hall with a sprung dance floor and a balcony.
+  - name: Clydeside Conference Centre
+    city: Glasgow
+    venue_type: conference centre
+    description: Riverside conference centre with a large auditorium.
+  - name: West End Bistro Rooms
+    city: Glasgow
+    venue_type: restaurant
+    description: Bistro with a private dining room under a glass roof.
+  - name: Trongate Roof Bar
+    city: Glasgow
+    venue_type: rooftop bar
+    description: Rooftop bar with heaters and city views.
+  - name: Bridgeton Carpet Mill
+    city: Glasgow
+    venue_type: converted mill
+    description: Converted carpet factory with a colourful brick front.
+
+  # Newcastle (10)
+  - name: Quayside Bonded Warehouse
+    city: Newcastle
+    venue_type: warehouse
+    description: Riverside bonded warehouse with stone arches.
+  - name: Grainger Hotel
+    city: Newcastle
+    venue_type: hotel
+    description: Georgian hotel with a ballroom and a cocktail bar.
+  - name: Tyne Museum of Engineering
+    city: Newcastle
+    venue_type: museum
+    description: Engineering museum with ship models and engines.
+  - name: Ouseburn Gallery
+    city: Newcastle
+    venue_type: gallery
+    description: Gallery in a former flax mill in the Ouseburn valley.
+  - name: Clayton Street Theatre
+    city: Newcastle
+    venue_type: theatre
+    description: Small theatre with a cabaret layout.
+  - name: Gateshead Conference Centre
+    city: Newcastle
+    venue_type: conference centre
+    description: Modern conference centre beside the river.
+  - name: Jesmond Villa
+    city: Newcastle
+    venue_type: historic house
+    description: Arts and Crafts villa with a garden and a music room.
+  - name: Tyne Bridge Roof Bar
+    city: Newcastle
+    venue_type: rooftop bar
+    description: Rooftop bar with views of the bridges.
+  - name: Bigg Market Dining Rooms
+    city: Newcastle
+    venue_type: restaurant
+    description: Restaurant in a former bank with marble columns.
+  - name: Byker Flour Mill
+    city: Newcastle
+    venue_type: converted mill
+    description: Converted flour mill with timber beams.

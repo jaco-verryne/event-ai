@@ -1,0 +1,121 @@
+venue_id,name,city,venue_type,description,seated_capacity,standing_capacity,day_rate_gbp,step_free_access,parking_spaces,av_included,catering,nearest_station,walk_minutes
+V001,Stanley Dock Mill,Liverpool,converted mill,Converted tobacco warehouse with cast-iron columns.,210,300,3650,false,75,false,external,Liverpool Central,11
+V002,Old Mill Studios,Manchester,converted mill,"Film studios in a former cotton mill, with a sound stage and green rooms.",150,230,2850,false,95,true,in-house,Deansgate,5
+V003,The Edgbaston Park Hotel,Birmingham,hotel,Hotel in parkland with a ballroom and a view of the lake.,95,160,1700,true,0,true,in-house,Birmingham New Street,11
+V004,Tyne Bridge Roof Bar,Newcastle,rooftop bar,Rooftop bar with views of the bridges.,95,125,2100,true,90,false,external,MetroCentre,3
+V005,Glasgow Museum of Trams,Glasgow,museum,Transport museum with historic trams in the main hall.,205,340,3150,true,25,true,external,Glasgow Central,3
+V006,Wapping Wharf Kitchen,Bristol,restaurant,Waterside restaurant built from shipping containers.,115,195,2050,false,100,true,in-house,Clifton Down,12
+V007,Holbeck Print Gallery,Leeds,gallery,"White-walled gallery in a former print works, with movable walls.",105,170,2000,true,115,false,external,Cottingley,2
+V008,Northern Quarter Print Rooms,Manchester,gallery,Gallery in a former print shop with tiled walls.,135,210,3000,true,5,true,external,Manchester Piccadilly,4
+V009,Salford Quays Conference Centre,Manchester,conference centre,Waterside conference centre with a large plenary hall.,120,195,2350,true,0,true,external,Manchester Piccadilly,7
+V010,Deptford Rope Hall,London,historic house,Long former rope-making hall with brick arches.,190,310,4200,true,0,true,in-house,Farringdon,2
+V011,Clifton Assembly Rooms,Bristol,historic house,Regency assembly rooms with a bow-fronted ballroom.,155,215,2150,true,45,true,in-house,Clifton Down,12
+V012,The Old Mill,Leeds,converted mill,Converted Victorian mill with exposed brick and a courtyard.,120,180,2400,true,20,true,external,Burley Park,11
+V013,Clydeside Conference Centre,Glasgow,conference centre,Riverside conference centre with a large auditorium.,330,440,5700,true,105,true,in-house,Glasgow Central,15
+V014,Redland Hall,Bristol,historic house,Victorian hall with stained glass and a large lawn.,75,110,1550,true,45,true,in-house,Bristol Temple Meads,8
+V015,Quayside Bonded Warehouse,Newcastle,warehouse,Riverside bonded warehouse with stone arches.,85,125,2000,true,5,true,external,MetroCentre,3
+V016,Bigg Market Dining Rooms,Newcastle,restaurant,Restaurant in a former bank with marble columns.,90,130,2000,true,120,true,in-house,Manors,7
+V017,Bristol Museum of Ships,Bristol,museum,Maritime museum with a hall of historic boats.,210,285,2800,true,95,true,in-house,Lawrence Hill,3
+V018,Borough Lantern Theatre,London,theatre,Small Victorian theatre with a balcony and a private bar.,370,505,9850,true,0,true,in-house,Liverpool Street,9
+V019,Tyne Museum of Engineering,Newcastle,museum,Engineering museum with ship models and engines.,290,470,5500,true,75,true,external,Manors,8
+V020,Fazeley Street Mill,Birmingham,converted mill,Converted canal-side mill with timber floors.,155,215,2300,true,0,true,external,Birmingham Moor Street,5
+V021,Baltic Triangle Gallery,Liverpool,gallery,Gallery in a former bakery with large windows.,180,290,2700,true,50,false,in-house,Liverpool Central,13
+V022,Sefton Park Villa,Liverpool,historic house,Victorian villa beside the park with a view of the palm house.,200,280,2600,true,95,false,external,James Street,10
+V023,The Piccadilly Exchange Hotel,Manchester,hotel,"Hotel in a former cotton exchange, with a domed ballroom.",220,330,3050,true,15,true,in-house,Manchester Victoria,9
+V024,Kirkgate Grand Hotel,Leeds,hotel,City-centre hotel with a large ballroom and a rooftop terrace above the river.,260,385,3650,true,0,true,in-house,Headingley,3
+V025,Hurst Street Studio Theatre,Birmingham,theatre,Studio theatre with flexible seating and a bar.,705,1115,10100,true,105,false,external,Five Ways,9
+V026,Corn Exchange Kitchen,Leeds,restaurant,"Restaurant under a domed Victorian roof, with a private dining room.",85,135,1950,true,0,true,in-house,Cottingley,2
+V027,Lothian Road Theatre,Edinburgh,theatre,Modern theatre with a glass foyer.,700,1145,10000,true,80,true,in-house,Haymarket,13
+V028,The Mayfair Terrace,London,rooftop bar,Rooftop bar with heated booths on a terrace above Mayfair.,115,150,3050,true,0,false,external,London Bridge,10
+V029,Merchant City Hall,Glasgow,historic house,Victorian trades hall with a domed ceiling.,60,80,1650,true,120,true,external,Partick,3
+V030,Ouseburn Gallery,Newcastle,gallery,Gallery in a former flax mill in the Ouseburn valley.,70,105,1800,true,0,false,in-house,Manors,11
+V031,Charlotte Square Hotel,Edinburgh,hotel,Georgian hotel with drawing rooms and a private dining room.,185,260,4200,true,50,true,in-house,Edinburgh Waverley,9
+V032,Kensington Lodge Hotel,London,hotel,Boutique hotel with a garden room and a library.,225,345,4300,true,10,false,in-house,Liverpool Street,3
+V033,Clayton Street Theatre,Newcastle,theatre,Small theatre with a cabaret layout.,535,775,8500,true,85,true,external,MetroCentre,12
+V034,Ancoats Engine House,Manchester,converted mill,Restored engine house with cast-iron columns and arched windows.,150,220,2900,true,55,false,in-house,Manchester Piccadilly,3
+V035,King Street Playhouse,Bristol,theatre,Georgian theatre with a horseshoe auditorium.,390,550,4750,true,90,true,in-house,Bedminster,6
+V036,Castlefield Arches,Manchester,warehouse,Venue in railway arches beside the canal basin.,245,330,3250,true,45,true,in-house,Deansgate,10
+V037,Gateshead Conference Centre,Newcastle,conference centre,Modern conference centre beside the river.,590,895,10600,true,40,false,in-house,MetroCentre,3
+V038,Moseley Hall Rooms,Birmingham,historic house,Georgian house with a walled garden and stables.,155,205,2950,true,0,true,in-house,Birmingham Snow Hill,12
+V039,Museum of Clockmaking,London,museum,Museum of clocks and watches with a Georgian staircase hall.,85,140,2250,false,0,true,external,Paddington,5
+V040,Oxford Road Hotel,Manchester,hotel,Quiet business hotel with a conservatory restaurant.,145,230,3050,true,5,false,in-house,Manchester Victoria,11
+V041,Handsworth Manor,Birmingham,historic house,Tudor manor with oak beams and a great hall.,125,205,2550,true,5,true,in-house,Five Ways,9
+V042,The Bullring Exchange Hotel,Birmingham,hotel,Business hotel with a flexible function suite.,230,365,4100,true,5,true,in-house,Birmingham Moor Street,6
+V043,The Archive Gallery,London,gallery,Contemporary art gallery with white walls and a glass roof.,120,205,3800,true,0,false,external,Paddington,11
+V044,Digbeth Biscuit Works,Birmingham,warehouse,Former biscuit factory with large open floors.,130,195,2700,false,0,true,in-house,Birmingham New Street,14
+V045,Headingley Assembly Rooms,Leeds,historic house,Georgian assembly rooms with a chandeliered ballroom and a walled garden.,180,255,3200,true,,true,external,Headingley,9
+V046,Pier Head Conference Centre,Liverpool,conference centre,Waterfront conference centre with a large auditorium.,195,290,3650,true,45,true,in-house,James Street,10
+V047,Brunel Conference Centre,Bristol,conference centre,Conference centre in a former engine shed.,120,165,2500,true,75,true,in-house,Clifton Down,8
+V048,Cabot Rooftop,Bristol,rooftop bar,Rooftop bar with views of the harbour and the suspension bridge.,45,70,1300,true,25,true,in-house,Lawrence Hill,9
+V049,Chorlton Reading Rooms,Manchester,historic house,Former public library with stained glass and oak shelves.,115,160,2450,false,0,false,in-house,Manchester Oxford Road,7
+V050,Marylebone Assembly Hall,London,conference centre,Restored assembly hall with a sprung floor and a gallery level.,385,520,7500,false,0,true,external,Paddington,3
+V051,Bedminster Tobacco Works,Bristol,converted mill,Former tobacco factory with exposed brick and a roof deck.,160,245,2250,false,110,true,external,Lawrence Hill,11
+V052,Didsbury Villa,Manchester,historic house,Victorian villa with a conservatory and a croquet lawn.,50,80,1100,true,90,false,external,Manchester Victoria,7
+V053,Shoreditch Foundry,London,warehouse,Former iron foundry with concrete floors and industrial lighting.,150,235,4100,true,0,true,in-house,Waterloo,2
+V054,Manchester Science Hall,Manchester,museum,Science museum hall with an aircraft hanging from the roof.,140,185,2650,true,55,false,in-house,Manchester Victoria,6
+V055,The Albert Square Brasserie,Manchester,restaurant,French brasserie with a mezzanine and a private room.,50,85,1400,true,5,false,in-house,Manchester Oxford Road,14
+V056,Leith Bond Warehouse,Edinburgh,warehouse,Former whisky bond with stone floors.,425,560,5850,false,50,false,in-house,Edinburgh Waverley,14
+V057,Finnieston Gallery,Glasgow,gallery,Gallery in a former engine works.,115,190,1850,false,110,false,external,Glasgow Queen Street,8
+V058,Colmore Row Dining Rooms,Birmingham,restaurant,Fine-dining restaurant in a former banking hall.,90,145,1950,false,40,true,in-house,Five Ways,5
+V059,Gun Quarter Gallery,Birmingham,gallery,Gallery in a former gun barrel proof house.,185,285,3450,false,80,true,in-house,Birmingham Snow Hill,7
+V060,Canning Dock Shed,Liverpool,warehouse,Open dock shed with steel roof trusses.,415,690,4800,false,0,false,in-house,Moorfields,7
+V061,Stokes Croft Gallery,Bristol,gallery,Street art gallery in a former furniture store.,115,155,2450,true,100,true,in-house,Bedminster,6
+V062,Briggate Theatre Rooms,Leeds,theatre,Edwardian theatre with a raked auditorium and a private bar.,290,470,5050,true,100,false,in-house,Cottingley,15
+V063,Spinningfields Sky Lounge,Manchester,rooftop bar,Twentieth-floor lounge with views of the Pennines.,60,95,1500,false,90,true,external,Manchester Victoria,5
+V064,Temple Flax Museum,Leeds,museum,Former flax mill museum with an Egyptian-style front and a large exhibition hall.,150,225,3200,true,35,false,in-house,Cottingley,4
+V065,Holborn Supper Club,London,restaurant,Art Deco restaurant with a sunken dance floor and a private dining room.,80,120,2600,true,0,true,in-house,Paddington,10
+V066,Calder Works,Leeds,warehouse,Raw brick warehouse with high ceilings and steel beams beside the canal.,345,570,5650,true,65,true,external,Leeds,14
+V067,Morningside Manor,Edinburgh,historic house,Baronial mansion with a library and gardens.,130,185,2700,false,90,true,external,Haymarket,15
+V068,Ardwick Goods Shed,Manchester,warehouse,Huge former railway goods shed with concrete pillars.,275,450,5250,true,110,true,external,Deansgate,7
+V069,Armley Museum of Industry,Leeds,museum,Industrial museum with steam engines in a glass-roofed hall.,90,125,1700,true,25,true,in-house,Leeds,9
+V070,Canal Basin Lofts,Leeds,warehouse,Loft spaces in a restored canal warehouse with a cobbled courtyard.,220,310,3650,true,110,true,in-house,Cottingley,4
+V071,The Bankside Rooms,London,warehouse,Riverside warehouse with exposed timber beams and views of the Thames.,435,660,11300,true,0,true,external,King's Cross St Pancras,10
+V072,West End Bistro Rooms,Glasgow,restaurant,Bistro with a private dining room under a glass roof.,95,125,1700,true,5,true,in-house,Glasgow Queen Street,14
+V073,Birmingham Railway Museum,Birmingham,museum,Museum of steam trains with a glass-roofed hall.,90,140,2150,true,65,false,in-house,Birmingham Moor Street,3
+V074,Haymarket Conference Centre,Edinburgh,conference centre,Conference centre with a large plenary hall and meeting rooms.,285,375,6150,true,5,false,external,Edinburgh Waverley,11
+V075,Temple Quay Hotel,Bristol,hotel,Modern hotel next to the station with a large function room.,390,525,4550,true,80,true,in-house,Bristol Temple Meads,6
+V076,Fitzrovia Loft,London,warehouse,Top-floor loft with skylights and a polished concrete floor.,405,565,10250,true,0,false,external,Waterloo,5
+V077,The Canal Street Supper Rooms,Manchester,restaurant,Lively restaurant with a stage for live music.,90,120,2000,true,55,true,in-house,Deansgate,10
+V078,Barras Music Hall,Glasgow,theatre,Music hall with a sprung dance floor and a balcony.,245,400,4250,true,45,true,in-house,Glasgow Queen Street,15
+V079,Battersea Engine Rooms,London,warehouse,Former pump house with a vaulted roof and original machinery.,110,170,3250,true,0,false,in-house,Waterloo,9
+V080,Dean Village Mill,Edinburgh,converted mill,Converted grain mill beside the Water of Leith.,100,155,2650,true,50,true,in-house,Edinburgh Waverley,3
+V081,The Harbourside Sheds,Bristol,warehouse,Harbour warehouse with a long brick hall and views of the docks.,215,345,3250,true,85,false,external,Lawrence Hill,5
+V082,The Liver Hotel,Liverpool,hotel,Waterfront hotel with a ballroom and river views.,335,545,5400,true,55,true,in-house,James Street,15
+V083,Deansgate Lecture Theatre,Manchester,theatre,Victorian lecture theatre with curved wooden benches.,745,1045,13450,true,0,false,in-house,Deansgate,14
+V084,Byker Flour Mill,Newcastle,converted mill,Converted flour mill with timber beams.,90,140,1650,false,40,true,external,Newcastle,14
+V085,The Meridian Hotel Westminster,London,hotel,Grand hotel with a mirrored ballroom and a cocktail bar.,320,490,7500,true,0,false,in-house,Farringdon,13
+V086,Stockbridge Gallery,Edinburgh,gallery,Gallery in a Georgian terrace with tall windows.,115,170,2650,true,105,true,in-house,Haymarket,6
+V087,Thameside Conference Centre,London,conference centre,Modern conference centre with a tiered auditorium and breakout rooms.,110,150,3050,true,50,true,external,London Bridge,3
+V088,Skyline Twelve,Leeds,rooftop bar,Twelfth-floor bar with a planted roof terrace and views across the city.,45,75,1150,true,115,true,in-house,Leeds,9
+V089,Bridgeton Carpet Mill,Glasgow,converted mill,Converted carpet factory with a colourful brick front.,250,325,4800,true,0,true,in-house,Glasgow Central,4
+V090,Eastside Conference Centre,Birmingham,conference centre,Modern conference centre near the city park.,520,795,7750,false,70,true,in-house,Five Ways,6
+V091,The Skyline Bar Canary Wharf,London,rooftop bar,Rooftop bar with glass walls and views across the docks.,105,170,3700,true,0,false,external,King's Cross St Pancras,6
+V092,Museum of Scottish Instruments,Edinburgh,museum,Museum of musical instruments with a recital room.,195,265,3900,true,30,true,external,Edinburgh Park,12
+V093,Rope Walk Theatre,Liverpool,theatre,Small theatre with a thrust stage.,320,455,3850,false,40,false,in-house,Liverpool Lime Street,12
+V094,Grassmarket Supper Rooms,Edinburgh,restaurant,Candlelit restaurant in a stone-vaulted cellar.,110,150,2400,true,95,false,in-house,Edinburgh Park,6
+V095,Hackney Wick Studio Gallery,London,gallery,Canal-side gallery in a former paint factory.,175,275,5050,true,110,true,in-house,London Bridge,11
+V096,The Mailbox Sky Bar,Birmingham,rooftop bar,Rooftop bar above a former sorting office.,75,125,1700,false,0,false,in-house,Five Ways,12
+V097,Jesmond Villa,Newcastle,historic house,Arts and Crafts villa with a garden and a music room.,140,205,2750,true,25,true,in-house,Newcastle,3
+V098,Museum of Printed Maps,London,museum,Small museum of historic maps with a galleried reading room.,225,370,5400,true,0,false,in-house,Liverpool Street,8
+V099,Wharf Street Hotel,Leeds,hotel,"Boutique hotel with dark wood panels, a library bar and meeting rooms.",70,100,1500,true,70,false,in-house,Burley Park,9
+V100,Headrow Conference Centre,Leeds,conference centre,Modern conference centre with a large auditorium and ten meeting rooms.,450,665,5650,true,75,true,external,Cottingley,12
+V101,Liverpool Museum of Music,Liverpool,museum,Music museum with a stage and a recording studio.,220,360,2800,true,75,true,in-house,James Street,12
+V102,Queen Square Hotel,Bristol,hotel,Georgian hotel on a tree-lined square.,105,170,1800,false,75,true,in-house,Bedminster,12
+V103,Calton Hill Roof Bar,Edinburgh,rooftop bar,Rooftop bar with views of the hills and the sea.,105,170,2750,true,40,true,external,Edinburgh Park,6
+V104,Brindleyplace Conference Hall,Birmingham,conference centre,Canal-side conference hall with modern meeting rooms.,235,350,3450,true,100,false,in-house,Birmingham Moor Street,6
+V105,Bold Street Kitchen,Liverpool,restaurant,Busy restaurant with an open kitchen and a private room.,45,65,1400,false,25,true,in-house,James Street,7
+V106,Rodney Street Hotel,Liverpool,hotel,Townhouse hotel with a basement bar.,175,260,2400,true,95,true,in-house,James Street,3
+V107,Clyde Shipyard Shed,Glasgow,warehouse,Former shipyard shed with crane rails and a high roof.,330,430,5300,true,110,true,in-house,Partick,3
+V108,Caledonian Grand Hotel,Edinburgh,hotel,Grand hotel with a ballroom that faces the castle.,140,205,3200,true,10,true,in-house,Haymarket,7
+V109,The Camden Vault,London,warehouse,Underground venue in brick railway arches with a small stage.,495,840,8900,true,0,false,in-house,King's Cross St Pancras,10
+V110,Aldwych Velvet Theatre,London,theatre,West End theatre with red velvet seats and an ornate foyer.,735,1020,15450,true,0,false,in-house,Waterloo,6
+V111,Albert Dock Warehouse Rooms,Liverpool,warehouse,Listed dock warehouse with brick vaults.,390,660,5950,true,55,false,in-house,James Street,6
+V112,Trongate Roof Bar,Glasgow,rooftop bar,Rooftop bar with heaters and city views.,120,165,2600,true,95,false,in-house,Glasgow Queen Street,14
+V113,Roundhay Hall,Leeds,historic house,Victorian mansion in parkland with an orangery and formal lawns.,100,140,1650,true,45,false,in-house,Burley Park,5
+V114,The Royal Mile Hall,Edinburgh,historic house,Medieval hall with stone walls and a vaulted ceiling.,165,255,3900,true,90,true,external,Haymarket,15
+V115,Clerkenwell House,London,historic house,Georgian townhouse with panelled drawing rooms and a quiet courtyard.,195,260,3950,true,0,false,in-house,London Bridge,8
+V116,Mersey Sky Bar,Liverpool,rooftop bar,Rooftop bar with views across the Mersey.,90,125,2050,true,0,false,external,James Street,12
+V117,Grainger Hotel,Newcastle,hotel,Georgian hotel with a ballroom and a cocktail bar.,120,180,2550,true,20,true,in-house,MetroCentre,2
+V118,The Kelvin Hotel,Glasgow,hotel,Hotel in a sandstone terrace with a ballroom.,225,335,3950,false,55,true,in-house,Glasgow Central,12
+V119,Jewellery Quarter Workshop,Birmingham,warehouse,Former jewellery workshop with original benches and tools on display.,110,155,2000,true,55,true,external,Five Ways,6
+V120,Manchester Textile Museum,Manchester,museum,Museum of textiles with working looms in the main gallery.,100,155,1800,true,90,true,in-house,Manchester Victoria,10
