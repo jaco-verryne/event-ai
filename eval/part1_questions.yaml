@@ -1,0 +1,128 @@
+# Part 1 evaluation set (Notion page 7). The expected tools copy page 7.
+# reference_sql: a correct query for questions that use query_sql. tests/test_eval_set.py
+#   runs it, so a data change cannot change the expected rows without notice.
+#   For a question that uses only query_sql, the result IDs equal expected_record_ids.
+#   For a question that uses both tools, expected_record_ids is a subset of the result IDs.
+# follow_up_of: the scorer sends that question and its answer as chat history first.
+# expected_facts: case-insensitive text that the answer must contain.
+
+- id: 1
+  type: lookup
+  question: What is the seated capacity of The Old Mill?
+  expected_tools: [search_text]
+  expected_record_ids: [V012]
+  expected_facts: ["The Old Mill", "120"]
+
+- id: 2
+  type: lookup_by_code
+  question: What does PKG-07 include?
+  expected_tools: [search_text]
+  expected_record_ids: [PKG-07]
+  expected_facts: ["drinks", "badges"]
+
+- id: 3
+  type: value_not_in_data
+  question: How many parking spaces does venue V045 have?
+  expected_tools: [query_sql]
+  reference_sql: SELECT venue_id, name, parking_spaces FROM venues WHERE venue_id = 'V045'
+  expected_record_ids: [V045]
+  expected_facts: ["Headingley Assembly Rooms", "does not give"]
+
+- id: 4
+  type: list
+  question: Which venues in Manchester seat 150 or more and have step-free access?
+  expected_tools: [query_sql]
+  reference_sql: >-
+    SELECT venue_id, name, seated_capacity, step_free_access FROM venues
+    WHERE city = 'Manchester' AND seated_capacity >= 150 AND step_free_access
+  expected_record_ids: [V023, V034, V036, V068, V083]
+  expected_facts:
+    - The Piccadilly Exchange Hotel
+    - Ancoats Engine House
+    - Castlefield Arches
+    - Ardwick Goods Shed
+    - Deansgate Lecture Theatre
+
+- id: 5
+  type: aggregate
+  question: How many partner venues are in London, and what is the lowest day rate there?
+  expected_tools: [query_sql]
+  reference_sql: >-
+    SELECT COUNT(*) AS venue_count, MIN(day_rate_gbp) AS lowest_day_rate_gbp
+    FROM venues WHERE city = 'London'
+  expected_record_ids: []
+  expected_facts: ["20", "2,250"]
+
+- id: 6
+  type: filter_and_meaning
+  question: Suggest a venue in Leeds with outdoor space for a summer party.
+  expected_tools: [query_sql, search_text]
+  reference_sql: SELECT venue_id, name, description FROM venues WHERE city = 'Leeds'
+  # Courtyard, rooftop terrace, walled garden, cobbled courtyard, roof terrace, lawns.
+  expected_record_ids: [V012, V024, V045, V070, V088, V113]
+  expected_facts: ["The Old Mill"]
+
+- id: 7
+  type: policy
+  question: A client cancels 20 days before the event. What fee is due?
+  expected_tools: [query_sql]
+  # Select every rule of the area, so that the answer step sees all the bands.
+  reference_sql: SELECT policy_id, condition, rule FROM policies WHERE area = 'cancellation'
+  expected_record_ids: [POL-CAN-01, POL-CAN-02, POL-CAN-03, POL-CAN-04, POL-CAN-05, POL-CAN-06]
+  expected_facts: ["100%"]
+
+- id: 8
+  type: policy_with_scope
+  question: When are final guest numbers due for a Gala Dinner?
+  expected_tools: [query_sql]
+  reference_sql: >-
+    SELECT policy_id, applies_to, condition, rule FROM policies
+    WHERE area = 'guest numbers'
+  expected_record_ids: [POL-GST-01, POL-GST-02, POL-GST-03, POL-GST-04]
+  expected_facts: ["21 days"]
+
+- id: 9
+  type: multi_document
+  question: >-
+    A client wants a gala dinner for 120 guests in Leeds. Which venues fit,
+    and what is the price per head?
+  expected_tools: [query_sql, search_text]
+  reference_sql: >-
+    SELECT v.venue_id, v.name, v.seated_capacity, p.package_id, p.price_per_head_gbp
+    FROM venues v JOIN packages p ON list_contains(p.suitable_venue_types, v.venue_type)
+    WHERE p.package_id = 'PKG-05' AND v.city = 'Leeds' AND v.seated_capacity >= 120
+  expected_record_ids: [V012, V024, V045, V064, PKG-05]
+  expected_facts:
+    - The Old Mill
+    - Kirkgate Grand Hotel
+    - Headingley Assembly Rooms
+    - Temple Flax Museum
+    - "145"
+
+- id: 10
+  type: follow_up
+  follow_up_of: 9
+  question: Which of those venues has parking?
+  expected_tools: [query_sql]
+  # Keep all four venues: the answer must say that V045 has no parking value in the data.
+  reference_sql: >-
+    SELECT v.venue_id, v.name, v.parking_spaces
+    FROM venues v JOIN packages p ON list_contains(p.suitable_venue_types, v.venue_type)
+    WHERE p.package_id = 'PKG-05' AND v.city = 'Leeds' AND v.seated_capacity >= 120
+  expected_record_ids: [V012, V024, V045, V064]
+  expected_facts: ["The Old Mill", "Temple Flax Museum", "does not give"]
+
+- id: 11
+  type: meaning_only
+  question: Which package suits a team away day with workshops?
+  expected_tools: [search_text]
+  expected_record_ids: [PKG-02]
+  expected_facts: ["Team Retreat"]
+
+- id: 12
+  type: out_of_scope
+  question: Do you run events in Paris?
+  expected_tools: [query_sql]
+  reference_sql: SELECT venue_id, name FROM venues WHERE city = 'Paris'
+  expected_record_ids: []
+  expected_facts: ["Paris"]
