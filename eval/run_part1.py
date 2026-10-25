@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))  # so that "python eval/run_part1.py" finds the eventai package
 
 from eventai.config import load_settings  # noqa: E402
-from eventai.llm import DailyLimitReached  # noqa: E402
+from eventai.llm import DailyLimitReached, build_providers  # noqa: E402
 from eventai.rag.loaders import build_chunks, build_database, connect_readonly, read_sources  # noqa: E402
 from eventai.rag.router import plan_question, schema_text  # noqa: E402
 from eventai.rag.search_text import DOCUMENTS, build_text_index, search_text  # noqa: E402
@@ -94,6 +94,8 @@ def score_retrieval(index, con, questions: list[dict]) -> dict:
 
 
 def score_router(con, schema: str, questions: list[dict]) -> dict:
+    # Primary provider only: a fallback would mix two models in one score.
+    providers = build_providers(load_settings())[:1]
     by_id = {q["id"]: q for q in questions}
     rows = []
     for q in questions:
@@ -107,7 +109,7 @@ def score_router(con, schema: str, questions: list[dict]) -> dict:
             ]
         row = {"id": q["id"], "question": q["question"]}
         try:
-            plan = _plan_with_pacing(q["question"], history, schema)
+            plan = _plan_with_pacing(q["question"], history, schema, providers)
         except Exception as err:  # a failed call is a failed score, not a crash
             rows.append({**row, "error": f"{type(err).__name__}: {err}", "tool_ok": False, "sql_ok": None})
             continue
@@ -123,7 +125,7 @@ def score_router(con, schema: str, questions: list[dict]) -> dict:
         rows.append(row)
     checked = [r for r in rows if r["sql_ok"] is not None]
     return {
-        "model": load_settings().groq_model,
+        "model": f"{providers[0].name}: {providers[0].model}",
         "tool_choice": round(sum(r["tool_ok"] for r in rows) / len(rows), 2),
         "sql_result": round(sum(r["sql_ok"] for r in checked) / len(checked), 2) if checked else None,
         "sql_checked": len(checked),
@@ -131,10 +133,10 @@ def score_router(con, schema: str, questions: list[dict]) -> dict:
     }
 
 
-def _plan_with_pacing(question: str, history: list[dict], schema: str):
+def _plan_with_pacing(question: str, history: list[dict], schema: str, providers):
     for attempt in range(1, RATE_LIMIT_ATTEMPTS + 1):
         try:
-            return plan_question(question, history, schema=schema)
+            return plan_question(question, history, schema=schema, providers=providers)
         except DailyLimitReached:
             if attempt == RATE_LIMIT_ATTEMPTS:
                 raise

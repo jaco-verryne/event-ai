@@ -82,13 +82,15 @@ rows. Then search_text ranks those rows by meaning.
 
 SQL rules:
 1. Write one SELECT statement for DuckDB. Use only the tables and the columns below.
-2. Always select the ID column of each table in the query (venue_id, package_id, policy_id), so that \
-the answer can cite the rows.
+2. Always select the ID column of each table in the FROM and JOIN clauses (venue_id, package_id, \
+policy_id), so that the answer can cite each row and each value. For a join of venues and packages, \
+select both v.venue_id and p.package_id.
 3. For a policy question, select all the rules of the policy area, for example \
 WHERE area = 'cancellation'. Do not filter on the number of days or the amount in the question. \
 The answer step picks the correct rule.
 4. When the question asks about a value that can be NULL (for example parking_spaces), select the \
-column. Do not remove the rows where the value is NULL.
+column and keep every row. Do not filter on that column (no IS NOT NULL, no > 0): the answer step \
+must see the rows where the data does not give the value.
 5. To match packages to venues, use list_contains(p.suitable_venue_types, v.venue_type).
 6. Use the exact values from the lists below. When a city or a value is not in a list, still query \
 for it, so that the result shows that the data has no rows.

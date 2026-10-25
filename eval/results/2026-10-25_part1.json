@@ -180,9 +180,9 @@
     ]
   },
   "router": {
-    "model": "openai/gpt-oss-120b",
+    "model": "groq: openai/gpt-oss-120b",
     "tool_choice": 0.83,
-    "sql_result": 0.82,
+    "sql_result": 1.0,
     "sql_checked": 11,
     "questions": [
       {
@@ -238,7 +238,7 @@
           "documents": [
             "venues"
           ],
-          "sql": "SELECT venue_id, name, parking_spaces FROM venues WHERE venue_id = 'V045'",
+          "sql": "SELECT venue_id, parking_spaces FROM venues WHERE venue_id = 'V045'",
           "search_text": null,
           "standalone_question": "How many parking spaces does venue V045 have?"
         },
@@ -304,7 +304,7 @@
           "documents": [
             "venues"
           ],
-          "sql": "SELECT venue_id, name, city, venue_type, description FROM venues WHERE city = 'Leeds'",
+          "sql": "SELECT venue_id, name, city, venue_type, description, seated_capacity, standing_capacity, day_rate_gbp FROM venues WHERE city = 'Leeds'",
           "search_text": "outdoor space summer party",
           "standalone_question": "Suggest a venue in Leeds with outdoor space for a summer party."
         },
@@ -357,14 +357,14 @@
         "id": 8,
         "question": "When are final guest numbers due for a Gala Dinner?",
         "plan": {
-          "intent": "policy",
+          "intent": "lookup",
           "tools": [
             "query_sql"
           ],
           "documents": [
             "policies"
           ],
-          "sql": "SELECT policy_id, area, applies_to, condition, rule FROM policies WHERE area = 'guest numbers' AND (applies_to = 'PKG-05' OR applies_to = 'all')",
+          "sql": "SELECT policy_id, condition, rule FROM policies WHERE area = 'guest numbers' AND (applies_to = 'PKG-05' OR applies_to = 'all')",
           "search_text": null,
           "standalone_question": "When are final guest numbers due for a Gala Dinner?"
         },
@@ -389,13 +389,14 @@
             "venues",
             "packages"
           ],
-          "sql": "SELECT v.venue_id, v.name, v.seated_capacity, p.price_per_head_gbp FROM venues v JOIN packages p ON list_contains(p.suitable_venue_types, v.venue_type) WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.package_id = 'PKG-05'",
+          "sql": "SELECT v.venue_id, p.package_id, v.name, v.seated_capacity, p.price_per_head_gbp FROM venues v JOIN packages p ON list_contains(p.suitable_venue_types, v.venue_type) WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.name = 'Gala Dinner'",
           "search_text": null,
           "standalone_question": "A client wants a gala dinner for 120 guests in Leeds. Which venues fit, and what is the price per head?"
         },
         "tool_ok": false,
-        "sql_ok": false,
+        "sql_ok": true,
         "sql_record_ids": [
+          "PKG-05",
           "V012",
           "V024",
           "V045",
@@ -413,15 +414,16 @@
           "documents": [
             "venues"
           ],
-          "sql": "SELECT venue_id, name, parking_spaces FROM venues WHERE name IN ('The Old Mill','Kirkgate Grand Hotel','Headingley Assembly Rooms','Temple Flax Museum') AND parking_spaces IS NOT NULL",
+          "sql": "SELECT venue_id, name, parking_spaces FROM venues WHERE name IN ('The Old Mill','Kirkgate Grand Hotel','Headingley Assembly Rooms','Temple Flax Museum')",
           "search_text": null,
           "standalone_question": "Which of those venues has parking?"
         },
         "tool_ok": true,
-        "sql_ok": false,
+        "sql_ok": true,
         "sql_record_ids": [
           "V012",
           "V024",
+          "V045",
           "V064"
         ]
       },
@@ -438,7 +440,7 @@
             "packages"
           ],
           "sql": "SELECT package_id, name FROM packages WHERE event_type = 'team building'",
-          "search_text": "away day workshops",
+          "search_text": "team away day workshops",
           "standalone_question": "Which package suits a team away day with workshops?"
         },
         "tool_ok": false,
