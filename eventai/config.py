@@ -14,7 +14,7 @@ class Settings(BaseModel):
     groq_api_key: str | None = None
     groq_model: str = "openai/gpt-oss-120b"
     openrouter_api_key: str | None = None
-    openrouter_model: str = "nvidia/nemotron-3-super-120b-a12b:free"
+    openrouter_model: str = "nvidia/nemotron-3.5-super-vl:free"
     companies_house_api_key: str | None = None
     langfuse_public_key: str | None = None
     langfuse_secret_key: str | None = None

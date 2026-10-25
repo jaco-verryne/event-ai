@@ -95,6 +95,7 @@ def complete_json(
 
 
 def _chat(messages: list[dict[str, str]], providers: Sequence[Provider]) -> str:
+    last_error: Exception | None = None
     for provider in providers:
         try:
             response = provider.client.chat.completions.create(
@@ -106,6 +107,11 @@ def _chat(messages: list[dict[str, str]], providers: Sequence[Provider]) -> str:
         except openai.RateLimitError:
             log.warning("%s returned a rate-limit error, trying the next provider", provider.name)
             continue
+        except (openai.APIConnectionError, openai.InternalServerError) as err:
+            # A network drop or a provider outage: the next provider can still answer.
+            log.warning("%s failed (%s), trying the next provider", provider.name, type(err).__name__)
+            last_error = err
+            continue
         usage = getattr(response, "usage", None)
         log.info(
             "LLM call served by %s (%s), %s tokens",
@@ -114,6 +120,8 @@ def _chat(messages: list[dict[str, str]], providers: Sequence[Provider]) -> str:
             getattr(usage, "total_tokens", "unknown"),
         )
         return response.choices[0].message.content or ""
+    if last_error is not None:
+        raise last_error
     raise DailyLimitReached("Each LLM provider returned a rate-limit error.")
 
 

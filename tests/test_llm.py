@@ -1,3 +1,5 @@
+import httpx2
+import openai
 import pytest
 from pydantic import BaseModel
 
@@ -47,6 +49,26 @@ def test_all_providers_rate_limited(fake_provider, rate_limit):
     router, _ = fake_provider("openrouter", [rate_limit()])
 
     with pytest.raises(DailyLimitReached):
+        complete_json(QUESTION, Pair, providers=[groq, router])
+
+
+def connection_error():
+    return openai.APIConnectionError(request=httpx2.Request("POST", "http://test"))
+
+
+def test_connection_error_falls_back_to_next_provider(fake_provider):
+    groq, _ = fake_provider("groq", [connection_error()])
+    router, router_calls = fake_provider("openrouter", [GOOD])
+
+    assert complete_json(QUESTION, Pair, providers=[groq, router]).city == "Leeds"
+    assert len(router_calls.calls) == 1
+
+
+def test_connection_error_everywhere_is_not_a_limit(fake_provider, rate_limit):
+    groq, _ = fake_provider("groq", [connection_error()])
+    router, _ = fake_provider("openrouter", [rate_limit()])
+
+    with pytest.raises(openai.APIConnectionError):
         complete_json(QUESTION, Pair, providers=[groq, router])
 
 
