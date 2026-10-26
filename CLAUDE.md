@@ -364,8 +364,11 @@ class Attendee(BaseModel):
   question: Suggest a venue in Leeds with outdoor space for a summer party.
   expected_tools: [query_sql, search_text]
   expected_record_ids: [V0xx, V0yy]
-  expected_facts: ["The Old Mill"]
+  expected_facts: []
+  expected_facts_any: ["The Old Mill", "Roundhay Hall"]   # any one counts (26 Oct)
 ```
+
+Other fields in the file: `accepted_tools` (other tool sets that count as correct), `reference_sql` (checked by a test against the data) and `follow_up_of` (the scorer sends that turn as history).
 
 Metrics:
 

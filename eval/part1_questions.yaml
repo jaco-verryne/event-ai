@@ -5,6 +5,8 @@
 #   For a question that uses both tools, expected_record_ids is a subset of the result IDs.
 # follow_up_of: the scorer sends that question and its answer as chat history first.
 # expected_facts: case-insensitive text that the answer must contain.
+# expected_facts_any: one more fact, found when the answer contains any one of these items
+#   (Q6: each Leeds venue with outdoor space is a correct suggestion; Jaco, 26 Oct).
 # accepted_tools: other tool sets that also count as a correct tool choice. Q1 and Q2 accept
 #   either tool (Jaco, 25 Oct): page 7 expects search_text, but CLAUDE.md section 7.3 sends
 #   numbers and IDs to query_sql. The retrieval hit rate still tests search_text on both.
@@ -35,7 +37,8 @@
   expected_tools: [query_sql]
   reference_sql: SELECT venue_id, name, parking_spaces FROM venues WHERE venue_id = 'V045'
   expected_record_ids: [V045]
-  expected_facts: ["Headingley Assembly Rooms", "does not give"]
+  # The answer must say that the value is missing; the venue name is not needed (Jaco, 26 Oct).
+  expected_facts: ["does not give"]
 
 - id: 4
   type: list
@@ -69,7 +72,14 @@
   reference_sql: SELECT venue_id, name, description FROM venues WHERE city = 'Leeds'
   # Courtyard, rooftop terrace, walled garden, cobbled courtyard, roof terrace, lawns.
   expected_record_ids: [V012, V024, V045, V070, V088, V113]
-  expected_facts: ["The Old Mill"]
+  expected_facts: []
+  expected_facts_any:
+    - The Old Mill
+    - Kirkgate Grand Hotel
+    - Headingley Assembly Rooms
+    - Canal Basin Lofts
+    - Skyline Twelve
+    - Roundhay Hall
 
 - id: 7
   type: policy

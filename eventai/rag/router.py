@@ -107,7 +107,8 @@ venues, packages or booking terms).
 - documents: the documents that the tools use: packages, venues, policies.
 - standalone_question: the question, complete without the chat history. For a follow-up question \
 (for example "those venues"), repeat the filters of the earlier question in the SQL and in the \
-standalone question.
+standalone question. An assistant turn ends with "Earlier plan:", the question and the SQL that \
+answered it. Reuse all its filters and joins, then add the new condition.
 - For out_of_scope, tools and documents are empty lists, and sql and search_text are null.
 
 Schema:

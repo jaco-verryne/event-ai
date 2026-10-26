@@ -40,7 +40,15 @@ def test_twelve_questions_with_valid_fields():
         uses_sql = any("query_sql" in tools for tools in tool_sets(q))
         assert ("reference_sql" in q) == uses_sql, q["id"]
         assert isinstance(q["expected_record_ids"], list)
-        assert q["expected_facts"]
+        assert q["expected_facts"] or q.get("expected_facts_any"), q["id"]
+
+
+def test_any_of_facts_name_expected_records():
+    names = {c.record_id: c.context_text for c in build_chunks(read_sources())}
+    for q in QUESTIONS:
+        for fact in q.get("expected_facts_any", []):
+            # Each accepted answer is one of the expected records.
+            assert any(f": {fact} (" in names[rid] for rid in q["expected_record_ids"]), (q["id"], fact)
 
 
 def test_follow_up_points_to_an_earlier_question():

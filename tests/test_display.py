@@ -36,18 +36,27 @@ ANSWER = Answer(
 CHUNKS = {c.chunk_id: c for c in build_chunks(read_sources())}
 
 
-def test_router_history_drops_error_turns():
+def test_router_history_drops_error_turns_and_carries_the_plan():
+    gala = PipelineResult(
+        question="Gala dinner in Leeds?",
+        answer=ANSWER.model_copy(update={"answer": "Four venues fit."}),
+        plan=PLAN.model_copy(update={"standalone_question": "Which Leeds venues fit a gala dinner?"}),
+        sql=SqlResult(sql="SELECT v.venue_id FROM venues AS v WHERE v.city = 'Leeds'"),
+    )
     messages = [
         {"role": "user", "content": "Gala dinner in Leeds?"},
-        {"role": "assistant", "content": "Four venues fit.", "result": {"x": 1}},
+        {"role": "assistant", "content": "Four venues fit.", "result": gala},
         {"role": "user", "content": "And parking?"},
         {"role": "assistant", "content": LIMIT_TEXT, "error": True},
     ]
-    assert router_history(messages) == [
-        {"role": "user", "content": "Gala dinner in Leeds?"},
-        {"role": "assistant", "content": "Four venues fit."},
-        {"role": "user", "content": "And parking?"},
-    ]
+
+    history = router_history(messages)
+
+    assert [m["role"] for m in history] == ["user", "assistant", "user"]
+    assert history[1]["content"] == (
+        "Four venues fit.\nEarlier plan: question \"Which Leeds venues fit a gala dinner?\"; "
+        "SQL: SELECT v.venue_id FROM venues AS v WHERE v.city = 'Leeds'"
+    )
 
 
 def test_fact_rows():

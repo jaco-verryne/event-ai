@@ -115,6 +115,17 @@ def _ask(question, history, resources, providers) -> PipelineResult:
     return result
 
 
+def history_text(result: PipelineResult) -> str:
+    """The assistant turn for the chat history: the answer plus the plan behind it. With the
+    earlier SQL in view, the router can reuse its filters and joins for a follow-up (Q10)."""
+    plan = [f'question "{result.plan.standalone_question}"']
+    if result.sql is not None and not result.sql.error:
+        plan.append(f"SQL: {result.sql.sql}")
+    if result.plan.search_text:
+        plan.append(f'search: "{result.plan.search_text}"')
+    return f"{result.answer.answer}\nEarlier plan: " + "; ".join(plan)
+
+
 def _search_filter(sql: SqlResult | None) -> list[str] | None:
     """For a mixed question, search only the rows that the SQL selected."""
     if sql is None or sql.error:

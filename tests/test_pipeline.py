@@ -3,7 +3,7 @@ import json
 import pytest
 
 from eventai.rag.answer import OUT_OF_SCOPE_TEXT, SQL_FAILED_TEXT
-from eventai.rag.pipeline import ask, load_resources
+from eventai.rag.pipeline import ask, history_text, load_resources
 
 
 @pytest.fixture(scope="module")
@@ -110,3 +110,31 @@ def test_follow_up_sends_history_to_the_router(fake_provider, resources):
     router_message = calls.calls[0]["messages"][-1]["content"]
     assert "user: Gala dinner for 120 in Leeds?" in router_message
     assert "assistant: Four venues fit." in router_message
+
+
+def test_history_text_carries_the_plan(fake_provider, resources):
+    mixed = plan(
+        tools=["query_sql", "search_text"],
+        sql="SELECT venue_id, name FROM venues WHERE city = 'Leeds'",
+        search_text="courtyard",
+        standalone_question="Which Leeds venue has a courtyard?",
+    )
+    groq, _ = fake_provider("groq", [mixed, answer("venues.csv#V012")])
+    result = ask("A Leeds venue with a courtyard?", None, resources, providers=[groq])
+
+    text = history_text(result)
+
+    assert text.startswith("The Old Mill fits.\nEarlier plan: ")
+    assert 'question "Which Leeds venue has a courtyard?"' in text
+    assert f"SQL: {result.sql.sql}" in text
+    assert 'search: "courtyard"' in text
+
+
+def test_follow_up_router_sees_the_earlier_sql(fake_provider, resources):
+    groq, calls = fake_provider("groq", [plan(), answer("venues.csv#V012"), plan(), answer("venues.csv#V012")])
+    first = ask("Which venue?", None, resources, providers=[groq])
+    history = [{"role": "user", "content": "Which venue?"}, {"role": "assistant", "content": history_text(first)}]
+
+    ask("Does it have parking?", history, resources, providers=[groq])
+
+    assert f"SQL: {first.sql.sql}" in calls.calls[2]["messages"][-1]["content"]

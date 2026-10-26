@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT))  # so that "python eval/run_part1.py" finds the ev
 from eventai.config import load_settings  # noqa: E402
 from eventai.llm import DailyLimitReached, build_providers  # noqa: E402
 from eventai import tracing  # noqa: E402
-from eventai.rag.pipeline import ask, load_resources  # noqa: E402
+from eventai.rag.pipeline import PipelineResult, ask, history_text, load_resources  # noqa: E402
 from eventai.rag.query_sql import query_sql  # noqa: E402
 from eventai.rag.router import plan_question  # noqa: E402
 from eventai.rag.search_text import DOCUMENTS, search_text  # noqa: E402
@@ -141,21 +141,35 @@ def normalise(text: str) -> str:
     return text.lower().replace("£", "").replace(",", "").replace("‑", "-")
 
 
+def fact_score(q: dict, text: str) -> tuple[list[str], int]:
+    """The expected facts found in the answer text, and the number of facts to find.
+    Each item of expected_facts must appear; expected_facts_any counts as one fact, found when
+    any one of its items appears (Q6: any Leeds venue with outdoor space is a correct answer)."""
+    text = normalise(text)
+    found = [f for f in q.get("expected_facts", []) if normalise(f) in text]
+    total = len(q.get("expected_facts", []))
+    if q.get("expected_facts_any"):
+        total += 1
+        found += [f for f in q["expected_facts_any"] if normalise(f) in text][:1]
+    return found, total
+
+
 def score_answers(resources, questions: list[dict]) -> dict:
     """The full flow, as a user sees it: tools, SQL (with repair), answer and citation check."""
     providers = build_providers(load_settings())[:1]  # one model for the whole score
     by_id = {q["id"]: q for q in questions}
-    answers: dict[int, str] = {}
+    results: dict[int, PipelineResult] = {}
     rows = []
     for n, q in enumerate(questions):
         if n:
             time.sleep(QUESTION_PAUSE_SECONDS)
         history = []
-        if "follow_up_of" in q:
+        if "follow_up_of" in q and q["follow_up_of"] in results:
             earlier = q["follow_up_of"]
+            # The same history turn as the chat UI builds: the answer plus its plan.
             history = [
                 {"role": "user", "content": by_id[earlier]["question"]},
-                {"role": "assistant", "content": answers.get(earlier, "")},
+                {"role": "assistant", "content": history_text(results[earlier])},
             ]
         row = {"id": q["id"], "question": q["question"]}
         try:
@@ -164,15 +178,14 @@ def score_answers(resources, questions: list[dict]) -> dict:
             rows.append({**row, "error": f"{type(err).__name__}: {err}", "tool_ok": False, "sql_ok": None,
                          "accuracy": 0.0, "facts": 0, "removed": 0, "cites_expected": None})
             continue
-        answers[q["id"]] = result.answer.answer
+        results[q["id"]] = result
 
         sql_ok = None
         if result.sql is not None and "reference_sql" in q:
             sql = result.sql
             reference = run_sql(resources.con, q["reference_sql"])
             sql_ok = sql.error is None and sql_matches(q, (sql.columns, sql.rows), reference)
-        text = normalise(" ".join([result.answer.answer, *(f.value for f in result.answer.facts)]))
-        found = [f for f in q["expected_facts"] if normalise(f) in text]
+        found, total = fact_score(q, " ".join([result.answer.answer, *(f.value for f in result.answer.facts)]))
         cited = {s.split("#", 1)[1] for s in result.answer.source_ids if "#" in s}
         expected_ids = set(q["expected_record_ids"])
         rows.append({
@@ -188,7 +201,7 @@ def score_answers(resources, questions: list[dict]) -> dict:
             "removed": len(result.removed_facts),
             "source_ids": result.answer.source_ids,
             "expected_facts_found": found,
-            "accuracy": round(len(found) / len(q["expected_facts"]), 2),
+            "accuracy": round(len(found) / total, 2),
             "cites_expected": bool(cited & expected_ids) if expected_ids else None,
             "trace_id": result.trace_id,
         })

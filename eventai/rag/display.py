@@ -9,7 +9,7 @@ import openai
 from eventai.llm import DailyLimitReached, InvalidOutput, ProviderError
 from eventai.rag.answer import Answer
 from eventai.rag.chunks import NOT_GIVEN, Chunk
-from eventai.rag.pipeline import PipelineResult
+from eventai.rag.pipeline import PipelineResult, history_text
 from eventai.rag.query_sql import SqlResult
 from eventai.rag.search_text import SearchHit
 
@@ -20,8 +20,13 @@ OTHER_TEXT = "Something went wrong. Try again, or ask the question in other word
 
 
 def router_history(messages: Sequence[Mapping[str, Any]]) -> list[dict[str, str]]:
-    """The earlier chat turns for the router. Error turns are not part of the conversation."""
-    return [{"role": m["role"], "content": m["content"]} for m in messages if not m.get("error")]
+    """The earlier chat turns for the router. Error turns are not part of the conversation.
+    An answered turn also carries its plan, so that a follow-up can reuse the filters."""
+    return [
+        {"role": m["role"], "content": history_text(m["result"]) if "result" in m else m["content"]}
+        for m in messages
+        if not m.get("error")
+    ]
 
 
 def fact_rows(answer: Answer) -> list[dict[str, str]]:
