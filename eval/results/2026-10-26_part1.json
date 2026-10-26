@@ -179,290 +179,331 @@
       }
     ]
   },
-  "router": {
+  "answers": {
     "model": "groq: openai/gpt-oss-120b",
     "tool_choice": 0.83,
     "sql_result": 0.91,
     "sql_checked": 11,
+    "sql_repairs": 0,
+    "answer_accuracy": 0.85,
+    "answers_fully_correct": 9,
+    "facts_cited": 33,
+    "facts_removed": 0,
+    "answers_with_removed_facts": 0,
+    "cites_expected_record": 1.0,
     "questions": [
       {
         "id": 1,
         "question": "What is the seated capacity of The Old Mill?",
-        "plan": {
-          "intent": "lookup",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "venues"
-          ],
-          "sql": "SELECT venue_id, name, seated_capacity FROM venues WHERE name = 'The Old Mill'",
-          "search_text": null,
-          "standalone_question": "What is the seated capacity of The Old Mill?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
+        "sql": "SELECT venue_id, name, seated_capacity FROM venues WHERE name = 'The Old Mill'",
         "sql_ok": true,
-        "sql_record_ids": [
-          "V012"
-        ]
+        "sql_repaired": false,
+        "answer": "The seated capacity of The Old Mill is 120.",
+        "confidence": "high",
+        "facts": 1,
+        "removed": 0,
+        "source_ids": [
+          "venues.csv#V012"
+        ],
+        "expected_facts_found": [
+          "The Old Mill",
+          "120"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": true,
+        "trace_id": "879fd6cec9f5e89c0fe90f115954473c"
       },
       {
         "id": 2,
         "question": "What does PKG-07 include?",
-        "plan": {
-          "intent": "list",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "packages"
-          ],
-          "sql": "SELECT package_id, name FROM package_items WHERE package_id = 'PKG-07' AND kind = 'include'",
-          "search_text": null,
-          "standalone_question": "What does PKG-07 include?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
+        "sql": "SELECT package_id, name FROM package_items WHERE package_id = 'PKG-07' AND kind = 'include'",
         "sql_ok": true,
-        "sql_record_ids": [
-          "PKG-07"
-        ]
+        "sql_repaired": false,
+        "answer": "PKG-07 includes two drinks per guest, six canap\u00e9s per guest, a microphone for welcome speeches, name badges and a check\u2011in desk, and an event manager.",
+        "confidence": "high",
+        "facts": 5,
+        "removed": 0,
+        "source_ids": [
+          "packages.json#PKG-07"
+        ],
+        "expected_facts_found": [
+          "drinks",
+          "badges"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": true,
+        "trace_id": "12f32f4f25e8a6e40ef5a02b55e964a9"
       },
       {
         "id": 3,
         "question": "How many parking spaces does venue V045 have?",
-        "plan": {
-          "intent": "lookup",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "venues"
-          ],
-          "sql": "SELECT venue_id, parking_spaces FROM venues WHERE venue_id = 'V045'",
-          "search_text": null,
-          "standalone_question": "How many parking spaces does venue V045 have?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
+        "sql": "SELECT venue_id, parking_spaces FROM venues WHERE venue_id = 'V045'",
         "sql_ok": true,
-        "sql_record_ids": [
-          "V045"
-        ]
+        "sql_repaired": false,
+        "answer": "The data does not give the number of parking spaces for venue V045.",
+        "confidence": "low",
+        "facts": 1,
+        "removed": 0,
+        "source_ids": [
+          "venues.csv#V045"
+        ],
+        "expected_facts_found": [
+          "does not give"
+        ],
+        "accuracy": 0.5,
+        "cites_expected": true,
+        "trace_id": "8b9e9d482debe33416ec55bb9889fdde"
       },
       {
         "id": 4,
         "question": "Which venues in Manchester seat 150 or more and have step-free access?",
-        "plan": {
-          "intent": "list",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "venues"
-          ],
-          "sql": "SELECT venue_id, name, seated_capacity, step_free_access FROM venues WHERE city = 'Manchester' AND seated_capacity >= 150 AND step_free_access = true",
-          "search_text": null,
-          "standalone_question": "Which venues in Manchester seat 150 or more and have step-free access?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
+        "sql": "SELECT venue_id, name, seated_capacity FROM venues WHERE city = 'Manchester' AND seated_capacity >= 150 AND step_free_access",
         "sql_ok": true,
-        "sql_record_ids": [
-          "V023",
-          "V034",
-          "V036",
-          "V068",
-          "V083"
-        ]
+        "sql_repaired": false,
+        "answer": "The venues in Manchester with step\u2011free access and a seated capacity of at least 150 are The Piccadilly Exchange Hotel (220 seats), Ancoats Engine House (150 seats), Castlefield Arches (245 seats), Ardwick Goods Shed (275 seats) and Deansgate Lecture Theatre (745 seats).",
+        "confidence": "high",
+        "facts": 5,
+        "removed": 0,
+        "source_ids": [
+          "venues.csv#V023",
+          "venues.csv#V034",
+          "venues.csv#V036",
+          "venues.csv#V068",
+          "venues.csv#V083"
+        ],
+        "expected_facts_found": [
+          "The Piccadilly Exchange Hotel",
+          "Ancoats Engine House",
+          "Castlefield Arches",
+          "Ardwick Goods Shed",
+          "Deansgate Lecture Theatre"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": true,
+        "trace_id": "c8ffe60e355ce7cafd2dcc11a8463d62"
       },
       {
         "id": 5,
         "question": "How many partner venues are in London, and what is the lowest day rate there?",
-        "plan": {
-          "intent": "aggregate",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "venues"
-          ],
-          "sql": "SELECT COUNT(*) AS venue_count, MIN(day_rate_gbp) AS lowest_day_rate FROM venues WHERE city = 'London'",
-          "search_text": null,
-          "standalone_question": "How many partner venues are in London, and what is the lowest day rate there?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
+        "sql": "SELECT COUNT(*) AS venue_count, MIN(day_rate_gbp) AS lowest_day_rate FROM venues WHERE city = 'London'",
         "sql_ok": true,
-        "sql_record_ids": []
+        "sql_repaired": false,
+        "answer": "There are 20 partner venues in London, and the lowest day rate is \u00a32,250 (excluding VAT).",
+        "confidence": "high",
+        "facts": 2,
+        "removed": 0,
+        "source_ids": [
+          "venues.csv"
+        ],
+        "expected_facts_found": [
+          "20",
+          "2,250"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": null,
+        "trace_id": "7b3379bbc3773ad013cd52263f4fceb6"
       },
       {
         "id": 6,
         "question": "Suggest a venue in Leeds with outdoor space for a summer party.",
-        "plan": {
-          "intent": "list",
-          "tools": [
-            "query_sql",
-            "search_text"
-          ],
-          "documents": [
-            "venues"
-          ],
-          "sql": "SELECT venue_id, name, description FROM venues WHERE city = 'Leeds'",
-          "search_text": "outdoor space summer party",
-          "standalone_question": "Suggest a venue in Leeds with outdoor space for a summer party."
-        },
+        "tools": [
+          "query_sql",
+          "search_text"
+        ],
         "tool_ok": true,
+        "sql": "SELECT venue_id, name, description FROM venues WHERE city = 'Leeds'",
         "sql_ok": true,
-        "sql_record_ids": [
-          "V007",
-          "V012",
-          "V024",
-          "V026",
-          "V045",
-          "V062",
-          "V064",
-          "V066",
-          "V069",
-          "V070",
-          "V088",
-          "V099",
-          "V100",
-          "V113"
-        ]
+        "sql_repaired": false,
+        "answer": "Roundhay Hall in Leeds offers a Victorian mansion set in parkland with an orangery and formal lawns, providing ample outdoor space for a summer party. Its standing capacity of 140 guests makes it suitable for medium\u2011sized events.",
+        "confidence": "high",
+        "facts": 2,
+        "removed": 0,
+        "source_ids": [
+          "venues.csv#V113"
+        ],
+        "expected_facts_found": [],
+        "accuracy": 0.0,
+        "cites_expected": true,
+        "trace_id": "20a7be609514713d79196f1d03c5a056"
       },
       {
         "id": 7,
         "question": "A client cancels 20 days before the event. What fee is due?",
-        "plan": {
-          "intent": "policy",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "policies"
-          ],
-          "sql": "SELECT policy_id, condition, rule FROM policies WHERE area = 'cancellation'",
-          "search_text": null,
-          "standalone_question": "A client cancels 20 days before the event. What fee is due?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
+        "sql": "SELECT policy_id, condition, rule FROM policies WHERE area = 'cancellation'",
         "sql_ok": true,
-        "sql_record_ids": [
-          "POL-CAN-01",
-          "POL-CAN-02",
-          "POL-CAN-03",
-          "POL-CAN-04",
-          "POL-CAN-05",
-          "POL-CAN-06"
-        ]
+        "sql_repaired": false,
+        "answer": "Because the cancellation is 20 days before the event, it falls under the \u201cfewer than 30 days\u201d rule. The client must pay 100% of the package fee, excluding VAT.",
+        "confidence": "high",
+        "facts": 1,
+        "removed": 0,
+        "source_ids": [
+          "policies.csv#POL-CAN-04"
+        ],
+        "expected_facts_found": [
+          "100%"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": true,
+        "trace_id": "f70eecaae243a5ac91511072d651a4a8"
       },
       {
         "id": 8,
         "question": "When are final guest numbers due for a Gala Dinner?",
-        "plan": {
-          "intent": "policy",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "policies"
-          ],
-          "sql": "SELECT policy_id, condition, rule FROM policies WHERE area = 'guest numbers' AND (applies_to = 'PKG-05' OR applies_to = 'all')",
-          "search_text": null,
-          "standalone_question": "When are final guest numbers due for a Gala Dinner?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
+        "sql": "SELECT policy_id, condition, rule FROM policies WHERE area = 'guest numbers' AND (applies_to = 'PKG-05' OR applies_to = 'all')",
         "sql_ok": true,
-        "sql_record_ids": [
-          "POL-GST-01",
-          "POL-GST-02",
-          "POL-GST-03",
-          "POL-GST-04"
-        ]
+        "sql_repaired": false,
+        "answer": "Final guest numbers for a Gala Dinner are due 21 days before the event.",
+        "confidence": "high",
+        "facts": 1,
+        "removed": 0,
+        "source_ids": [
+          "policies.csv#POL-GST-02"
+        ],
+        "expected_facts_found": [
+          "21 days"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": true,
+        "trace_id": "72db68e8f48f406e49d1ce5eac770b43"
       },
       {
         "id": 9,
         "question": "A client wants a gala dinner for 120 guests in Leeds. Which venues fit, and what is the price per head?",
-        "plan": {
-          "intent": "list",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "venues",
-            "packages"
-          ],
-          "sql": "SELECT v.venue_id, v.name, v.seated_capacity, p.price_per_head_gbp FROM venues v JOIN packages p ON list_contains(p.suitable_venue_types, v.venue_type) WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.name = 'Gala Dinner'",
-          "search_text": null,
-          "standalone_question": "A client wants a gala dinner for 120 guests in Leeds. Which venues fit, and what is the price per head?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": false,
-        "sql_ok": false,
-        "sql_record_ids": [
-          "V012",
-          "V024",
-          "V045",
-          "V064"
-        ]
+        "sql": "SELECT v.venue_id, v.name, v.seated_capacity, p.package_id, p.price_per_head_gbp FROM venues AS v JOIN packages AS p ON ARRAY_CONTAINS(p.suitable_venue_types, v.venue_type) WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.package_id = 'PKG-05' AND p.min_guests <= 120 AND p.max_guests >= 120",
+        "sql_ok": true,
+        "sql_repaired": false,
+        "answer": "The venues that meet the 120\u2011guest requirement in Leeds are The Old Mill, Kirkgate Grand Hotel, Headingley Assembly Rooms and Temple Flax Museum. All charge \u00a3145 per head, excluding VAT.",
+        "confidence": "high",
+        "facts": 5,
+        "removed": 0,
+        "source_ids": [
+          "venues.csv#V012",
+          "venues.csv#V024",
+          "venues.csv#V045",
+          "venues.csv#V064",
+          "packages.json#PKG-05"
+        ],
+        "expected_facts_found": [
+          "The Old Mill",
+          "Kirkgate Grand Hotel",
+          "Headingley Assembly Rooms",
+          "Temple Flax Museum",
+          "145"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": true,
+        "trace_id": "cb222fce40a513c0d41dd604cc5664d7"
       },
       {
         "id": 10,
         "question": "Which of those venues has parking?",
-        "plan": {
-          "intent": "list",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "venues"
-          ],
-          "sql": "SELECT venue_id, name, parking_spaces FROM venues WHERE city = 'Leeds' AND name IN ('The Old Mill','Kirkgate Grand Hotel','Headingley Assembly Rooms','Temple Flax Museum')",
-          "search_text": null,
-          "standalone_question": "Which of those venues has parking?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
-        "sql_ok": true,
-        "sql_record_ids": [
-          "V012",
-          "V024",
-          "V045",
-          "V064"
-        ]
+        "sql": "SELECT venue_id, name, parking_spaces FROM venues WHERE city = 'Leeds' AND seated_capacity >= 120",
+        "sql_ok": false,
+        "sql_repaired": false,
+        "answer": "The venues in Leeds that have parking are The Old Mill, Briggate Theatre Rooms, Temple Flax Museum, Calder Works, Canal Basin Lofts and Headrow Conference Centre.",
+        "confidence": "high",
+        "facts": 6,
+        "removed": 0,
+        "source_ids": [
+          "venues.csv#V012",
+          "venues.csv#V062",
+          "venues.csv#V064",
+          "venues.csv#V066",
+          "venues.csv#V070",
+          "venues.csv#V100"
+        ],
+        "expected_facts_found": [
+          "The Old Mill",
+          "Temple Flax Museum"
+        ],
+        "accuracy": 0.67,
+        "cites_expected": true,
+        "trace_id": "f41560aa4e7cf0e2542aea4d8221629f"
       },
       {
         "id": 11,
         "question": "Which package suits a team away day with workshops?",
-        "plan": {
-          "intent": "list",
-          "tools": [
-            "query_sql",
-            "search_text"
-          ],
-          "documents": [
-            "packages"
-          ],
-          "sql": "SELECT package_id, name, event_type FROM packages WHERE event_type = 'team building'",
-          "search_text": "team away day workshops",
-          "standalone_question": "Which package suits a team away day with workshops?"
-        },
+        "tools": [
+          "query_sql",
+          "search_text"
+        ],
         "tool_ok": false,
-        "sql_ok": null
+        "sql": "SELECT package_id, name, description FROM packages WHERE event_type = 'team building'",
+        "sql_ok": null,
+        "sql_repaired": false,
+        "answer": "The Team Retreat (PKG-02) package is designed for team away days with hands\u2011on workshops and breakout sessions. Its description mentions a facilitator running small\u2011group sessions, making it ideal for workshop\u2011style activities. Prices are quoted per head and exclude VAT.",
+        "confidence": "high",
+        "facts": 3,
+        "removed": 0,
+        "source_ids": [
+          "packages.json#PKG-02"
+        ],
+        "expected_facts_found": [
+          "Team Retreat"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": true,
+        "trace_id": "81ecee0506ce7e2bd01d3c69baf07655"
       },
       {
         "id": 12,
         "question": "Do you run events in Paris?",
-        "plan": {
-          "intent": "list",
-          "tools": [
-            "query_sql"
-          ],
-          "documents": [
-            "venues"
-          ],
-          "sql": "SELECT venue_id, name FROM venues WHERE city = 'Paris'",
-          "search_text": null,
-          "standalone_question": "Do you run events in Paris?"
-        },
+        "tools": [
+          "query_sql"
+        ],
         "tool_ok": true,
+        "sql": "SELECT venue_id, name FROM venues WHERE city = 'Paris'",
         "sql_ok": true,
-        "sql_record_ids": []
+        "sql_repaired": false,
+        "answer": "The data has no records for venues in Paris.",
+        "confidence": "high",
+        "facts": 1,
+        "removed": 0,
+        "source_ids": [
+          "venues.csv"
+        ],
+        "expected_facts_found": [
+          "Paris"
+        ],
+        "accuracy": 1.0,
+        "cites_expected": null,
+        "trace_id": "43f6a487344180ed8a4d63bcd765a76c"
       }
     ]
   }
