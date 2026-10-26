@@ -23,6 +23,12 @@ TABLE_SOURCES = {
     "package_items": "packages.json",
     "policies": "policies.csv",
 }
+TABLE_ID_COLUMNS = {
+    "venues": "venue_id",
+    "packages": "package_id",
+    "package_items": "package_id",
+    "policies": "policy_id",
+}
 _KNOWN_COLUMNS = {c.lower() for columns in TABLES.values() for c in columns}
 # Statement nodes that change data, settings or files. A SELECT root cannot hold them in
 # DuckDB, but the walk costs nothing and stops a parser surprise.
@@ -50,6 +56,7 @@ class SqlResult(BaseModel):
     repaired: bool = False
     first_error: str | None = None
     error: str | None = None  # set when the query failed twice: the answer says it cannot answer
+    added_id_columns: list[str] = []  # ID columns that code added, so that each row can be cited
 
 
 def check_sql(sql: str) -> exp.Expression:
@@ -88,6 +95,36 @@ def check_sql(sql: str) -> exp.Expression:
         if name not in _KNOWN_COLUMNS and name not in defined:
             raise SqlRejected(f"Unknown column '{column.name}'.")
     return tree
+
+
+def add_id_columns(tree: exp.Expression) -> tuple[exp.Expression, list[str]]:
+    """Add the ID column of each table to a plain SELECT, so that each row can be cited.
+
+    The router prompt asks for the IDs (SQL rule 2), but the model sometimes leaves one out
+    (Q9: p.package_id). A query with GROUP BY, DISTINCT or an aggregate stays as it is,
+    because an extra column would change its rows."""
+    if not isinstance(tree, exp.Select) or tree.args.get("distinct") or tree.args.get("group"):
+        return tree, []
+    projections = tree.expressions
+    if any(isinstance(e, exp.Star) or e.find(exp.AggFunc) for e in projections):
+        return tree, []
+    present = {e.alias_or_name.lower() for e in projections}
+    starred = {e.table.lower() for e in projections if isinstance(e, exp.Column) and isinstance(e.this, exp.Star)}
+
+    tables = [tree.args["from_"].this] if tree.args.get("from_") else []
+    tables += [join.this for join in tree.args.get("joins") or []]
+    added = []
+    for table in tables:
+        if not isinstance(table, exp.Table):  # a subquery
+            continue
+        id_column = TABLE_ID_COLUMNS.get(table.name.lower())
+        qualifier = table.alias_or_name
+        if id_column is None or id_column in present or qualifier.lower() in starred:
+            continue
+        tree = tree.select(exp.column(id_column, table=qualifier), append=True)
+        present.add(id_column)
+        added.append(f"{qualifier}.{id_column}")
+    return tree, added
 
 
 def run_with_timeout(
@@ -144,7 +181,7 @@ def query_sql(
 
 
 def _run(con: duckdb.DuckDBPyConnection, sql: str) -> SqlResult:
-    tree = check_sql(sql)
+    tree, added_id_columns = add_id_columns(check_sql(sql))
     # Run the SQL that sqlglot generates from the checked tree: what runs is what was checked.
     checked = tree.sql(dialect="duckdb", comments=False)
     # Guardrail 4: one extra row tells us that the result was cut.
@@ -173,6 +210,7 @@ def _run(con: duckdb.DuckDBPyConnection, sql: str) -> SqlResult:
         truncated=truncated,
         record_ids=record_ids,
         source_ids=source_ids,
+        added_id_columns=added_id_columns,
     )
 
 

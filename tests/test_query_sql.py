@@ -204,3 +204,53 @@ def test_values_are_json_safe(con):
     assert result.rows == [["POL-GST-02", "2026-04-01"]]
     lists = query_sql(con, "SELECT package_id, suitable_venue_types FROM packages WHERE package_id = 'PKG-05'")
     assert lists.rows[0][1] == ["hotel", "historic house", "converted mill", "museum"]
+
+
+# Citations: code adds a missing ID column to a plain SELECT.
+
+Q9_WITHOUT_PACKAGE_ID = (
+    "SELECT v.venue_id, v.name, v.seated_capacity, p.price_per_head_gbp FROM venues v "
+    "JOIN packages p ON list_contains(p.suitable_venue_types, v.venue_type) "
+    "WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.name = 'Gala Dinner'"
+)
+
+
+def test_missing_join_id_is_added(con):
+    result = query_sql(con, Q9_WITHOUT_PACKAGE_ID)
+
+    assert result.added_id_columns == ["p.package_id"]
+    assert result.columns[-1] == "package_id"
+    assert "packages.json#PKG-05" in result.source_ids
+    assert set(result.record_ids) == {"V012", "V024", "V045", "V064", "PKG-05"}
+    assert "p.package_id" in result.sql
+
+
+def test_missing_id_is_added_for_one_table(con):
+    result = query_sql(con, "SELECT name, seated_capacity FROM venues WHERE name = 'The Old Mill'")
+    assert result.added_id_columns == ["venues.venue_id"]
+    assert result.record_ids == ["V012"]
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT venue_id, name FROM venues WHERE city = 'Leeds'",  # ID already there
+        "SELECT city, COUNT(*) AS n FROM venues GROUP BY city",  # GROUP BY
+        "SELECT DISTINCT city FROM venues",  # DISTINCT
+        "SELECT COUNT(*) AS n FROM venues WHERE city = 'London'",  # aggregate
+        "SELECT * FROM venues WHERE venue_id = 'V012'",  # star
+        "SELECT name FROM venues UNION SELECT name FROM packages",  # set operation
+        "WITH leeds AS (SELECT venue_id, name FROM venues WHERE city = 'Leeds') SELECT name FROM leeds",  # CTE
+    ],
+)
+def test_ids_are_not_added_when_rows_would_change(con, sql):
+    assert query_sql(con, sql).added_id_columns == []
+
+
+def test_star_of_one_table_still_gets_the_other_id(con):
+    result = query_sql(
+        con,
+        "SELECT v.*, p.name FROM venues v JOIN packages p "
+        "ON list_contains(p.suitable_venue_types, v.venue_type) WHERE v.venue_id = 'V012'",
+    )
+    assert result.added_id_columns == ["p.package_id"]
