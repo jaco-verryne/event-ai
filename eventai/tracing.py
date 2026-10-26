@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Any
 
-from langfuse import Langfuse
+from langfuse import Langfuse, propagate_attributes
 
 from eventai.config import get, load_settings
 
@@ -50,6 +50,16 @@ def observation(name: str, as_type: str = "span", input: Any = None) -> Iterator
         return
     with client.start_as_current_observation(name=name, as_type=as_type, input=input) as obs:
         yield obs
+
+
+@contextmanager
+def session(session_id: str | None) -> Iterator[None]:
+    """Group the traces of one chat as one Langfuse session. A no-op when tracing is off."""
+    if init_tracing() is None or not session_id:
+        yield
+        return
+    with propagate_attributes(session_id=session_id):
+        yield
 
 
 def current_trace_id() -> str | None:

@@ -22,7 +22,7 @@ from eventai.rag.loaders import DATA_DIR, DB_PATH, build_chunks, build_database,
 from eventai.rag.query_sql import SqlResult, query_sql
 from eventai.rag.router import RouterPlan, plan_question, repair_sql, schema_text
 from eventai.rag.search_text import Embedder, SearchHit, TextIndex, build_text_index, search_text
-from eventai.tracing import current_trace_id, observation
+from eventai.tracing import current_trace_id, observation, session
 
 
 @dataclass(frozen=True)
@@ -59,10 +59,13 @@ def ask(
     history: Sequence[dict[str, str]] | None,
     resources: Resources,
     providers: Sequence[Provider] | None = None,
+    session_id: str | None = None,
 ) -> PipelineResult:
-    """One question: a Langfuse trace with one observation per step (D10)."""
+    """One question: a Langfuse trace with one observation per step (D10). `session_id` groups
+    the traces of one chat."""
     history = list(history or [])
-    with observation("part1.ask", input={"question": question, "history_turns": len(history)}) as root:
+    trace_input = {"question": question, "history_turns": len(history)}
+    with observation("part1.ask", input=trace_input) as root, session(session_id):
         result = _ask(question, history, resources, providers)
         result.trace_id = current_trace_id()
         root.update(output=result.answer.model_dump())
