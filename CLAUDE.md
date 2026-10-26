@@ -15,6 +15,7 @@ This file gives Claude Code the agreed design for the Inference Group "AI Agent 
   - Page 6: Action Items (tasks by day).
   - Page 7: Knowledge Base Design.
   - Page 8: Future Improvements.
+  - Page 9: Architecture & Design (as built). It maps the build to the review criteria.
 - If this file and Notion do not agree, stop and ask Jaco.
 
 ## 2. How to work
@@ -25,6 +26,7 @@ This file gives Claude Code the agreed design for the Inference Group "AI Agent 
 4. Run `pytest` before each commit.
 5. Tick each finished task on page 6.
 6. Add one line to the progress log on the Notion hub page at the end of a session.
+7. Update Notion page 9 with what changed in the build: the section, the evidence, the last scores, and one line in its change log.
 
 Rules:
 

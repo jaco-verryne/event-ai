@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import httpx2
 import openai
 import pytest
@@ -7,6 +9,7 @@ from eventai.config import Settings
 from eventai.llm import (
     DailyLimitReached,
     InvalidOutput,
+    ProviderError,
     build_providers,
     complete_json,
 )
@@ -70,6 +73,16 @@ def test_connection_error_everywhere_is_not_a_limit(fake_provider, rate_limit):
 
     with pytest.raises(openai.APIConnectionError):
         complete_json(QUESTION, Pair, providers=[groq, router])
+
+
+def test_empty_response_falls_back_then_raises(fake_provider):
+    empty = SimpleNamespace(choices=None, error={"message": "Provider returned error"})
+    groq, _ = fake_provider("groq", [GOOD])
+    router, _ = fake_provider("openrouter", [empty])
+
+    assert complete_json(QUESTION, Pair, providers=[router, groq]).city == "Leeds"
+    with pytest.raises(ProviderError, match="Provider returned error"):
+        complete_json(QUESTION, Pair, providers=[fake_provider("openrouter", [empty])[0]])
 
 
 def test_invalid_output_is_retried_once(fake_provider):

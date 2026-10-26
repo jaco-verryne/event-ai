@@ -22,6 +22,7 @@ from eventai.rag.loaders import DATA_DIR, DB_PATH, build_chunks, build_database,
 from eventai.rag.query_sql import SqlResult, query_sql
 from eventai.rag.router import RouterPlan, plan_question, repair_sql, schema_text
 from eventai.rag.search_text import Embedder, SearchHit, TextIndex, build_text_index, search_text
+from eventai.tracing import current_trace_id, observation
 
 
 @dataclass(frozen=True)
@@ -59,7 +60,19 @@ def ask(
     resources: Resources,
     providers: Sequence[Provider] | None = None,
 ) -> PipelineResult:
-    plan = plan_question(question, history, schema=resources.schema, providers=providers)
+    """One question: a Langfuse trace with one observation per step (D10)."""
+    history = list(history or [])
+    with observation("part1.ask", input={"question": question, "history_turns": len(history)}) as root:
+        result = _ask(question, history, resources, providers)
+        result.trace_id = current_trace_id()
+        root.update(output=result.answer.model_dump())
+    return result
+
+
+def _ask(question, history, resources, providers) -> PipelineResult:
+    with observation("router", as_type="chain", input=question) as obs:
+        plan = plan_question(question, history, schema=resources.schema, providers=providers)
+        obs.update(output=plan.model_dump())
     result = PipelineResult(question=question, answer=fixed_answer(OUT_OF_SCOPE_TEXT, "high"), plan=plan)
     if plan.intent == "out_of_scope" or not plan.tools:
         return result
@@ -69,18 +82,33 @@ def ask(
         def repair(bad_sql: str, error: str) -> str:
             return repair_sql(plan.standalone_question, bad_sql, error, schema=resources.schema, providers=providers)
 
-        result.sql = query_sql(resources.con, plan.sql, repair)
+        with observation("query_sql", as_type="tool", input=plan.sql) as obs:
+            result.sql = query_sql(resources.con, plan.sql, repair)
+            obs.update(output=result.sql.model_dump(include={
+                "sql", "columns", "truncated", "record_ids", "repaired", "first_error", "error",
+            }) | {"row_count": len(result.sql.rows)})
 
     searched = "search_text" in plan.tools
     if searched:
-        result.hits = search_text(resources.index, plan.search_text, plan.documents, _search_filter(result.sql))
+        record_ids = _search_filter(result.sql)
+        with observation("search_text", as_type="retriever", input={
+            "query": plan.search_text, "documents": plan.documents,
+            "record_ids": None if record_ids is None else len(record_ids),
+        }) as obs:
+            result.hits = search_text(resources.index, plan.search_text, plan.documents, record_ids)
+            obs.update(output=[h.model_dump(exclude={"context_text"}) for h in result.hits])
 
     if result.sql is not None and result.sql.error and not result.hits:
         result.answer = fixed_answer(SQL_FAILED_TEXT, "low")
         return result
 
-    answer = answer_question(plan.standalone_question, result.sql, result.hits, searched, providers)
-    result.answer, result.removed_facts = check_citations(answer, allowed_source_ids(result.sql, result.hits))
+    with observation("answer", as_type="chain", input=plan.standalone_question) as obs:
+        answer = answer_question(plan.standalone_question, result.sql, result.hits, searched, providers)
+        obs.update(output=answer.model_dump())
+    allowed = allowed_source_ids(result.sql, result.hits)
+    with observation("citation_check", as_type="guardrail", input={"facts": len(answer.facts), "allowed": allowed}) as obs:
+        result.answer, result.removed_facts = check_citations(answer, allowed)
+        obs.update(output={"removed": [f.model_dump() for f in result.removed_facts]})
     return result
 
 

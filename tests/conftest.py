@@ -51,6 +51,8 @@ class FakeCompletions:
         out = self.outputs.pop(0)
         if isinstance(out, Exception):
             raise out
+        if isinstance(out, SimpleNamespace):  # a raw response, for odd provider replies
+            return out
         return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=out))])
 
 

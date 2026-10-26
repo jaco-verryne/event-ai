@@ -29,6 +29,10 @@ class InvalidOutput(Exception):
     """The model gave output that failed the schema twice."""
 
 
+class ProviderError(RuntimeError):
+    """A provider answered HTTP 200 with no choices (OpenRouter does this for upstream errors)."""
+
+
 @dataclass(frozen=True)
 class Provider:
     name: str
@@ -111,6 +115,11 @@ def _chat(messages: list[dict[str, str]], providers: Sequence[Provider]) -> str:
             # A network drop or a provider outage: the next provider can still answer.
             log.warning("%s failed (%s), trying the next provider", provider.name, type(err).__name__)
             last_error = err
+            continue
+        if not getattr(response, "choices", None):
+            detail = getattr(response, "error", None) or "no choices in the response"
+            log.warning("%s returned no answer (%s), trying the next provider", provider.name, detail)
+            last_error = ProviderError(f"{provider.name} returned no answer: {detail}")
             continue
         usage = getattr(response, "usage", None)
         log.info(
