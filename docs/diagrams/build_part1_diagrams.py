@@ -1,5 +1,14 @@
-"""Build docs/diagrams/event-ai-part1.drawio (3 pages). Usage: python docs/diagrams/build_part1_diagrams.py docs/diagrams/event-ai-part1.drawio"""
+"""Build docs/diagrams/event-ai-part1.drawio (4 pages).
 
+    python docs/diagrams/build_part1_diagrams.py docs/diagrams/event-ai-part1.drawio
+
+Pages 1-3 are drawn here. Page 4 (the call sequence) is laid out by the draw.io skill's
+seqlayout.py from llm-calls.json, then coloured here:
+
+    python3 <drawio-skill>/scripts/seqlayout.py docs/diagrams/llm-calls.json -o docs/diagrams/llm-calls.drawio
+"""
+
+import re
 import sys
 from html import escape
 from pathlib import Path
@@ -178,8 +187,41 @@ p3.e("s11", "cite", "end", extra="exitX=0.5;exitY=1;entryX=0.5;entryY=0;")
 p3.e("s12", "fixed", "end", "", points=[(940, 330), (940, 1240)], extra="exitX=1;exitY=0.5;entryX=1;entryY=0.5;")
 p3.legend("lg", 700, 1040, [(LLM, "LLM call"), (CODE, "Code step"), (ERROR, "Error path"), (META, "Fixed reply")])
 
+# Page 4: who calls the LLM, and who gets the data (sequence from seqlayout.py)
+def add_style(xml, cell_id, extra):
+    return re.sub(rf'(<mxCell id="{cell_id}" [^>]*?style=")([^"]*)(")',
+                  lambda m: m.group(1) + m.group(2) + extra + m.group(3), xml, count=1)
+
+
+def page4(seq_xml):
+    page = re.search(r"<diagram[\s\S]*?</diagram>", seq_xml).group(0)
+    page = re.sub(r'<diagram id="[^"]*"', '<diagram id="p4"', page, count=1)
+    for cell_id in ("router", "answer"):
+        page = add_style(page, cell_id, LLM)
+    page = add_style(page, "pipe", CODE)
+    for cell_id in ("sql", "search"):
+        page = add_style(page, cell_id, STORE)
+    for msg in ("m1", "m11"):  # the two LLM calls
+        page = add_style(page, msg, "strokeColor=#9673a6;strokeWidth=2;")
+    for msg in ("m5", "m9"):  # the only steps that read the data
+        page = add_style(page, msg, "strokeColor=#82b366;strokeWidth=2;fontStyle=1;")
+    extra = Page("extra")
+    extra.title("t4", "Event AI · Who calls the LLM, and who gets the data", y=0, w=900)
+    extra.v("key4", "<b>Only code touches the data.</b> The router LLM writes a plan (call 1). Code runs the tools, "
+            "which read DuckDB and the text index. The answer LLM writes the reply from what the code returned "
+            "(call 2). A third LLM call happens only to repair broken SQL. This is a plan-then-execute workflow, "
+            "not a tool-calling agent loop; the Part 2 agent is the LangGraph graph.",
+            BOX + "align=left;spacingLeft=12;spacingRight=12;fillColor=#ffffff;strokeColor=#000000;",
+            40, 1090, 900, 90)
+    extra.legend("lg4", 980, 1090, [(LLM, "LLM call (2 per question)"), (CODE, "Code"),
+                                    (STORE, "Code that reads the data")])
+    return page.replace("</root>", "".join(extra.cells) + "</root>")
+
+
+seq_file = Path(__file__).with_name("llm-calls.drawio")
 xml = ('<?xml version="1.0" encoding="UTF-8"?><mxfile host="drawio" version="26.0.0">'
-       + p1.xml("p1") + p2.xml("p2") + p3.xml("p3") + "</mxfile>")
+       + p1.xml("p1") + p2.xml("p2") + p3.xml("p3")
+       + (page4(seq_file.read_text()) if seq_file.exists() else "") + "</mxfile>")
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(xml)
 print(f"wrote {OUT}")

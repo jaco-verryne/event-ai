@@ -1,0 +1,114 @@
+{
+  "title": "4 · Who calls the LLM, who gets the data",
+  "participants": [
+    {
+      "id": "user",
+      "label": "Sales planner",
+      "actor": true
+    },
+    {
+      "id": "pipe",
+      "label": "ask() pipeline\n(code)"
+    },
+    {
+      "id": "router",
+      "label": "Router LLM\n(call 1)"
+    },
+    {
+      "id": "sql",
+      "label": "query_sql\n+ DuckDB"
+    },
+    {
+      "id": "search",
+      "label": "search_text +\nChroma, BM25"
+    },
+    {
+      "id": "answer",
+      "label": "Answer LLM\n(call 2)"
+    }
+  ],
+  "messages": [
+    {
+      "from": "user",
+      "to": "pipe",
+      "label": "question + chat history"
+    },
+    {
+      "from": "pipe",
+      "to": "router",
+      "label": "question, history, table schema"
+    },
+    {
+      "from": "router",
+      "to": "pipe",
+      "label": "plan JSON: tools, SQL, search words",
+      "return": true
+    },
+    {
+      "note": "Writes the plan only. It never sees a data row.",
+      "over": "router"
+    },
+    {
+      "from": "pipe",
+      "to": "sql",
+      "label": "run the SQL behind 6 guardrails"
+    },
+    {
+      "from": "sql",
+      "to": "sql",
+      "label": "read the tables (venues, packages, policies)"
+    },
+    {
+      "from": "sql",
+      "to": "pipe",
+      "label": "rows + source IDs, e.g. venues.csv#V012",
+      "return": true
+    },
+    {
+      "note": "On an SQL error only: one repair LLM call (call 3), then all the guardrails again.",
+      "over": "sql"
+    },
+    {
+      "from": "pipe",
+      "to": "search",
+      "label": "search words + the record IDs from the SQL"
+    },
+    {
+      "from": "search",
+      "to": "search",
+      "label": "rank the text fields (vectors + BM25, RRF)"
+    },
+    {
+      "from": "search",
+      "to": "pipe",
+      "label": "top hits + full record text",
+      "return": true
+    },
+    {
+      "from": "pipe",
+      "to": "answer",
+      "label": "question + tool results + allowed source IDs"
+    },
+    {
+      "from": "answer",
+      "to": "pipe",
+      "label": "answer JSON: facts, each with a source ID",
+      "return": true
+    },
+    {
+      "note": "Reads only the tool results. It never queries the data.",
+      "over": "answer"
+    },
+    {
+      "from": "pipe",
+      "to": "pipe",
+      "label": "citation check: drop facts with unknown IDs"
+    },
+    {
+      "from": "pipe",
+      "to": "user",
+      "label": "answer, facts, Sources, Debug",
+      "return": true
+    }
+  ]
+}
