@@ -1,38 +1,14 @@
-import hashlib
-import math
-
 import pytest
 
 from eventai.rag.loaders import build_chunks, read_sources
 from eventai.rag.search_text import build_text_index, rrf_merge, search_text, tokenize
 
-DIMENSIONS = 4096  # wide enough that unrelated words seldom share a slot
-
-
-class FakeEmbedder:
-    """Bag-of-words hashed into a vector: fast, offline, and similar words give similar vectors."""
-
-    def _vector(self, text):
-        vector = [0.0] * DIMENSIONS
-        vector[0] = 0.01  # never a zero vector
-        for token in tokenize(text):
-            vector[1 + int(hashlib.md5(token.encode()).hexdigest(), 16) % (DIMENSIONS - 1)] += 1.0
-        norm = math.sqrt(sum(v * v for v in vector))
-        return [v / norm for v in vector]
-
-    def passages(self, texts):
-        return [self._vector(t) for t in texts]
-
-    def query(self, text):
-        return self._vector(text)
-
-
 ALL = ["venues", "packages", "policies"]
 
 
 @pytest.fixture(scope="module")
-def index():
-    return build_text_index(build_chunks(read_sources()), FakeEmbedder(), min_similarity=0.1)
+def index(fake_embedder):
+    return build_text_index(build_chunks(read_sources()), fake_embedder, min_similarity=0.1)
 
 
 def test_tokenize_keeps_ids_whole():
@@ -63,8 +39,8 @@ def test_empty_record_ids_means_no_rows(index):
     assert search_text(index, "courtyard", ALL, record_ids=[]) == []
 
 
-def test_exact_id_passes_the_minimum_score(index):
-    strict = build_text_index(index.chunks, FakeEmbedder(), min_similarity=0.99)
+def test_exact_id_passes_the_minimum_score(index, fake_embedder):
+    strict = build_text_index(index.chunks, fake_embedder, min_similarity=0.99)
     hits = search_text(strict, "What does PKG-07 include?", ALL)
     assert [h.record_id for h in hits] == ["PKG-07"]
     assert hits[0].bm25_rank == 1
