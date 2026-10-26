@@ -182,12 +182,12 @@
   "answers": {
     "model": "groq: openai/gpt-oss-120b",
     "tool_choice": 0.83,
-    "sql_result": 0.91,
+    "sql_result": 1.0,
     "sql_checked": 11,
     "sql_repairs": 0,
-    "answer_accuracy": 0.85,
-    "answers_fully_correct": 9,
-    "facts_cited": 33,
+    "answer_accuracy": 0.97,
+    "answers_fully_correct": 11,
+    "facts_cited": 28,
     "facts_removed": 0,
     "answers_with_removed_facts": 0,
     "cites_expected_record": 1.0,
@@ -215,7 +215,7 @@
         ],
         "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "879fd6cec9f5e89c0fe90f115954473c"
+        "trace_id": "6a31d026bbb48356edacb806df9b7663"
       },
       {
         "id": 2,
@@ -227,7 +227,7 @@
         "sql": "SELECT package_id, name FROM package_items WHERE package_id = 'PKG-07' AND kind = 'include'",
         "sql_ok": true,
         "sql_repaired": false,
-        "answer": "PKG-07 includes two drinks per guest, six canap\u00e9s per guest, a microphone for welcome speeches, name badges and a check\u2011in desk, and an event manager.",
+        "answer": "PKG-07 includes two drinks per guest, six canap\u00e9s per guest, a microphone for welcome speeches, name badges with a check\u2011in desk, and an event manager.",
         "confidence": "high",
         "facts": 5,
         "removed": 0,
@@ -240,7 +240,7 @@
         ],
         "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "12f32f4f25e8a6e40ef5a02b55e964a9"
+        "trace_id": "cab07ebf059a53ebaa2e76eb3cc151fa"
       },
       {
         "id": 3,
@@ -262,9 +262,9 @@
         "expected_facts_found": [
           "does not give"
         ],
-        "accuracy": 0.5,
+        "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "8b9e9d482debe33416ec55bb9889fdde"
+        "trace_id": "a0bf4f93fac547b1449ade8785ccfa73"
       },
       {
         "id": 4,
@@ -296,7 +296,7 @@
         ],
         "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "c8ffe60e355ce7cafd2dcc11a8463d62"
+        "trace_id": "3dcfcdb501f4071b14047102ca460063"
       },
       {
         "id": 5,
@@ -305,7 +305,7 @@
           "query_sql"
         ],
         "tool_ok": true,
-        "sql": "SELECT COUNT(*) AS venue_count, MIN(day_rate_gbp) AS lowest_day_rate FROM venues WHERE city = 'London'",
+        "sql": "SELECT COUNT(v.venue_id) AS venue_count, MIN(v.day_rate_gbp) AS lowest_day_rate FROM venues AS v WHERE v.city = 'London'",
         "sql_ok": true,
         "sql_repaired": false,
         "answer": "There are 20 partner venues in London, and the lowest day rate is \u00a32,250 (excluding VAT).",
@@ -321,7 +321,7 @@
         ],
         "accuracy": 1.0,
         "cites_expected": null,
-        "trace_id": "7b3379bbc3773ad013cd52263f4fceb6"
+        "trace_id": "64401277ebd2ad313dba481ec5bb5667"
       },
       {
         "id": 6,
@@ -331,20 +331,22 @@
           "search_text"
         ],
         "tool_ok": true,
-        "sql": "SELECT venue_id, name, description FROM venues WHERE city = 'Leeds'",
+        "sql": "SELECT venue_id, name, city, venue_type, description FROM venues WHERE city = 'Leeds'",
         "sql_ok": true,
         "sql_repaired": false,
-        "answer": "Roundhay Hall in Leeds offers a Victorian mansion set in parkland with an orangery and formal lawns, providing ample outdoor space for a summer party. Its standing capacity of 140 guests makes it suitable for medium\u2011sized events.",
+        "answer": "Consider Headingley Assembly Rooms in Leeds; it has a walled garden that provides outdoor space ideal for a summer party.",
         "confidence": "high",
         "facts": 2,
         "removed": 0,
         "source_ids": [
-          "venues.csv#V113"
+          "venues.csv#V045"
         ],
-        "expected_facts_found": [],
-        "accuracy": 0.0,
+        "expected_facts_found": [
+          "Headingley Assembly Rooms"
+        ],
+        "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "20a7be609514713d79196f1d03c5a056"
+        "trace_id": "51b2adec5233ac72730954288d199b03"
       },
       {
         "id": 7,
@@ -356,7 +358,7 @@
         "sql": "SELECT policy_id, condition, rule FROM policies WHERE area = 'cancellation'",
         "sql_ok": true,
         "sql_repaired": false,
-        "answer": "Because the cancellation is 20 days before the event, it falls under the \u201cfewer than 30 days\u201d rule. The client must pay 100% of the package fee, excluding VAT.",
+        "answer": "Cancelling 20 days before the event falls under the \u2018fewer than 30 days\u2019 rule, so the client must pay 100% of the package fee (excluding VAT).",
         "confidence": "high",
         "facts": 1,
         "removed": 0,
@@ -368,7 +370,7 @@
         ],
         "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "f70eecaae243a5ac91511072d651a4a8"
+        "trace_id": "5401a7f23efcc2988a3852a0e737b8df"
       },
       {
         "id": 8,
@@ -392,7 +394,7 @@
         ],
         "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "72db68e8f48f406e49d1ce5eac770b43"
+        "trace_id": "212564f9cee4ff21db3a5e4664c924e2"
       },
       {
         "id": 9,
@@ -401,10 +403,10 @@
           "query_sql"
         ],
         "tool_ok": false,
-        "sql": "SELECT v.venue_id, v.name, v.seated_capacity, p.package_id, p.price_per_head_gbp FROM venues AS v JOIN packages AS p ON ARRAY_CONTAINS(p.suitable_venue_types, v.venue_type) WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.package_id = 'PKG-05' AND p.min_guests <= 120 AND p.max_guests >= 120",
+        "sql": "SELECT v.venue_id, v.name, v.seated_capacity, p.price_per_head_gbp, p.package_id FROM venues AS v JOIN packages AS p ON ARRAY_CONTAINS(p.suitable_venue_types, v.venue_type) WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.package_id = 'PKG-05'",
         "sql_ok": true,
         "sql_repaired": false,
-        "answer": "The venues that meet the 120\u2011guest requirement in Leeds are The Old Mill, Kirkgate Grand Hotel, Headingley Assembly Rooms and Temple Flax Museum. All charge \u00a3145 per head, excluding VAT.",
+        "answer": "The venues in Leeds that can accommodate 120 guests are The Old Mill, Kirkgate Grand Hotel, Headingley Assembly Rooms, and Temple Flax Museum. The price per head for the PKG-05 package is \u00a3145, excluding VAT.",
         "confidence": "high",
         "facts": 5,
         "removed": 0,
@@ -424,7 +426,7 @@
         ],
         "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "cb222fce40a513c0d41dd604cc5664d7"
+        "trace_id": "0e1e553231ee7a0e6867efce26603acf"
       },
       {
         "id": 10,
@@ -433,20 +435,16 @@
           "query_sql"
         ],
         "tool_ok": true,
-        "sql": "SELECT venue_id, name, parking_spaces FROM venues WHERE city = 'Leeds' AND seated_capacity >= 120",
-        "sql_ok": false,
+        "sql": "SELECT v.venue_id, v.name, v.parking_spaces, p.package_id FROM venues AS v JOIN packages AS p ON ARRAY_CONTAINS(p.suitable_venue_types, v.venue_type) WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.package_id = 'PKG-05'",
+        "sql_ok": true,
         "sql_repaired": false,
-        "answer": "The venues in Leeds that have parking are The Old Mill, Briggate Theatre Rooms, Temple Flax Museum, Calder Works, Canal Basin Lofts and Headrow Conference Centre.",
+        "answer": "The Old Mill and Temple Flax Museum have parking (20 and 35 spaces respectively). Kirkgate Grand Hotel has no parking and Headingley Assembly Rooms does not have parking data recorded.",
         "confidence": "high",
-        "facts": 6,
+        "facts": 2,
         "removed": 0,
         "source_ids": [
           "venues.csv#V012",
-          "venues.csv#V062",
-          "venues.csv#V064",
-          "venues.csv#V066",
-          "venues.csv#V070",
-          "venues.csv#V100"
+          "venues.csv#V064"
         ],
         "expected_facts_found": [
           "The Old Mill",
@@ -454,7 +452,7 @@
         ],
         "accuracy": 0.67,
         "cites_expected": true,
-        "trace_id": "f41560aa4e7cf0e2542aea4d8221629f"
+        "trace_id": "3e9c93ad4eaf96f903140ff181c7130f"
       },
       {
         "id": 11,
@@ -464,12 +462,12 @@
           "search_text"
         ],
         "tool_ok": false,
-        "sql": "SELECT package_id, name, description FROM packages WHERE event_type = 'team building'",
+        "sql": "SELECT package_id, name, event_type FROM packages WHERE event_type = 'team building'",
         "sql_ok": null,
         "sql_repaired": false,
-        "answer": "The Team Retreat (PKG-02) package is designed for team away days with hands\u2011on workshops and breakout sessions. Its description mentions a facilitator running small\u2011group sessions, making it ideal for workshop\u2011style activities. Prices are quoted per head and exclude VAT.",
+        "answer": "The Team Retreat (PKG-02) package is designed for team building away days with hands\u2011on workshop sessions.",
         "confidence": "high",
-        "facts": 3,
+        "facts": 2,
         "removed": 0,
         "source_ids": [
           "packages.json#PKG-02"
@@ -479,7 +477,7 @@
         ],
         "accuracy": 1.0,
         "cites_expected": true,
-        "trace_id": "81ecee0506ce7e2bd01d3c69baf07655"
+        "trace_id": "7ddc4f09fa02583f0e32f66d1d740bd2"
       },
       {
         "id": 12,
@@ -503,8 +501,9 @@
         ],
         "accuracy": 1.0,
         "cites_expected": null,
-        "trace_id": "43f6a487344180ed8a4d63bcd765a76c"
+        "trace_id": "3eef4a572a494e84481d376fa767d83c"
       }
-    ]
+    ],
+    "sql_rechecked": "2026-10-26"
   }
 }

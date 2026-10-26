@@ -25,3 +25,20 @@ def test_fact_score_mixes_both_kinds():
     q = {"expected_facts": ["does not give"], "expected_facts_any": ["V045", "Headingley Assembly Rooms"]}
     found, total = run_part1.fact_score(q, "The data does not give the parking for Headingley Assembly Rooms.")
     assert found == ["does not give", "Headingley Assembly Rooms"] and total == 2
+
+
+Q10 = {"expected_tools": ["query_sql"], "expected_record_ids": ["V012", "V024", "V045", "V064"]}
+REFERENCE = (["venue_id", "name", "parking_spaces"], [("V012", "a", 20), ("V024", "b", 0), ("V045", "c", None), ("V064", "d", 35)])
+
+
+def test_extra_id_column_from_a_join_still_matches():
+    result = (["venue_id", "name", "parking_spaces", "package_id"],
+              [["V012", "a", 20, "PKG-05"], ["V024", "b", 0, "PKG-05"], ["V045", "c", None, "PKG-05"], ["V064", "d", 35, "PKG-05"]])
+    assert run_part1.sql_matches(Q10, result, REFERENCE)
+
+
+def test_missing_or_extra_rows_do_not_match():
+    missing = (["venue_id"], [["V012"], ["V024"], ["V064"]])
+    extra = (["venue_id"], [["V012"], ["V024"], ["V045"], ["V064"], ["V062"]])
+    assert not run_part1.sql_matches(Q10, missing, REFERENCE)
+    assert not run_part1.sql_matches(Q10, extra, REFERENCE)

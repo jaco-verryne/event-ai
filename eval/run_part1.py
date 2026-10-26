@@ -48,8 +48,8 @@ def run_sql(con, sql: str) -> tuple[list[str], list[tuple]]:
     return [d[0] for d in cursor.description], cursor.fetchall()
 
 
-def ids_in(columns: list[str], rows: list[tuple]) -> set[str]:
-    id_columns = [i for i, name in enumerate(columns) if name.endswith("_id")]
+def ids_in(columns: list[str], rows: list[tuple], only: set[str] | None = None) -> set[str]:
+    id_columns = [i for i, name in enumerate(columns) if name.endswith("_id") and (only is None or name in only)]
     return {row[i] for row in rows for i in id_columns if row[i] is not None}
 
 
@@ -59,7 +59,10 @@ def sql_matches(q: dict, result: tuple, reference: tuple) -> bool:
     if not expected:  # aggregate or empty result: compare the cell values
         cells = lambda rows: Counter(str(v) for row in rows for v in row)  # noqa: E731
         return cells(result[1]) == cells(reference[1])
-    found = ids_in(*result)
+    # Compare the same kinds of ID as the reference. An extra ID column from a join (SQL rule 2,
+    # or added in code) is not a wrong row.
+    reference_ids = {name for name in reference[0] if name.endswith("_id")}
+    found = ids_in(*result, only=reference_ids)
     mixed = set(q["expected_tools"]) == {"query_sql", "search_text"}
     # A mixed question needs every candidate row; search_text then ranks them.
     return expected <= found if mixed else found == expected
@@ -225,6 +228,26 @@ def score_answers(resources, questions: list[dict]) -> dict:
     }
 
 
+def recheck_sql(report: dict, resources, questions: list[dict]) -> None:
+    """Run the stored SQL of a results file again with the current scorer. No LLM call."""
+    by_id = {q["id"]: q for q in questions}
+    for section in ("router", "answers"):
+        if section not in report:
+            continue
+        rows = report[section]["questions"]
+        for row in rows:
+            q = by_id[row["id"]]
+            sql = row.get("sql") or (row.get("plan") or {}).get("sql")
+            if not sql or "reference_sql" not in q:
+                continue
+            result = query_sql(resources.con, sql)
+            reference = run_sql(resources.con, q["reference_sql"])
+            row["sql_ok"] = result.error is None and sql_matches(q, (result.columns, result.rows), reference)
+        checked = [r for r in rows if r["sql_ok"] is not None]
+        report[section]["sql_result"] = round(sum(r["sql_ok"] for r in checked) / len(checked), 2)
+        report[section]["sql_rechecked"] = date.today().isoformat()
+
+
 def _ask_with_pacing(question: str, history: list[dict], resources, providers):
     for attempt in range(1, RATE_LIMIT_ATTEMPTS + 1):
         try:
@@ -253,11 +276,24 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("--skip-router", action="store_true", help="retrieval only, no LLM calls")
     parser.add_argument("--router-only", action="store_true", help="retrieval and the router only")
+    parser.add_argument("--recheck-sql", type=Path, metavar="RESULTS_JSON",
+                        help="run the stored SQL of a results file again with the current scorer (no LLM)")
     args = parser.parse_args()
 
     tracing.init_tracing(environment="eval")  # eval traces stay apart from app traces
     questions = yaml.safe_load(QUESTIONS.read_text())
     resources = load_resources()
+
+    if args.recheck_sql:
+        report = json.loads(args.recheck_sql.read_text())
+        recheck_sql(report, resources, questions)
+        args.recheck_sql.write_text(json.dumps(report, indent=2, default=str) + "\n")
+        for section in ("router", "answers"):
+            if section in report:
+                rows = report[section]["questions"]
+                print(f"{section}: SQL result {report[section]['sql_result']:.0%}; "
+                      f"misses: {[r['id'] for r in rows if r['sql_ok'] is False]}")
+        return
 
     report = {"date": date.today().isoformat(), "retrieval": score_retrieval(resources.index, resources.con, questions)}
     if args.router_only:

@@ -40,13 +40,14 @@ The last full run was on 26 Oct 2026, with Groq `openai/gpt-oss-120b`, on the 12
 | --- | --- |
 | Retrieval hit@5 (no LLM call) | 100% (mean recall@5: 80%) |
 | Router tool choice | 83% (10 of 12) |
-| SQL result check (result rows, not SQL text) | 91% (10 of 11) |
-| Citation check: facts removed | 0 of 33 |
+| SQL result check (result rows, not SQL text) | 100% (11 of 11) |
+| Citation check: facts removed | 0 of 28 |
 | Answer cites an expected record | 100% |
-| Answer accuracy (expected facts in the answer) | 85% (9 of 12 fully correct) |
+| Answer accuracy (expected facts in the answer) | 97% (11 of 12 fully correct) |
 
 Known misses:
 
-- Q10 (a follow-up question) kept the city and the capacity, but lost the Gala Dinner filter.
-- Q3 and Q6 give correct answers, but with other words than the expected facts.
 - Q9 and Q11 use other tools than the evaluation set expects, but give the correct data.
+- Q10 (a follow-up question) gives the correct venues and parking values. It writes "does not have parking data recorded" instead of the agreed words "The data does not give".
+
+The first full run on the same day gave 85% answer accuracy. Two changes followed. First, a follow-up question now sends the earlier SQL to the router, which fixed Q10. Second, Q3 and Q6 now accept each correct answer, not one fixed wording or one venue (agreed by Jaco). The SQL score compares the same kind of ID as the reference query, so an extra ID column from a join does not count as an error.
