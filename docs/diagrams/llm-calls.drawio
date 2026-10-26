@@ -43,10 +43,10 @@
         <mxCell id="m1" value="question, history, table schema" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;exitX=1;exitY=0.0595;entryX=0;entryY=0.0;" edge="1" parent="1" source="act4" target="act0">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="m2" value="plan JSON: tools, SQL, search words" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;exitX=0;exitY=1.0;entryX=1;entryY=0.119;" edge="1" parent="1" source="act0" target="act4">
+        <mxCell id="m2" value="plan: tools + inputs (SQL, search words)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;exitX=0;exitY=1.0;entryX=1;entryY=0.119;" edge="1" parent="1" source="act0" target="act4">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="note3" value="Writes the plan only. It never sees a data row." style="shape=note;whiteSpace=wrap;html=1;size=14;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+        <mxCell id="note3" value="Chooses the tools and writes their inputs. One decision, made before any data comes back." style="shape=note;whiteSpace=wrap;html=1;size=14;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
           <mxGeometry x="650" y="260" width="210" height="40" as="geometry"/>
         </mxCell>
         <mxCell id="m4" value="run the SQL behind 6 guardrails" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;exitX=1;exitY=0.25;entryX=0;entryY=0.0;" edge="1" parent="1" source="act4" target="act1">
@@ -80,7 +80,7 @@
         <mxCell id="m12" value="answer JSON: facts, each with a source ID" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;exitX=0;exitY=1.0;entryX=1;entryY=0.7857;" edge="1" parent="1" source="act3" target="act4">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="note13" value="Reads only the tool results. It never queries the data." style="shape=note;whiteSpace=wrap;html=1;size=14;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+        <mxCell id="note13" value="First time the model sees data: it writes the reply from the tool results only." style="shape=note;whiteSpace=wrap;html=1;size=14;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
           <mxGeometry x="1460" y="820" width="210" height="40" as="geometry"/>
         </mxCell>
         <mxCell id="m14" value="citation check: drop facts with unknown IDs" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;exitX=1;exitY=0.9167;entryX=1;entryY=0.9524;" edge="1" parent="1" source="act4" target="act4">

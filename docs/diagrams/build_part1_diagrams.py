@@ -207,12 +207,13 @@ def page4(seq_xml):
         page = add_style(page, msg, "strokeColor=#82b366;strokeWidth=2;fontStyle=1;")
     extra = Page("extra")
     extra.title("t4", "Event AI · Who calls the LLM, and who gets the data", y=0, w=900)
-    extra.v("key4", "<b>Only code touches the data.</b> The router LLM writes a plan (call 1). Code runs the tools, "
-            "which read DuckDB and the text index. The answer LLM writes the reply from what the code returned "
-            "(call 2). A third LLM call happens only to repair broken SQL. This is a plan-then-execute workflow, "
-            "not a tool-calling agent loop; the Part 2 agent is the LangGraph graph.",
+    extra.v("key4", "<b>The router chooses; code executes.</b> The router LLM picks the tools and writes their "
+            "inputs, the SQL and the search words (call 1), so its choice decides which data comes back. Code runs "
+            "the chosen tools in a fixed order, behind the guardrails; only these code steps read the data. The "
+            "model sees the results once, when it writes the answer (call 2). <b>One decision, not a loop</b>: a "
+            "third call only repairs broken SQL. The Part 2 agent is the loop: it sees each result and decides again.",
             BOX + "align=left;spacingLeft=12;spacingRight=12;fillColor=#ffffff;strokeColor=#000000;",
-            40, 1090, 900, 90)
+            40, 1090, 900, 100)
     extra.legend("lg4", 980, 1090, [(LLM, "LLM call (2 per question)"), (CODE, "Code"),
                                     (STORE, "Code that reads the data")])
     return page.replace("</root>", "".join(extra.cells) + "</root>")

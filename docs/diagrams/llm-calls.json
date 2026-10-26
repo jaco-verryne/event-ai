@@ -41,11 +41,11 @@
     {
       "from": "router",
       "to": "pipe",
-      "label": "plan JSON: tools, SQL, search words",
+      "label": "plan: tools + inputs (SQL, search words)",
       "return": true
     },
     {
-      "note": "Writes the plan only. It never sees a data row.",
+      "note": "Chooses the tools and writes their inputs. One decision, made before any data comes back.",
       "over": "router"
     },
     {
@@ -96,7 +96,7 @@
       "return": true
     },
     {
-      "note": "Reads only the tool results. It never queries the data.",
+      "note": "First time the model sees data: it writes the reply from the tool results only.",
       "over": "answer"
     },
     {
