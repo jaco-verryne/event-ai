@@ -66,20 +66,7 @@ CATEGORY_COLUMNS = {
     "policies": ["area", "applies_to"],
 }
 
-SYSTEM_PROMPT = """\
-You plan how to answer a question from the sales planners of a UK event company. \
-The data has three documents in four DuckDB tables. Do not answer the question. Return one JSON plan.
-
-Tools:
-- query_sql: one DuckDB SELECT statement on the tables below. Use it for numbers, categories, IDs, \
-counts, minimum and maximum values, and filters on attributes (city, capacity, price, access, parking, \
-dates). Use it for each policy question.
-- search_text: a meaning search on the text fields (venue name, type and description; package name, \
-description, included items and add-ons; policy condition and rule). Use it for style, features, \
-atmosphere and suitability, for example "rustic", "space to enjoy a summer evening" or "suits a team event".
-- Use both tools when the question has a filter part and a meaning part. The SQL selects the candidate \
-rows. Then search_text ranks those rows by meaning.
-
+SQL_RULES = """\
 SQL rules:
 1. Write one SELECT statement for DuckDB. Use only the tables and the columns below.
 2. Always select the ID column of each table in the FROM and JOIN clauses (venue_id, package_id, \
@@ -95,6 +82,23 @@ must see the rows where the data does not give the value.
 6. Use the exact values from the lists below. When a city or a value is not in a list, still query \
 for it, so that the result shows that the data has no rows.
 7. Prices exclude VAT. Do not add VAT.
+8. Do not use table functions (for example read_csv or range) or file paths. Use no schema prefix."""
+
+_ROUTER_TEMPLATE = """\
+You plan how to answer a question from the sales planners of a UK event company. \
+The data has three documents in four DuckDB tables. Do not answer the question. Return one JSON plan.
+
+Tools:
+- query_sql: one DuckDB SELECT statement on the tables below. Use it for numbers, categories, IDs, \
+counts, minimum and maximum values, and filters on attributes (city, capacity, price, access, parking, \
+dates). Use it for each policy question.
+- search_text: a meaning search on the text fields (venue name, type and description; package name, \
+description, included items and add-ons; policy condition and rule). Use it for style, features, \
+atmosphere and suitability, for example "rustic", "space to enjoy a summer evening" or "suits a team event".
+- Use both tools when the question has a filter part and a meaning part. The SQL selects the candidate \
+rows. Then search_text ranks those rows by meaning.
+
+{sql_rules}
 
 Other fields:
 - intent: lookup (one record), list (the records that match filters), aggregate (count, minimum, \
@@ -118,6 +122,17 @@ Question: Which venue has a vaulted ceiling?
 
 Question: Find a rooftop bar in Glasgow with a relaxed feel for 60 seated guests.
 {"intent": "list", "tools": ["query_sql", "search_text"], "documents": ["venues"], "sql": "SELECT venue_id, name, seated_capacity FROM venues WHERE city = 'Glasgow' AND venue_type = 'rooftop bar' AND seated_capacity >= 60", "search_text": "relaxed feel", "standalone_question": "Find a rooftop bar in Glasgow with a relaxed feel for 60 seated guests."}
+"""
+SYSTEM_PROMPT = _ROUTER_TEMPLATE.replace("{sql_rules}", SQL_RULES)
+
+REPAIR_PROMPT = f"""\
+A DuckDB SELECT statement failed. Fix it, so that it answers the question. Return one JSON object \
+with the key "sql".
+
+{SQL_RULES}
+
+Schema:
+{{schema}}
 """
 
 
@@ -181,6 +196,26 @@ def plan_question(
         {"role": "user", "content": _user_message(question, history or [])},
     ]
     return complete_json(messages, RouterPlan, providers)
+
+
+class SqlRepair(BaseModel):
+    sql: str
+
+
+def repair_sql(
+    question: str,
+    sql: str,
+    error: str,
+    *,
+    schema: str,
+    providers: Sequence[Provider] | None = None,
+) -> str:
+    """Guardrail 6: one LLM call to fix SQL that failed a check or a run."""
+    messages = [
+        {"role": "system", "content": REPAIR_PROMPT.replace("{schema}", schema)},
+        {"role": "user", "content": f"Question: {question}\n\nSQL:\n{sql}\n\nError:\n{error}"},
+    ]
+    return complete_json(messages, SqlRepair, providers).sql
 
 
 def _user_message(question: str, history: Sequence[dict[str, str]]) -> str:

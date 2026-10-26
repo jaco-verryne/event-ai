@@ -98,8 +98,9 @@ def build_database(sources: Sources, db_path: Path = DB_PATH) -> Path:
 
 
 def connect_readonly(db_path: Path = DB_PATH) -> duckdb.DuckDBPyConnection:
-    # Guardrail 1: the LLM-written SQL can never change the data.
-    return duckdb.connect(str(db_path), read_only=True)
+    # Guardrail 1: the LLM-written SQL can never change the data. With external access off,
+    # it also cannot read files or URLs, even if a SQL check misses a table function.
+    return duckdb.connect(str(db_path), read_only=True, config={"enable_external_access": False})
 
 
 def build_chunks(sources: Sources) -> list[Chunk]:
