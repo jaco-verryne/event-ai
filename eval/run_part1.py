@@ -15,7 +15,6 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 
-import duckdb
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -23,7 +22,9 @@ sys.path.insert(0, str(ROOT))  # so that "python eval/run_part1.py" finds the ev
 
 from eventai.config import load_settings  # noqa: E402
 from eventai.llm import DailyLimitReached, build_providers  # noqa: E402
+from eventai import tracing  # noqa: E402
 from eventai.rag.loaders import build_chunks, build_database, connect_readonly, read_sources  # noqa: E402
+from eventai.rag.query_sql import query_sql  # noqa: E402
 from eventai.rag.router import plan_question, schema_text  # noqa: E402
 from eventai.rag.search_text import DOCUMENTS, build_text_index, search_text  # noqa: E402
 
@@ -115,13 +116,13 @@ def score_router(con, schema: str, questions: list[dict]) -> dict:
             continue
         row.update(plan=plan.model_dump(), tool_ok=set(plan.tools) in tool_sets(q), sql_ok=None)
         if plan.sql and "reference_sql" in q:
-            # Read-only connection; the full guardrails (query_sql) come on Thu.
-            try:
-                result = run_sql(con, plan.sql)
-                row["sql_ok"] = sql_matches(q, result, run_sql(con, q["reference_sql"]))
-                row["sql_record_ids"] = sorted(ids_in(*result))
-            except duckdb.Error as err:
-                row.update(sql_ok=False, sql_error=str(err))
+            # All the guardrails, but no repair: the score measures the router's own SQL.
+            result = query_sql(con, plan.sql)
+            if result.error:
+                row.update(sql_ok=False, sql_error=result.error)
+            else:
+                row["sql_ok"] = sql_matches(q, (result.columns, result.rows), run_sql(con, q["reference_sql"]))
+                row["sql_record_ids"] = sorted(ids_in(result.columns, result.rows))
         rows.append(row)
     checked = [r for r in rows if r["sql_ok"] is not None]
     return {
@@ -151,6 +152,7 @@ def main() -> None:
     parser.add_argument("--skip-router", action="store_true", help="retrieval only, no LLM calls")
     args = parser.parse_args()
 
+    tracing.init_tracing(environment="eval")  # eval traces stay apart from app traces
     questions = yaml.safe_load(QUESTIONS.read_text())
     sources = read_sources()
     con = connect_readonly(build_database(sources))
@@ -177,6 +179,7 @@ def main() -> None:
             tools = ",".join(row["plan"]["tools"]) if "plan" in row else row.get("error", "")
             print(f"  Q{row['id']:<3} tools_ok={row['tool_ok']!s:5} sql_ok={row['sql_ok']!s:5} {tools}")
     print(f"Wrote {out.relative_to(ROOT)}")
+    tracing.flush()
 
 
 if __name__ == "__main__":

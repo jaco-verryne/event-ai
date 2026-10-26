@@ -1,0 +1,469 @@
+{
+  "date": "2026-10-26",
+  "retrieval": {
+    "k": 5,
+    "hit_rate": 1.0,
+    "mean_recall": 0.8,
+    "questions": [
+      {
+        "id": 1,
+        "hit": true,
+        "recall": 1.0,
+        "sql_prefilter": false,
+        "top": [
+          {
+            "record_id": "V012",
+            "vector_similarity": 0.698,
+            "bm25_rank": 1,
+            "rrf": 0.0328
+          },
+          {
+            "record_id": "V002",
+            "vector_similarity": 0.608,
+            "bm25_rank": 2,
+            "rrf": 0.032
+          },
+          {
+            "record_id": "V080",
+            "vector_similarity": 0.576,
+            "bm25_rank": 3,
+            "rrf": 0.0298
+          },
+          {
+            "record_id": "V001",
+            "vector_similarity": 0.611,
+            "bm25_rank": 15,
+            "rrf": 0.0295
+          },
+          {
+            "record_id": "V084",
+            "vector_similarity": 0.608,
+            "bm25_rank": 14,
+            "rrf": 0.0291
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "hit": true,
+        "recall": 1.0,
+        "sql_prefilter": false,
+        "top": [
+          {
+            "record_id": "POL-GST-02",
+            "vector_similarity": 0.582,
+            "bm25_rank": null,
+            "rrf": 0.0164
+          },
+          {
+            "record_id": "PKG-07",
+            "vector_similarity": 0,
+            "bm25_rank": 1,
+            "rrf": 0.0164
+          },
+          {
+            "record_id": "POL-PAY-04",
+            "vector_similarity": 0.547,
+            "bm25_rank": null,
+            "rrf": 0.0161
+          },
+          {
+            "record_id": "PKG-06",
+            "vector_similarity": 0.527,
+            "bm25_rank": null,
+            "rrf": 0.0159
+          },
+          {
+            "record_id": "POL-CAN-04",
+            "vector_similarity": 0.525,
+            "bm25_rank": null,
+            "rrf": 0.0156
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "hit": true,
+        "recall": 0.6,
+        "sql_prefilter": true,
+        "top": [
+          {
+            "record_id": "V062",
+            "vector_similarity": 0.549,
+            "bm25_rank": 4,
+            "rrf": 0.0315
+          },
+          {
+            "record_id": "V070",
+            "vector_similarity": 0.512,
+            "bm25_rank": 1,
+            "rrf": 0.0313
+          },
+          {
+            "record_id": "V099",
+            "vector_similarity": 0.6,
+            "bm25_rank": 10,
+            "rrf": 0.0307
+          },
+          {
+            "record_id": "V024",
+            "vector_similarity": 0.549,
+            "bm25_rank": 7,
+            "rrf": 0.0306
+          },
+          {
+            "record_id": "V045",
+            "vector_similarity": 0.524,
+            "bm25_rank": 6,
+            "rrf": 0.0303
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "hit": true,
+        "recall": 0.4,
+        "sql_prefilter": true,
+        "top": [
+          {
+            "record_id": "PKG-05",
+            "vector_similarity": 0.653,
+            "bm25_rank": 1,
+            "rrf": 0.0328
+          },
+          {
+            "record_id": "V024",
+            "vector_similarity": 0.56,
+            "bm25_rank": 2,
+            "rrf": 0.0323
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "hit": true,
+        "recall": 1.0,
+        "sql_prefilter": false,
+        "top": [
+          {
+            "record_id": "PKG-01",
+            "vector_similarity": 0.726,
+            "bm25_rank": 2,
+            "rrf": 0.0325
+          },
+          {
+            "record_id": "PKG-02",
+            "vector_similarity": 0.72,
+            "bm25_rank": 1,
+            "rrf": 0.0325
+          },
+          {
+            "record_id": "POL-CAN-03",
+            "vector_similarity": 0.641,
+            "bm25_rank": 11,
+            "rrf": 0.0297
+          },
+          {
+            "record_id": "POL-PAY-04",
+            "vector_similarity": 0.595,
+            "bm25_rank": 7,
+            "rrf": 0.0296
+          },
+          {
+            "record_id": "POL-CAN-02",
+            "vector_similarity": 0.638,
+            "bm25_rank": 10,
+            "rrf": 0.0294
+          }
+        ]
+      }
+    ]
+  },
+  "router": {
+    "model": "groq: openai/gpt-oss-120b",
+    "tool_choice": 0.83,
+    "sql_result": 0.91,
+    "sql_checked": 11,
+    "questions": [
+      {
+        "id": 1,
+        "question": "What is the seated capacity of The Old Mill?",
+        "plan": {
+          "intent": "lookup",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "venues"
+          ],
+          "sql": "SELECT venue_id, name, seated_capacity FROM venues WHERE name = 'The Old Mill'",
+          "search_text": null,
+          "standalone_question": "What is the seated capacity of The Old Mill?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": [
+          "V012"
+        ]
+      },
+      {
+        "id": 2,
+        "question": "What does PKG-07 include?",
+        "plan": {
+          "intent": "list",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "packages"
+          ],
+          "sql": "SELECT package_id, name FROM package_items WHERE package_id = 'PKG-07' AND kind = 'include'",
+          "search_text": null,
+          "standalone_question": "What does PKG-07 include?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": [
+          "PKG-07"
+        ]
+      },
+      {
+        "id": 3,
+        "question": "How many parking spaces does venue V045 have?",
+        "plan": {
+          "intent": "lookup",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "venues"
+          ],
+          "sql": "SELECT venue_id, parking_spaces FROM venues WHERE venue_id = 'V045'",
+          "search_text": null,
+          "standalone_question": "How many parking spaces does venue V045 have?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": [
+          "V045"
+        ]
+      },
+      {
+        "id": 4,
+        "question": "Which venues in Manchester seat 150 or more and have step-free access?",
+        "plan": {
+          "intent": "list",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "venues"
+          ],
+          "sql": "SELECT venue_id, name, seated_capacity, step_free_access FROM venues WHERE city = 'Manchester' AND seated_capacity >= 150 AND step_free_access = true",
+          "search_text": null,
+          "standalone_question": "Which venues in Manchester seat 150 or more and have step-free access?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": [
+          "V023",
+          "V034",
+          "V036",
+          "V068",
+          "V083"
+        ]
+      },
+      {
+        "id": 5,
+        "question": "How many partner venues are in London, and what is the lowest day rate there?",
+        "plan": {
+          "intent": "aggregate",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "venues"
+          ],
+          "sql": "SELECT COUNT(*) AS venue_count, MIN(day_rate_gbp) AS lowest_day_rate FROM venues WHERE city = 'London'",
+          "search_text": null,
+          "standalone_question": "How many partner venues are in London, and what is the lowest day rate there?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": []
+      },
+      {
+        "id": 6,
+        "question": "Suggest a venue in Leeds with outdoor space for a summer party.",
+        "plan": {
+          "intent": "list",
+          "tools": [
+            "query_sql",
+            "search_text"
+          ],
+          "documents": [
+            "venues"
+          ],
+          "sql": "SELECT venue_id, name, description FROM venues WHERE city = 'Leeds'",
+          "search_text": "outdoor space summer party",
+          "standalone_question": "Suggest a venue in Leeds with outdoor space for a summer party."
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": [
+          "V007",
+          "V012",
+          "V024",
+          "V026",
+          "V045",
+          "V062",
+          "V064",
+          "V066",
+          "V069",
+          "V070",
+          "V088",
+          "V099",
+          "V100",
+          "V113"
+        ]
+      },
+      {
+        "id": 7,
+        "question": "A client cancels 20 days before the event. What fee is due?",
+        "plan": {
+          "intent": "policy",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "policies"
+          ],
+          "sql": "SELECT policy_id, condition, rule FROM policies WHERE area = 'cancellation'",
+          "search_text": null,
+          "standalone_question": "A client cancels 20 days before the event. What fee is due?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": [
+          "POL-CAN-01",
+          "POL-CAN-02",
+          "POL-CAN-03",
+          "POL-CAN-04",
+          "POL-CAN-05",
+          "POL-CAN-06"
+        ]
+      },
+      {
+        "id": 8,
+        "question": "When are final guest numbers due for a Gala Dinner?",
+        "plan": {
+          "intent": "policy",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "policies"
+          ],
+          "sql": "SELECT policy_id, condition, rule FROM policies WHERE area = 'guest numbers' AND (applies_to = 'PKG-05' OR applies_to = 'all')",
+          "search_text": null,
+          "standalone_question": "When are final guest numbers due for a Gala Dinner?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": [
+          "POL-GST-01",
+          "POL-GST-02",
+          "POL-GST-03",
+          "POL-GST-04"
+        ]
+      },
+      {
+        "id": 9,
+        "question": "A client wants a gala dinner for 120 guests in Leeds. Which venues fit, and what is the price per head?",
+        "plan": {
+          "intent": "list",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "venues",
+            "packages"
+          ],
+          "sql": "SELECT v.venue_id, v.name, v.seated_capacity, p.price_per_head_gbp FROM venues v JOIN packages p ON list_contains(p.suitable_venue_types, v.venue_type) WHERE v.city = 'Leeds' AND v.seated_capacity >= 120 AND p.name = 'Gala Dinner'",
+          "search_text": null,
+          "standalone_question": "A client wants a gala dinner for 120 guests in Leeds. Which venues fit, and what is the price per head?"
+        },
+        "tool_ok": false,
+        "sql_ok": false,
+        "sql_record_ids": [
+          "V012",
+          "V024",
+          "V045",
+          "V064"
+        ]
+      },
+      {
+        "id": 10,
+        "question": "Which of those venues has parking?",
+        "plan": {
+          "intent": "list",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "venues"
+          ],
+          "sql": "SELECT venue_id, name, parking_spaces FROM venues WHERE city = 'Leeds' AND name IN ('The Old Mill','Kirkgate Grand Hotel','Headingley Assembly Rooms','Temple Flax Museum')",
+          "search_text": null,
+          "standalone_question": "Which of those venues has parking?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": [
+          "V012",
+          "V024",
+          "V045",
+          "V064"
+        ]
+      },
+      {
+        "id": 11,
+        "question": "Which package suits a team away day with workshops?",
+        "plan": {
+          "intent": "list",
+          "tools": [
+            "query_sql",
+            "search_text"
+          ],
+          "documents": [
+            "packages"
+          ],
+          "sql": "SELECT package_id, name, event_type FROM packages WHERE event_type = 'team building'",
+          "search_text": "team away day workshops",
+          "standalone_question": "Which package suits a team away day with workshops?"
+        },
+        "tool_ok": false,
+        "sql_ok": null
+      },
+      {
+        "id": 12,
+        "question": "Do you run events in Paris?",
+        "plan": {
+          "intent": "list",
+          "tools": [
+            "query_sql"
+          ],
+          "documents": [
+            "venues"
+          ],
+          "sql": "SELECT venue_id, name FROM venues WHERE city = 'Paris'",
+          "search_text": null,
+          "standalone_question": "Do you run events in Paris?"
+        },
+        "tool_ok": true,
+        "sql_ok": true,
+        "sql_record_ids": []
+      }
+    ]
+  }
+}
