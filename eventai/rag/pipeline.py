@@ -1,5 +1,6 @@
 """ask(): the Part 1 flow. Router -> query_sql and/or search_text -> answer -> citation check."""
 
+import tempfile
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -47,8 +48,13 @@ class PipelineResult(BaseModel):
 
 
 def load_resources(
-    data_dir: Path = DATA_DIR, db_path: Path = DB_PATH, embedder: Embedder | None = None
+    data_dir: Path = DATA_DIR, db_path: Path | None = None, embedder: Embedder | None = None
 ) -> Resources:
+    # Each build gets its own database file. DuckDB refuses a write connection to a file that
+    # this process already holds read-only, and Streamlit Cloud reloads new code into the
+    # running process while the old cached connection is still open.
+    if db_path is None:
+        db_path = Path(tempfile.mkdtemp(prefix="eventai-")) / DB_PATH.name
     sources = read_sources(data_dir)
     con = connect_readonly(build_database(sources, db_path))
     return Resources(con, build_text_index(build_chunks(sources), embedder), schema_text(sources))

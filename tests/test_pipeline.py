@@ -138,3 +138,18 @@ def test_follow_up_router_sees_the_earlier_sql(fake_provider, resources):
     ask("Does it have parking?", history, resources, providers=[groq])
 
     assert f"SQL: {first.sql.sql}" in calls.calls[2]["messages"][-1]["content"]
+
+
+def test_a_second_build_works_while_the_first_connection_is_open(fake_embedder, tmp_path):
+    # Streamlit Cloud reloads code into a running process that still holds the old connection.
+    from eventai.rag.loaders import build_database, connect_readonly, read_sources
+
+    shared = tmp_path / "events.duckdb"
+    old = connect_readonly(build_database(read_sources(), shared))
+    try:
+        first = load_resources(embedder=fake_embedder)
+        second = load_resources(embedder=fake_embedder)
+        assert first.con.execute("SELECT COUNT(*) FROM venues").fetchone() == (120,)
+        assert second.con.execute("SELECT COUNT(*) FROM venues").fetchone() == (120,)
+    finally:
+        old.close()

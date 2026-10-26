@@ -171,7 +171,7 @@ Test cases that the data must contain:
 
 ### 7.1 Ingestion
 
-- Build `data/events.duckdb` at start-up from the three files. Then reopen it in read-only mode.
+- Build the DuckDB file at start-up from the three files, in a new temporary folder for each build. Then reopen it in read-only mode. (A fixed path fails on Streamlit Cloud: a code reload keeps the old read-only connection open, and DuckDB refuses a write connection to the same file.)
 - `packages.json` gives two tables: `packages`, and `package_items` (the included items and the add-ons, with a `kind` column).
 - Make one chunk per CSV row and one chunk per package. Do not cut records into smaller pieces.
 - Each chunk has two texts:
