@@ -7,6 +7,14 @@ A demo in two parts for a fictional UK event company.
 
 All data is synthetic. The full technical summary comes later.
 
+## Live demo
+
+Part 1 runs on Streamlit Community Cloud: https://event-ai-xyp3apsfydznwqktuhvxhu.streamlit.app/
+
+- The free host puts the app to sleep when nobody uses it for some time. If the page says that the app is asleep, click the button to wake it up, then wait about one minute. The first question after a wake-up takes longer, because the app builds its search index again.
+- The app uses free models. They allow about two questions a minute. When the limit is reached, the chat says so. Wait one minute, then ask again.
+- Use the example questions in the sidebar for a quick test. Open "Sources" and "Debug" under an answer to see the records, the SQL and the search scores.
+
 ## Setup
 
 1. Make a virtual environment and install the packages:
