@@ -72,6 +72,15 @@ def test_sql_rows_show_empty_values_and_lists():
     assert sql_rows(sql) == [{"venue_id": "V045", "parking_spaces": NOT_GIVEN, "suitable_venue_types": "hotel, museum"}]
 
 
+def test_column_with_an_empty_value_becomes_text():
+    sql = SqlResult(sql="SELECT ...", columns=["venue_id", "parking_spaces", "seated_capacity"],
+                    rows=[["V012", 20, 120], ["V045", None, 180]])
+    assert sql_rows(sql) == [
+        {"venue_id": "V012", "parking_spaces": "20", "seated_capacity": 120},
+        {"venue_id": "V045", "parking_spaces": NOT_GIVEN, "seated_capacity": 180},
+    ]
+
+
 def test_hit_rows_round_the_scores():
     hit = SearchHit(
         chunk_id="venues.csv#V012", source="venues.csv", record_id="V012", score=0.0327869,

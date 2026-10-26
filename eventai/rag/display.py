@@ -42,7 +42,13 @@ def cited_sources(result: PipelineResult, chunks: Mapping[str, Chunk]) -> list[t
 
 
 def sql_rows(sql: SqlResult) -> list[dict[str, Any]]:
-    return [{c: _cell(v) for c, v in zip(sql.columns, row)} for row in sql.rows]
+    # A column with an empty value shows "not given in the data", so it becomes all text:
+    # the table widget (Arrow) cannot hold numbers and text in one column.
+    text_columns = {i for i in range(len(sql.columns)) if any(row[i] is None for row in sql.rows)}
+    return [
+        {c: _cell(v, as_text=i in text_columns) for i, (c, v) in enumerate(zip(sql.columns, row))}
+        for row in sql.rows
+    ]
 
 
 def hit_rows(hits: Sequence[SearchHit]) -> list[dict[str, Any]]:
@@ -70,9 +76,9 @@ def error_message(err: Exception) -> str:
     return OTHER_TEXT
 
 
-def _cell(value: Any) -> Any:
+def _cell(value: Any, as_text: bool = False) -> Any:
     if value is None:
         return NOT_GIVEN
     if isinstance(value, list):
         return ", ".join(map(str, value))
-    return value
+    return str(value) if as_text else value
