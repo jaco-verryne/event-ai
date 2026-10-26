@@ -89,9 +89,10 @@ Keep `requirements.txt` at the repository root, because Streamlit Community Clou
 ├── .gitignore                   # .env, token*.json, credentials.json, .chroma/, *.duckdb
 ├── .streamlit/
 │   └── secrets.toml.example
-├── streamlit_app.py             # Part 1 chat (Streamlit entry point)
+├── streamlit_app.py             # entry point: st.navigation and the Part 1 chat page
 ├── pages/
-│   └── 1_Part_2_Results.py      # read-only view of outputs/
+│   ├── knowledge_base.py        # read-only view of the three documents and their chunks
+│   └── part2_results.py         # read-only view of outputs/ (register it in st.navigation)
 ├── data/
 │   ├── packages.json            # written by hand
 │   ├── policies.csv             # written by hand
@@ -102,7 +103,10 @@ Keep `requirements.txt` at the repository root, because Streamlit Community Clou
 │   ├── config.py                # settings from .env or st.secrets
 │   ├── llm.py                   # client with the Groq -> OpenRouter fallback
 │   ├── tracing.py               # Langfuse setup
+│   ├── webapp.py                # cached resources that both app pages share
 │   ├── rag/
+│   │   ├── display.py           # chat helpers: rows, sources, history, error messages
+│   │   ├── knowledge.py         # Knowledge base page helpers
 │   │   ├── loaders.py           # DuckDB tables and chunks
 │   │   ├── chunks.py            # Chunk model, embedding text, context text
 │   │   ├── search_text.py       # Chroma + BM25 + RRF

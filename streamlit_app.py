@@ -1,4 +1,5 @@
-"""Part 1: a chat for the sales planners of a fictional UK event company (CLAUDE.md section 7.5)."""
+"""Part 1: a chat for the sales planners of a fictional UK event company (CLAUDE.md section 7.5),
+plus a read-only view of the knowledge base."""
 
 import uuid
 from pathlib import Path
@@ -7,8 +8,9 @@ import streamlit as st
 import yaml
 
 from eventai.rag.display import cited_sources, error_message, fact_rows, hit_rows, router_history, sql_rows
-from eventai.rag.pipeline import PipelineResult, ask, load_resources
-from eventai.tracing import init_tracing, trace_url
+from eventai.rag.pipeline import PipelineResult, ask
+from eventai.tracing import trace_url
+from eventai.webapp import get_resources
 
 ROOT = Path(__file__).resolve().parent
 EXAMPLES = yaml.safe_load((ROOT / "eval" / "part1_questions.yaml").read_text())
@@ -29,13 +31,6 @@ Free model limits allow about two questions a minute. If the limit is reached, w
 """
 
 st.set_page_config(page_title="Event AI", page_icon="🎪", layout="wide")
-
-
-@st.cache_resource(show_spinner="Loading the knowledge base and the search index...")
-def get_resources():
-    # Built once per server process: DuckDB tables, Chroma collection, BM25 index.
-    init_tracing(environment="app")
-    return load_resources()
 
 
 def new_chat() -> None:
@@ -90,53 +85,60 @@ def render_answer(result: PipelineResult, chunks: dict) -> None:
             st.link_button("Open the Langfuse trace", url)
 
 
-if "messages" not in st.session_state:
-    new_chat()
+def chat_page() -> None:
+    if "messages" not in st.session_state:
+        new_chat()
+    resources = get_resources()
+    chunks = {c.chunk_id: c for c in resources.index.chunks}
 
-resources = get_resources()
-chunks = {c.chunk_id: c for c in resources.index.chunks}
+    with st.sidebar:
+        st.header("Example questions")
+        for example in EXAMPLES:
+            if st.button(example["question"], key=f"example-{example['id']}", width="stretch"):
+                st.session_state.pending = example["question"]
+        st.divider()
+        st.button("New chat", on_click=new_chat, width="stretch")
+        with st.expander("How it works"):
+            st.markdown(HOW_IT_WORKS)
 
-with st.sidebar:
-    st.header("Example questions")
-    for example in EXAMPLES:
-        if st.button(example["question"], key=f"example-{example['id']}", width="stretch"):
-            st.session_state.pending = example["question"]
-    st.divider()
-    st.button("New chat", on_click=new_chat, width="stretch")
-    with st.expander("How it works"):
-        st.markdown(HOW_IT_WORKS)
+    st.title("Event AI: venues, packages and booking terms")
+    st.caption(
+        "A demo for the sales planners of a fictional UK event company. "
+        "All data is synthetic. Prices exclude VAT. The Knowledge base page shows the data."
+    )
 
-st.title("Event AI: venues, packages and booking terms")
-st.caption(
-    "A demo for the sales planners of a fictional UK event company. "
-    "All data is synthetic. Prices exclude VAT."
-)
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            if message.get("error"):
+                st.warning(message["content"])
+            elif "result" in message:
+                render_answer(message["result"], chunks)
+            else:
+                st.markdown(message["content"])
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        if message.get("error"):
-            st.warning(message["content"])
-        elif "result" in message:
-            render_answer(message["result"], chunks)
-        else:
-            st.markdown(message["content"])
+    question = st.chat_input("Ask about venues, packages or booking terms") or st.session_state.pop("pending", None)
+    if question:
+        history = router_history(st.session_state.messages)
+        st.session_state.messages.append({"role": "user", "content": question})
+        with st.chat_message("user"):
+            st.markdown(question)
+        with st.chat_message("assistant"):
+            try:
+                with st.spinner("Planning, querying and checking the answer..."):
+                    result = ask(question, history, resources, session_id=st.session_state.session_id)
+            except Exception as err:  # the chat must survive a model limit or an outage
+                text = error_message(err)
+                st.warning(text)
+                st.session_state.messages.append({"role": "assistant", "content": text, "error": True})
+            else:
+                render_answer(result, chunks)
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": result.answer.answer, "result": result}
+                )
 
-question = st.chat_input("Ask about venues, packages or booking terms") or st.session_state.pop("pending", None)
-if question:
-    history = router_history(st.session_state.messages)
-    st.session_state.messages.append({"role": "user", "content": question})
-    with st.chat_message("user"):
-        st.markdown(question)
-    with st.chat_message("assistant"):
-        try:
-            with st.spinner("Planning, querying and checking the answer..."):
-                result = ask(question, history, resources, session_id=st.session_state.session_id)
-        except Exception as err:  # the chat must survive a model limit or an outage
-            text = error_message(err)
-            st.warning(text)
-            st.session_state.messages.append({"role": "assistant", "content": text, "error": True})
-        else:
-            render_answer(result, chunks)
-            st.session_state.messages.append(
-                {"role": "assistant", "content": result.answer.answer, "result": result}
-            )
+
+# Explicit navigation, so that the menu says "Chat" and not the file name.
+st.navigation([
+    st.Page(chat_page, title="Chat", icon="💬", default=True),
+    st.Page("pages/knowledge_base.py", title="Knowledge base", icon="📚", url_path="knowledge-base"),
+]).run()
