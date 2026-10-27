@@ -381,7 +381,8 @@ Rules in `checks.py`, beyond the flow above:
 ### 10.5 Google access
 
 - Agent scopes (read-only): `https://www.googleapis.com/auth/calendar.readonly` and `https://www.googleapis.com/auth/gmail.readonly`. Token file: `token.json`.
-- Seed scopes (write): `https://www.googleapis.com/auth/calendar.events` and `https://www.googleapis.com/auth/gmail.insert`. Token file: `token_seed.json`. Only `seed/seed_google.py` uses them.
+- Seed scopes (write): `https://www.googleapis.com/auth/calendar.events` and `https://www.googleapis.com/auth/gmail.insert`, plus `gmail.readonly`, so a second seed run skips the emails already there. Token file: `token_seed.json`. Only `seed/seed_google.py` uses them. It sends nothing: no invitations (`sendUpdates="none"`), and the emails are inserted, not sent.
+- Setup steps for the demo account: `seed/GOOGLE_SETUP.md`.
 - Use a separate Google demo account. The consent screen stays in Testing status, with the demo account as a test user.
 - In Testing status, refresh tokens expire after 7 days. Sign in again before a demo.
 

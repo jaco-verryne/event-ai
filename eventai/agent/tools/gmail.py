@@ -11,8 +11,9 @@ from eventai.agent.tools.google_auth import execute
 
 
 def rsvp_query(event: Event) -> str:
-    """Gmail search: each RSVP names the event in its subject or body."""
-    return f'"{event.summary}"'
+    """Gmail search: each RSVP names the event in its subject or body, but a reply seldom repeats the
+    year (seed email e07: "the Northern Partners Summit"), so the search leaves out a final year."""
+    return f'"{re.sub(r"\s+(19|20)\d{2}$", "", event.summary.strip())}"'
 
 
 def list_rsvp_emails(service, event: Event, query: str | None = None, limit: int = 200) -> list[Email]:

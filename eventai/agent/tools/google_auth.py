@@ -22,6 +22,8 @@ AGENT_SCOPES = [
 SEED_SCOPES = [
     "https://www.googleapis.com/auth/calendar.events",
     "https://www.googleapis.com/auth/gmail.insert",
+    # Read too, so that a second seed run finds the emails already there and inserts no copies.
+    "https://www.googleapis.com/auth/gmail.readonly",
 ]
 RETRY_STATUS = {429, 500, 502, 503, 504}
 
