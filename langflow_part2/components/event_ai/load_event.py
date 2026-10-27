@@ -4,6 +4,7 @@ from lfx.custom import Component
 from lfx.io import DropdownInput, MessageTextInput, Output
 from lfx.schema import Data
 
+from eventai.agent.flow_io import remember_event
 from eventai.agent.tools import seed_files
 
 
@@ -32,5 +33,6 @@ class LoadEvent(Component):
             event = seed_files.load_event()
             if event.event_id != event_id:
                 raise ValueError(f"The seed event is {event.event_id!r}, not {event_id!r}.")
+        remember_event(event)  # for the Invitee Lookup tool inside the Loop
         self.status = f"{event.summary}: {len(event.invitees)} invitees, venue {event.venue_id}"
         return Data(data={**event.model_dump(mode="json"), "source": self.source})

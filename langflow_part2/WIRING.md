@@ -20,7 +20,7 @@ This guide builds the Part 2 attendee-list flow by hand: 16 components and 21 co
 ## Step 1: Create the flow
 
 1. Click **Create first flow** (or **New Flow**), then **Blank Flow**.
-2. Click the flow name at the top. Rename it to exactly **`Part 2 attendee list`**. The run command finds the flow by this name.
+2. Click the flow name at the top. Rename it to exactly **`Event AI Part 2 Attendee list`**. The run command finds the flow by this name.
 
 ## Step 2: Add the components
 
@@ -41,7 +41,7 @@ A suggested layout, from left to right:
 | 2 | Load Event | Event Ai | **Source**: `seed` (`google` needs the demo account) |
 | 3 | Load RSVP Emails | Event Ai | none |
 | 4 | Language Model, rename it "Groq" | Models & Agents | See the note below the table. |
-| 5 | Language Model, rename it "OpenRouter" | Models & Agents | **Language Model**: OpenRouter `nvidia/nemotron-3.5-super-vl:free`. **Temperature**: `0` (advanced). |
+| 5 | Language Model, rename it "OpenRouter" | Models & Agents | See the note below the table. |
 | 6 | Extract RSVPs | Event Ai | none |
 | 7 | Check Records | Event Ai | none |
 | 8 | Loop | Flow Control | none |
@@ -54,13 +54,20 @@ A suggested layout, from left to right:
 | 15 | Write Outputs | Event Ai | none (it writes to `outputs/`) |
 | 16 | Chat Output | Input & Output | none |
 
-**The Groq model (component 4).** The Groq model list in the dropdown is empty in this Langflow version, so this component uses the override fields:
-1. Select any model in the dropdown, for example the OpenRouter Nemotron model.
-2. Under advanced, set **Provider Override** to `Groq`.
-3. Set **Model Name Override** to `openai/gpt-oss-120b`.
-4. Set **Temperature** to `0`.
+**The two models (components 4 and 5).** In this Langflow version the model dropdown is not enough:
+- It lists only a few paid OpenRouter models, with no search.
+- Groq is not in it at all.
 
-This setting was tested on the server on 27 Oct.
+So both components use the override fields, which you open with **Parameters** above the box.
+
+| Setting | Groq (4) | OpenRouter (5) |
+| --- | --- | --- |
+| **Language Model** (dropdown) | any listed model (a placeholder) | any listed model (a placeholder) |
+| **Provider Override** | `Groq` | empty, or `OpenRouter` |
+| **Model Name Override** | `openai/gpt-oss-120b` | `nvidia/nemotron-3.5-super-vl:free` |
+| **Temperature** | `0` | `0` |
+
+Both overrides were tested on 27 Oct. The override replaces the placeholder, so the placeholder model is never called.
 
 ## Step 3: Connect the components
 
@@ -71,7 +78,7 @@ Click the output name first, where the step says so.
 | 1 | Chat Input · **Chat Message** | Load Event · **Event ID** |
 | 2 | Load Event · **Event** | Load RSVP Emails · **Event** |
 | 3 | Load Event · **Event** | Check Records · **Event** |
-| 4 | Load Event · **Event** | Invitee Lookup · **Event** |
+| 4 | *(removed on 27 Oct, see below)* | |
 | 5 | Load RSVP Emails · **Emails** | Extract RSVPs · **Emails** |
 | 6 | Load RSVP Emails · **Emails** | Check Records · **Emails** |
 | 7 | Groq · **Language Model** (select this output) | Extract RSVPs · **Primary model** |
@@ -89,6 +96,14 @@ Click the output name first, where the step says so.
 | 19 | Check Records · **Checked records** | Apply Decisions · **Checked records** |
 | 20 | Apply Decisions · **Final records** | Write Outputs · **Final records** |
 | 21 | Write Outputs · **Summary** | Chat Output · **Inputs** |
+
+**Why there is no connection 4.** Langflow's Loop runs its body as a separate graph. That graph includes every component that the body depends on, back to the start of the flow.
+
+At first, Invitee Lookup had an Event input from Load Event, and this broke the run:
+- The Loop re-ran Load Event and the Chat Input for each flagged record.
+- On these re-runs the Chat Input had no text, so Load Event failed on an empty event ID.
+
+Now Load Event keeps the event in memory for the run, and Invitee Lookup reads it there. The rule: **a component inside the loop body (the Agent, its tools and its model) must have no input from before the Loop.**
 
 Connection 17 closes the loop. The Agent decides one flag at a time. Its decision goes back into the Loop, and the Loop then sends the next flagged record. When every record is done, **Done** passes all the decisions on.
 

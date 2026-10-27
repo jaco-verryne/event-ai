@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import pandas as pd
 
+from eventai.agent import flow_io
 from eventai.agent.flow_io import records
 from eventai.agent.lookups import company_search, crm_lookup, invitee_lookup
 from eventai.agent.tools import ToolError
@@ -46,3 +47,11 @@ def test_records_from_each_flow_type():
     assert records(SimpleNamespace(data={"results": [{"a": 1}, {"a": 2}]})) == [{"a": 1}, {"a": 2}]
     assert records(SimpleNamespace(data={"a": 1})) == [{"a": 1}]
     assert records(None) == []
+
+
+def test_the_tool_reads_the_event_that_load_event_remembered(monkeypatch):
+    monkeypatch.setattr(flow_io, "_event", None)
+    assert flow_io.remembered_event().event_id == "partnersummit2026"  # no run yet: the seed event
+    other = load_event().model_copy(update={"event_id": "other", "invitees": []})
+    flow_io.remember_event(other)
+    assert flow_io.remembered_event() is other

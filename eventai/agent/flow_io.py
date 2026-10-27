@@ -4,6 +4,27 @@ the eventai modules take dicts and Pydantic models."""
 import math
 from typing import Any
 
+from eventai.agent.schema import Event
+
+# Langflow's Loop runs its body as a separate graph, with every component that the body depends on.
+# A tool of the Agent with an input from Load Event would re-run Load Event (and the Chat Input, with
+# no text) for each flagged record. So Load Event leaves the event here, and the tool reads it.
+_event: Event | None = None
+
+
+def remember_event(event: Event) -> None:
+    global _event
+    _event = event
+
+
+def remembered_event() -> Event:
+    """The event of the current run; the seed event when no run has loaded one (for example a test)."""
+    if _event is not None:
+        return _event
+    from eventai.agent.tools.seed_files import load_event
+
+    return load_event()
+
 
 def _clean(value: Any) -> Any:
     # A table turns a missing value into NaN; the models expect None.
