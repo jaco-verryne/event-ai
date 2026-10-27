@@ -51,6 +51,10 @@ Rules:
 | D9 | DuckDB reads the files. The LLM writes the SQL (text-to-SQL), with guardrails (section 8). |
 | D10 | Langfuse Cloud (Hobby plan) for traces. A self-hosted server is a future improvement. |
 | D11 | Build in Claude Code. Use the claude.ai chat for design, Notion and reviews. |
+| D12 | Part 2 resolution is a bounded agent loop: read-only lookups (CRM, invitees, Companies House), at most 3 for each flagged record, then one decision for each flag. Code accepts a value only when it is in the evidence. Orchestrator: LangGraph in the approved plan; Langflow is under review (spike, 27 Oct). |
+| D13 | Fictional firms only. Companies House "not on the register" is an audit note, not a flag. A failed call gives `web_check_failed`. |
+| D14 | Own read-only Calendar and Gmail wrappers on `google-api-python-client`, not the `langchain-google-community` toolkit. |
+| D15 | Provider order for each step (section 9). Part 1 and Part 2 extraction: Groq first. Part 2 agent step: OpenRouter Nemotron first, Groq fallback. |
 
 ## 4. Stack
 
@@ -269,9 +273,18 @@ The debug panel shows the SQL and the result rows.
 - One `openai.OpenAI` client per provider:
   - Groq: `base_url="https://api.groq.com/openai/v1"`, model `openai/gpt-oss-120b`.
   - OpenRouter: `base_url="https://openrouter.ai/api/v1"`, a `:free` model that supports JSON output. Check the current list on openrouter.ai.
-- On HTTP 429 from Groq, retry the same request on OpenRouter.
+- On HTTP 429 from the first provider, retry the same request on the second provider.
 - Use `temperature=0` and JSON output. Validate each output with Pydantic. Retry once on invalid output.
-- Start with one model for all steps. Try a smaller model for the router only if the evaluation score stays the same.
+- Provider order for each step (D15):
+
+  | Step | First | Fallback |
+  | --- | --- | --- |
+  | Part 1 router, answer, SQL repair | Groq `openai/gpt-oss-120b` | OpenRouter `nvidia/nemotron-3.5-super-vl:free` |
+  | Part 2 extraction (about 13 calls a run) | Groq `openai/gpt-oss-120b` | OpenRouter `nvidia/nemotron-3.5-super-vl:free` |
+  | Part 2 agent step (resolution) | OpenRouter `nvidia/nemotron-3.5-super-vl:free` | Groq `openai/gpt-oss-120b` |
+
+  Reason: in the spike on 27 Oct, Nemotron gave a correct structured decision first time; gpt-oss failed on that path. OpenRouter free models allow 50 requests a day (fewer than 10 credits bought), so only the low-volume agent step uses OpenRouter first.
+- Try a smaller model for the router only if the evaluation score stays the same.
 - Budget: a Part 1 question uses two calls (router and answer). An SQL repair adds one call.
 
 ## 10. Part 2 design
@@ -287,7 +300,7 @@ One command starts a full run: `python -m eventai.agent.run --event-id <id>`. Th
 5. **Normalization (code):** name case, lower-case emails, E.164 phone numbers (default region GB), standard company suffixes (Ltd, Limited, PLC).
 6. **Deduplication (code):** exact match on email first, then fuzzy match on name and company. Keep the source of each value.
 7. **Verification (code and tools):** format rules, the CRM export (`seed/crm.csv`), Companies House, and the capacity in `venues.csv`.
-8. **Resolution (LLM, flagged records only):** pick a fix or send the record to human review, with a reason.
+8. **Resolution (LLM agent, flagged records only, D12):** read-only lookups (CRM, invitees, Companies House), at most 3 for each record, then one decision for each flag: use a value, keep the value, or send the record to human review, with a reason. Code accepts a value only when it is in the evidence. Provider order: OpenRouter Nemotron first, Groq fallback (D15).
 9. **Output:** `outputs/attendees.csv`, `outputs/audit_log.json` and `outputs/run_report.json`.
 
 ### 10.2 Schemas
@@ -351,11 +364,13 @@ class Attendee(BaseModel):
 - Base URL: `https://api.company-information.service.gov.uk`. Basic auth, with the API key as the user name and an empty password.
 - Use `/search/companies?q=<name>` for a name, and `/company/<number>` for the status.
 - Cache each response in memory for the run.
+- The seed firms are fictional (D13), so the check returns "not on the register". That result is an audit note, not a flag. A failed call gives the flag `web_check_failed`.
 
 ### 10.7 Seed data
 
 - One calendar event, about 12 RSVP emails, and `seed/crm.csv`.
-- Known defects: duplicates, typos, a nickname, mixed-case emails, an absent phone number, a dissolved company, and a company name that differs from the registry.
+- Known defects: duplicates, typos, a nickname, mixed-case emails, an absent phone number, a substitute attendee who is not on the invitee list, and a company name that differs from the CRM (D13).
+- Synthetic only: invented names, fictional firms, `.example` email domains, and phone numbers from the Ofcom drama ranges. Use the geographic ranges (for example 0113 496 0xxx); `phonenumbers` rejects the mobile range 07700 900xxx as invalid.
 - Write `seed/expected_attendees.csv` by hand. `eval/run_part2.py` measures the precision and recall of the flags against it.
 
 ## 11. Evaluation
