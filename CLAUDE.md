@@ -120,17 +120,22 @@ Keep `requirements.txt` at the repository root, because Streamlit Community Clou
 │   │   └── pipeline.py          # ask(question, history) -> Answer
 │   └── agent/
 │       ├── tools/
+│       │   ├── __init__.py      # ToolError, timeout, retries with backoff
+│       │   ├── google_auth.py   # sign-in, services, request execution with retries
 │       │   ├── calendar.py
 │       │   ├── gmail.py
-│       │   └── companies_house.py
-│       ├── schema.py            # ExtractedRsvp, FieldValue, Attendee
+│       │   ├── companies_house.py
+│       │   └── seed_files.py    # the seed files as a source (--source seed), the CRM, venue capacity
+│       ├── schema.py            # ExtractedRsvp, FieldValue, Attendee, Event, Email, Record, AuditEntry
 │       ├── extract.py           # LLM extraction node
-│       ├── checks.py            # grounding, normalization, deduplication, verification
+│       ├── checks.py            # grounding, normalization, deduplication, verification (plain code)
+│       ├── output.py            # attendees.csv, audit_log.json, run_report.json
 │       ├── resolve.py           # LLM resolution node (flagged records only)
 │       ├── graph.py             # LangGraph state graph
 │       └── run.py               # entry point: python -m eventai.agent.run
 ├── seed/
 │   ├── seed_google.py           # makes the event and inserts the RSVP emails
+│   ├── event.yaml               # the event, its invitees and its venue
 │   ├── rsvp_emails.yaml         # the seed emails, with known defects
 │   ├── crm.csv                  # reference data
 │   └── expected_attendees.csv   # expected output for the Part 2 score
@@ -332,8 +337,22 @@ class Attendee(BaseModel):
     company_number: FieldValue
     job_title: FieldValue
     dietary_needs: FieldValue
+    attending: FieldValue        # "yes", "no", or absent when unclear
     flags: list[str] = []
+    source_keys: list[str] = []  # the emails merged into this record
+    candidates: dict[str, list[FieldValue]] = {}  # the values of a field in conflict
+    crm_id: str | None = None
+    resolutions: list[str] = []  # "<flag>:<action>", from the agent step
 ```
+
+`eventai/agent/schema.py` also holds `Event`, `Invitee`, `Email`, `CrmContact`, `Record` (one email after the code checks) and `AuditEntry`.
+
+Rules in `checks.py`, beyond the flow above:
+
+- Status: `verified` (in the source and passed the checks), `corrected` (changed by a rule, with the old value in the note), `absent` (no source has a value), `conflict` (sources disagree, or the value fails a check).
+- A conflict that the CRM settles (the CRM value equals exactly one candidate) is a rule, so code settles it. The agent gets only judgement calls.
+- Info flags (`phone_absent`, `web_check_failed`) go to the run report only. Every other flag sends the record to the agent step.
+- Attendee IDs follow the date of the first email.
 
 ### 10.3 Graph (LangGraph)
 
