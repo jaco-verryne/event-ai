@@ -84,3 +84,13 @@ def test_output_files_round_trip_and_score_before_the_agent_step(tmp_path, expec
     assert scores["fields"]["correct"] == 74 and scores["fields"]["total"] == 77
     assert {m["source_keys"] for m in scores["fields"]["misses"]} == {"e07", "e08", "e10"}
     assert scores["resolutions"]["correct"] == 0
+
+
+def test_brief_score():
+    brief = {"answers": [{"source_ids": ["policies.csv#POL-GST-01", "venues.csv#V113"]},
+                         {"source_ids": ["policies.csv#POL-DIE-01"]}],
+             "deadlines": [{"policy_id": "POL-GST-01", "date": "2026-11-12"}]}
+    result = run_part2.score_brief(brief)
+    assert result["expected_sources_missed"] == ["policies.csv#POL-DAT-02"]
+    assert result["deadlines"] == ["POL-GST-01 2026-11-12"]
+    assert run_part2.score_brief({"error": "timeout"}) == {"ran": False, "error": "timeout"}

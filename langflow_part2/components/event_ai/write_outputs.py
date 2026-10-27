@@ -26,7 +26,8 @@ class WriteOutputs(Component):
         attendees = [Attendee.model_validate(a) for a in payload["attendees"]]
         audit = [AuditEntry.model_validate(x) for x in payload["audit"]]
         report = payload["report"]
-        paths = write_outputs(self.out_dir, attendees, audit, report)
+        brief = payload.get("brief")  # from the Planner Brief (D17), when it is in the flow
+        paths = write_outputs(self.out_dir, attendees, audit, report, brief=brief)
         lines = [
             f"{report['emails']} emails -> {len(attendees)} attendees ({report['merged_emails']} merged).",
             f"Flagged for review: {', '.join(report['for_review']) or 'none'}.",
@@ -35,4 +36,8 @@ class WriteOutputs(Component):
             f"No reply: {', '.join(report['no_reply']) or 'none'}.",
             f"Wrote {paths['attendees'].parent}.",
         ]
+        if brief and "error" in brief:
+            lines.append(f"Planner brief failed: {brief['error']}")
+        elif brief and brief.get("todo"):
+            lines += ["", "Planner brief (from Part 1, with sources):"] + [f"- {t}" for t in brief["todo"]]
         return Message(text="\n".join(lines))

@@ -1,6 +1,6 @@
 """A smoke test of the Event AI components, with no LLM call: a fake model gives the canned extraction for
 each seed email (tests/fixtures). The agent step is left out; Apply Decisions then sends each flag to
-human review. Run it with langflow_part2/smoke.sh."""
+human review, and the planner brief runs dry (questions only). Run it with langflow_part2/smoke.sh."""
 
 import json
 import os
@@ -12,6 +12,7 @@ from event_ai.check_records import CheckRecords
 from event_ai.extract_rsvps import ExtractRsvps
 from event_ai.load_event import LoadEvent
 from event_ai.load_rsvp_emails import LoadRsvpEmails
+from event_ai.planner_brief import PlannerBrief
 from event_ai.write_outputs import WriteOutputs
 from langchain_core.language_models.fake_chat_models import FakeListChatModel
 from lfx.components.input_output.chat import ChatInput
@@ -30,5 +31,6 @@ def get_graph() -> Graph:
     extract = ExtractRsvps().set(emails=emails.load_emails, primary_model=fake)
     check = CheckRecords().set(event=event.load_event, emails=emails.load_emails, extractions=extract.extract)
     apply = ApplyDecisions().set(checked=check.checked)
-    write = WriteOutputs().set(final=apply.apply, out_dir=os.environ["SMOKE_OUT"])
+    brief = PlannerBrief().set(final=apply.apply, dry_run=True)
+    write = WriteOutputs().set(final=brief.final_with_brief, out_dir=os.environ["SMOKE_OUT"])
     return Graph(start, ChatOutput().set(input_value=write.write))

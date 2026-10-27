@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 from eventai.agent import checks
-from eventai.agent.brief import brief_questions, deadline, policy_table, run_brief, todo_lines
+from eventai.agent.brief import brief_markdown, brief_questions, deadline, policy_table, run_brief, todo_lines
 from eventai.agent.schema import ExtractedRsvp
 from eventai.agent.tools.seed_files import SEED_DIR, load_crm, load_emails, load_event
 from eventai.config import ROOT
@@ -75,8 +75,16 @@ def test_run_brief_turns_the_cited_rules_into_deadlines(run):
     # POL-GST-02 is for the Gala Dinner only, so it sets no deadline for this event.
     assert [(d["policy_id"], d["date"]) for d in brief["deadlines"]] == [
         ("POL-GST-01", "2026-11-12"), ("POL-DIE-01", "2026-11-12"), ("POL-DAT-02", "2026-12-26")]
-    assert brief["todo"][0] == "Final guest numbers (9 attending): by Thu 12 Nov 2026 (policies.csv#POL-GST-01)"
-    assert "(no nuts; vegetarian)" in brief["todo"][1]
+    assert brief["todo"] == [
+        "Send the final guest numbers (9 attending) by Thu 12 Nov 2026 (policies.csv#POL-GST-01)",
+        "Send the dietary needs and allergies (no nuts; vegetarian) by Thu 12 Nov 2026 (policies.csv#POL-DIE-01)",
+        "Delete the guests' dietary and access information by Sat 26 Dec 2026 (policies.csv#POL-DAT-02)"]
+    text = brief_markdown(brief)
+    assert text.startswith("# Planner brief: Northern Partners Summit 2026")
+    assert "## To do" in text and "## Venue and access" in text and "Sources: venues.csv#V113" in text
+    assert "The brief failed: timeout" in brief_markdown({"event_id": "x", "error": "timeout"})
+    dry = brief_markdown({"dry_run": True, "questions": [{"topic": "guest numbers", "question": "When?"}]})
+    assert "Dry run" in dry and "- guest numbers: When?" in dry
     assert todo_lines({"deadlines": []}, attendees) == []
 
 

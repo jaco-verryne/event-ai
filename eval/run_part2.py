@@ -9,6 +9,7 @@ Metrics:
 - field accuracy: the final value of each field, after the agent step
 - deduplication: the expected groups of emails that the run merged exactly
 - resolution accuracy: the expected "<flag>:<action>" decisions that the run made
+- planner brief: the expected Part 1 sources that the brief cites, and its deadlines
 
 Writes eval/results/<date>_part2.json.
 """
@@ -29,6 +30,8 @@ EXPECTED = ROOT / "seed" / "expected_attendees.csv"
 OUTPUTS = ROOT / "outputs"
 RESULTS = ROOT / "eval" / "results"
 SCORED_FIELDS = ("full_name", "email", "phone", "company", "job_title", "dietary_needs", "attending")
+# The planner brief (D17) should cite these sources from Part 1's knowledge base.
+BRIEF_SOURCES = {"policies.csv#POL-GST-01", "policies.csv#POL-DIE-01", "policies.csv#POL-DAT-02", "venues.csv#V113"}
 
 
 def split(cell: str) -> list[str]:
@@ -99,6 +102,15 @@ def score(expected_rows: list[dict], output_rows: list[dict]) -> dict:
     }
 
 
+def score_brief(brief: dict | None) -> dict:
+    if not brief or "answers" not in brief:
+        return {"ran": False, "error": (brief or {}).get("error")}
+    cited = {s for a in brief["answers"] for s in a["source_ids"]}
+    return {"ran": True, "answers": len(brief["answers"]), "expected_sources_cited": sorted(BRIEF_SOURCES & cited),
+            "expected_sources_missed": sorted(BRIEF_SOURCES - cited),
+            "deadlines": [f"{d['policy_id']} {d['date']}" for d in brief["deadlines"]]}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--outputs", type=Path, default=OUTPUTS, help="folder with attendees.csv")
@@ -110,6 +122,7 @@ def main() -> None:
     run_report = args.outputs / "run_report.json"
     if run_report.exists():
         report["run"] = json.loads(run_report.read_text())
+        report["brief"] = score_brief(report["run"].get("brief"))
     f, fl, d, r = report["flags"], report["fields"], report["deduplication"], report["resolutions"]
     print(f"Flags        precision {f['precision']:.0%}  recall {f['recall']:.0%}  "
           f"(TP {f['true_positives']}, FP {f['false_positives']}, FN {f['false_negatives']}; "
@@ -118,6 +131,10 @@ def main() -> None:
     print(f"Merges       {d['exact_groups']} of {d['expected_groups']} expected records exact; "
           f"{d['output_records']} records in the output")
     print(f"Resolutions  accuracy {r['accuracy']:.0%}  ({r['correct']} of {r['total']})")
+    b = report.get("brief", {})
+    if b.get("ran"):
+        print(f"Brief        {len(b['expected_sources_cited'])} of {len(BRIEF_SOURCES)} expected sources cited; "
+              f"deadlines {', '.join(b['deadlines']) or 'none'}")
     for miss in f["misses"] + fl["misses"] + r["misses"]:
         print("  miss:", miss)
     if not args.no_save:

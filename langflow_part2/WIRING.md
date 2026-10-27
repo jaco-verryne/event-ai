@@ -52,6 +52,7 @@ A suggested layout, from left to right:
 | 13 | Company Search | Event Ai | **Tool Mode on** |
 | 14 | Apply Decisions | Event Ai | none |
 | 17 | Agent Decision | Event Ai | none (added on 27 Oct: it closes the loop) |
+| 18 | Planner Brief | Event Ai | none (added on 27 Oct: it asks Part 1, D17) |
 | 15 | Write Outputs | Event Ai | none (it writes to `outputs/`) |
 | 16 | Chat Output | Input & Output | none |
 
@@ -96,7 +97,8 @@ Click the output name first, where the step says so.
 | 22 | Agent Decision · **Decision** | Loop · the **looping** dot on the Item output |
 | 18 | Loop · **Done** | Apply Decisions · **Decisions** |
 | 19 | Check Records · **Checked records** | Apply Decisions · **Checked records** |
-| 20 | Apply Decisions · **Final records** | Write Outputs · **Final records** |
+| 20 | Apply Decisions · **Final records** | Planner Brief · **Final records** |
+| 23 | Planner Brief · **Final records** | Write Outputs · **Final records** |
 | 21 | Write Outputs · **Summary** | Chat Output · **Inputs** |
 
 **Why there is no connection 4.** Langflow's Loop runs its body as a separate graph. That graph includes every component that the body depends on, back to the start of the flow.
@@ -106,6 +108,8 @@ At first, Invitee Lookup had an Event input from Load Event, and this broke the 
 - On these re-runs the Chat Input had no text, so Load Event failed on an empty event ID.
 
 Now Load Event keeps the event in memory for the run, and Invitee Lookup reads it there. The rule: **a component inside the loop body (the Agent, its tools and its model) must have no input from before the Loop.**
+
+**The Planner Brief (D17).** After the list is final, it asks Part 1, the same RAG pipeline as the website, 4 questions about this event: guest numbers, dietary needs, the venue and access, and data retention. Part 1 runs in its own venv. Its answers keep their sources, and code computes the dates from the cited rules. The summary ends with the dated actions, and `outputs/planner_brief.md` has the full brief.
 
 **Why the Agent Decision box.** The Loop collects the **first** output of the last box in its body. For the Agent, that is its text Response, not the Structured Response, even when only the Structured Response is connected (found on 27 Oct: the first full run lost all 5 decisions). Agent Decision has one output, so the Loop collects the decision. The Agent also runs once for each record, not twice.
 

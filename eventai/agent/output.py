@@ -5,6 +5,7 @@ import csv
 import json
 from pathlib import Path
 
+from eventai.agent.brief import brief_markdown
 from eventai.agent.schema import FIELDS, Attendee, AuditEntry
 
 ATTENDEE_COLUMNS = (
@@ -32,7 +33,8 @@ def attendee_row(attendee: Attendee) -> dict[str, str]:
 
 
 def write_outputs(out_dir: str | Path, attendees: list[Attendee], audit: list[AuditEntry],
-                  report: dict) -> dict[str, Path]:
+                  report: dict, brief: dict | None = None) -> dict[str, Path]:
+    """With a planner brief (D17), it also writes planner_brief.md and puts the brief in the run report."""
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     paths = {"attendees": out / "attendees.csv", "audit": out / "audit_log.json", "report": out / "run_report.json"}
@@ -41,6 +43,10 @@ def write_outputs(out_dir: str | Path, attendees: list[Attendee], audit: list[Au
         writer.writeheader()
         writer.writerows(attendee_row(a) for a in attendees)
     paths["audit"].write_text(json.dumps([e.model_dump(exclude_none=True) for e in audit], indent=2) + "\n")
+    if brief is not None:
+        report = {**report, "brief": brief}
+        paths["brief"] = out / "planner_brief.md"
+        paths["brief"].write_text(brief_markdown(brief))
     paths["report"].write_text(json.dumps(report, indent=2, default=str) + "\n")
     return paths
 

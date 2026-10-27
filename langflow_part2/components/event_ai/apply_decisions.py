@@ -43,6 +43,6 @@ class ApplyDecisions(Component):
         report = {**payload["report"], "agent_decisions": len(decisions), "agent_outputs_rejected": len(rejected),
                   "agent_outputs_rejected_examples": rejected[:3], "resolutions": dict(actions)}
         self.status = ", ".join(f"{k}: {v}" for k, v in sorted(actions.items())) or "no flags to resolve"
-        return Data(data={"attendees": [a.model_dump(mode="json") for a in attendees],
+        return Data(data={"event": payload["event"], "attendees": [a.model_dump(mode="json") for a in attendees],
                           "audit": payload["audit"] + [x.model_dump(mode="json", exclude_none=True) for x in audit],
                           "report": report})

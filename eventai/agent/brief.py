@@ -76,13 +76,34 @@ def todo_lines(brief: dict, attendees: list[Attendee]) -> list[str]:
     """The deadlines as actions, for the run summary and the top of the brief."""
     attending = sum(1 for a in attendees if a.attending.value == "yes")
     needs = sorted({a.dietary_needs.value for a in attendees if a.attending.value == "yes" and a.dietary_needs.value})
+    actions = {
+        "guest numbers": f"Send the final guest numbers ({attending} attending)",
+        "dietary needs": "Send the dietary needs and allergies" + (f" ({'; '.join(needs)})" if needs else ""),
+        "data retention": "Delete the guests' dietary and access information",
+    }
     lines = []
     for d in brief.get("deadlines", []):
         day = date.fromisoformat(d["date"])
-        detail = {"guest numbers": f" ({attending} attending)",
-                  "dietary needs": f" ({'; '.join(needs)})" if needs else ""}.get(d["area"], "")
-        lines.append(f"{d['condition']}{detail}: by {day:%a %d %b %Y} ({d['source']})")
+        lines.append(f"{actions.get(d['area'], d['condition'])} by {day:%a %d %b %Y} ({d['source']})")
     return lines
+
+
+def brief_markdown(brief: dict) -> str:
+    """The brief for a planner: the dated actions, then each cited answer."""
+    title = f"# Planner brief: {brief.get('event_summary', brief.get('event_id', 'event'))}"
+    if "error" in brief:
+        return f"{title}\n\nThe brief failed: {brief['error']}\n"
+    if brief.get("dry_run"):
+        questions = "\n".join(f"- {q['topic']}: {q['question']}" for q in brief["questions"])
+        return f"{title}\n\nDry run: the questions only, with no LLM call.\n\n{questions}\n"
+    lines = [title, "", f"Event date: {brief['event_date']}. Each answer comes from Part 1, the knowledge-base "
+             "assistant, and cites its source. Code computed the dates from the cited rules.", "", "## To do", ""]
+    lines += [f"- {t}" for t in brief["todo"]] or ["- No dated actions."]
+    for a in brief["answers"]:
+        lines += ["", f"## {a['topic'].capitalize()}", "", f"**Question:** {a['question']}", "",
+                  f"**Answer** ({a['confidence']} confidence): {a['answer']}", "",
+                  f"Sources: {', '.join(a['source_ids']) or 'none'}"]
+    return "\n".join(lines) + "\n"
 
 
 AskFn = Callable[..., object]  # eventai.rag.pipeline.ask, or a fake in the tests
@@ -107,7 +128,8 @@ def run_brief(event: Event, attendees: list[Attendee], *, ask_fn: AskFn, resourc
         if day:
             deadlines.append({"source": source, "policy_id": policy["policy_id"], "area": policy["area"],
                               "condition": policy["condition"], "rule": policy["rule"], "date": day.isoformat()})
-    brief = {"event_id": event.event_id, "event_date": event.start.date().isoformat(), "answers": answers,
+    brief = {"event_id": event.event_id, "event_summary": event.summary, "event_date": event.start.date().isoformat(),
+             "answers": answers,
              "deadlines": sorted(deadlines, key=lambda d: d["date"])}
     brief["todo"] = todo_lines(brief, attendees)
     return brief

@@ -19,7 +19,7 @@ COMPONENTS = {
     "Extract RSVPs": ("ExtractRsvps",), "Check Records": ("CheckRecords",), "Loop": ("LoopComponent",),
     "Type Convert": ("TypeConverterComponent",), "Agent": ("Agent",), "CRM Lookup": ("CrmLookup",),
     "Invitee Lookup": ("InviteeLookup",), "Company Search": ("CompanySearch",),
-    "Agent Decision": ("AgentDecision",), "Apply Decisions": ("ApplyDecisions",), "Write Outputs": ("WriteOutputs",), "Chat Output": ("ChatOutput",),
+    "Agent Decision": ("AgentDecision",), "Apply Decisions": ("ApplyDecisions",), "Planner Brief": ("PlannerBrief",), "Write Outputs": ("WriteOutputs",), "Chat Output": ("ChatOutput",),
 }
 # (step in WIRING.md step 3, from component, output name, to component, input name)
 CONNECTIONS = [
@@ -42,7 +42,8 @@ CONNECTIONS = [
     (22, "Agent Decision", "decision_out", "Loop", "item"),
     (18, "Loop", "done", "Apply Decisions", "decisions"),
     (19, "Check Records", "checked", "Apply Decisions", "checked"),
-    (20, "Apply Decisions", "final", "Write Outputs", "final"),
+    (20, "Apply Decisions", "final", "Planner Brief", "final"),
+    (23, "Planner Brief", "final_with_brief", "Write Outputs", "final"),
     (21, "Write Outputs", "summary", "Chat Output", "input_value"),
 ]
 SCHEMA_NAMES = {"attendee_id", "flag", "action", "value", "source", "reason"}
