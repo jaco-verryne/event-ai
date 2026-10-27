@@ -1,0 +1,81 @@
+{
+  "title": "3 · The agent loop for one flag",
+  "participants": [
+    {
+      "id": "loop",
+      "label": "Loop\n(Langflow)"
+    },
+    {
+      "id": "agent",
+      "label": "Agent\n(Nemotron)"
+    },
+    {
+      "id": "tools",
+      "label": "Tools\n(Tool Mode)"
+    },
+    {
+      "id": "crm",
+      "label": "crm.csv"
+    },
+    {
+      "id": "apply",
+      "label": "Apply\nDecisions"
+    }
+  ],
+  "messages": [
+    {
+      "from": "loop",
+      "to": "agent",
+      "label": "Item: A06, flag phone_invalid, email e10, current value"
+    },
+    {
+      "from": "agent",
+      "to": "tools",
+      "label": "LLM call 1 → crm_lookup(\"sam.okoro@saltmere.example\")"
+    },
+    {
+      "note": "At most 3 tool calls (Max Iterations 4).",
+      "over": "agent"
+    },
+    {
+      "from": "tools",
+      "to": "crm",
+      "label": "find rows by email and name"
+    },
+    {
+      "from": "crm",
+      "to": "tools",
+      "label": "C007: Sam Okoro, +441134960712",
+      "return": true
+    },
+    {
+      "from": "tools",
+      "to": "agent",
+      "label": "JSON text: 1 CRM row",
+      "return": true
+    },
+    {
+      "from": "agent",
+      "to": "loop",
+      "label": "LLM call 2 → use_value · phone · crm.csv#C007 · reason"
+    },
+    {
+      "note": "Agent Decision passes the decision back. The Loop sends the next flag.",
+      "over": "loop"
+    },
+    {
+      "from": "loop",
+      "to": "apply",
+      "label": "Done: all decisions"
+    },
+    {
+      "note": "Code check: +441134960712 is in CRM row C007 → accepted (corrected, crm.csv#C007).",
+      "over": "apply"
+    },
+    {
+      "from": "apply",
+      "to": "apply",
+      "label": "audit log: decision, source, reason"
+    }
+  ]
+}

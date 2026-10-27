@@ -9,7 +9,7 @@ This file gives Claude Code the agreed design for the Inference Group "AI Agent 
   - **Part 1:** a RAG app on the web. It answers questions from three structured documents.
   - **Part 2:** an agent. It reads a calendar event and RSVP emails, then makes a verified attendee list. It runs as a Langflow flow on the laptop (D16).
 - **Client (fictional):** a UK event company. Its sales planners answer client questions about venues, packages and booking terms.
-- **Target:** send the submission pack as soon as it is ready. There is no interview date: the panel reviews the pack, then sets a meeting.
+- **Target:** send the submission pack on Thu 29 Oct 2026. Fri 30 Oct is a buffer day. There is no interview date: the panel reviews the pack, then sets a meeting.
 - **Reviewers:** a panel of technical and business people. The pack counts for the TCN Capital role too. Access stays simple: public links, with no sign-in.
 - **Source of truth:** the Notion workspace "Inference Group — AI Agent Technical Challenge".
   - Page 2: Architecture & Approach.
