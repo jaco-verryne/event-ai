@@ -13,6 +13,7 @@ import csv
 import json
 import re
 import sys
+import time
 from collections.abc import Callable
 from datetime import date, timedelta
 from pathlib import Path
@@ -22,6 +23,10 @@ from eventai.agent.tools.seed_files import venue_row
 from eventai.config import ROOT
 
 POLICIES_CSV = ROOT / "data" / "policies.csv"
+# Groq's free plan allows 8,000 tokens a minute, and OpenRouter's free models 50 requests a day.
+# When every provider gives a rate limit, wait for Groq's next minute (as the Part 1 scorer does).
+RATE_LIMIT_WAIT_SECONDS = 65
+RATE_LIMIT_ATTEMPTS = 3
 _DEADLINE = re.compile(r"(\d+)\s+(working\s+)?days?\s+(before|after)\s+the\s+event", re.IGNORECASE)
 
 
@@ -100,8 +105,11 @@ def brief_markdown(brief: dict) -> str:
              "assistant, and cites its source. Code computed the dates from the cited rules.", "", "## To do", ""]
     lines += [f"- {t}" for t in brief["todo"]] or ["- No dated actions."]
     for a in brief["answers"]:
-        lines += ["", f"## {a['topic'].capitalize()}", "", f"**Question:** {a['question']}", "",
-                  f"**Answer** ({a['confidence']} confidence): {a['answer']}", "",
+        lines += ["", f"## {a['topic'].capitalize()}", "", f"**Question:** {a['question']}", ""]
+        if "error" in a:
+            lines.append(f"No answer: {a['error']}")
+            continue
+        lines += [f"**Answer** ({a['confidence']} confidence): {a['answer']}", "",
                   f"Sources: {', '.join(a['source_ids']) or 'none'}"]
     return "\n".join(lines) + "\n"
 
@@ -109,12 +117,29 @@ def brief_markdown(brief: dict) -> str:
 AskFn = Callable[..., object]  # eventai.rag.pipeline.ask, or a fake in the tests
 
 
+def _ask_with_wait(ask_fn: AskFn, question: str, resources, providers, session_id, sleep) -> object:
+    from eventai.llm import DailyLimitReached
+
+    for attempt in range(1, RATE_LIMIT_ATTEMPTS + 1):
+        try:
+            return ask_fn(question, [], resources, providers, session_id)
+        except DailyLimitReached:
+            if attempt == RATE_LIMIT_ATTEMPTS:
+                raise
+            sleep(RATE_LIMIT_WAIT_SECONDS)
+
+
 def run_brief(event: Event, attendees: list[Attendee], *, ask_fn: AskFn, resources, providers=None,
-              session_id: str | None = None, policies: dict[str, dict[str, str]] | None = None) -> dict:
+              session_id: str | None = None, policies: dict[str, dict[str, str]] | None = None,
+              sleep: Callable[[float], None] = time.sleep) -> dict:
     policies = policies if policies is not None else policy_table()
     answers, cited = [], []
     for q in brief_questions(event, attendees):
-        result = ask_fn(q["question"], [], resources, providers, session_id)
+        try:
+            result = _ask_with_wait(ask_fn, q["question"], resources, providers, session_id, sleep)
+        except Exception as err:  # noqa: BLE001 - one failed question does not stop the brief
+            answers.append({**q, "error": f"{type(err).__name__}: {err}"[:300], "source_ids": [], "facts": []})
+            continue
         answer = result.answer
         answers.append({**q, "answer": answer.answer, "facts": [f.model_dump() for f in answer.facts],
                         "source_ids": answer.source_ids, "confidence": answer.confidence,

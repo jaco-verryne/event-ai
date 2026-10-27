@@ -2,7 +2,10 @@
 of its decisions. Framework-independent: the Langflow Agent sits between these two functions.
 """
 
-from pydantic import BaseModel
+import json
+import re
+
+from pydantic import BaseModel, ValidationError
 
 from eventai.agent import checks
 from eventai.agent.schema import FIELDS, Attendee, AuditEntry, CrmContact, Email, Event, FieldValue
@@ -33,6 +36,50 @@ class Decision(BaseModel):
     value: str | None = None
     source: str | None = None
     reason: str = ""
+
+
+_QUOTED = re.compile(r'"(attendee_id|flag|action|value|source)"\s*:\s*"([^"]*)"')
+_REASON = re.compile(r'"reason"\s*:\s*"?(.*?)"?\s*(?:,\s*"\w+"\s*:|\}|$)', re.DOTALL)
+
+
+def _objects(text: str) -> list[dict]:
+    """The decision objects in an agent's raw answer. Seen on 27 Oct: valid JSON except for an unquoted
+    reason, so on a JSON error each field is read on its own. The code check of the values still applies."""
+    text = text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+    try:
+        data = json.loads(text)
+    except ValueError:
+        data = None
+    if isinstance(data, dict):
+        return data.get("objects") or data.get("results") or [data]
+    if isinstance(data, list):
+        return [d for d in data if isinstance(d, dict)]
+    objects = []
+    for chunk in re.split(r"\}\s*,\s*\{", text):
+        fields = dict(_QUOTED.findall(chunk))
+        reason = _REASON.search(chunk)
+        if reason:
+            fields["reason"] = reason.group(1).strip()
+        if fields:
+            objects.append(fields)
+    return objects
+
+
+def decisions_from_rows(rows: list[dict]) -> tuple[list["Decision"], list[str]]:
+    """Decisions from the Loop's rows: a structured row, or an agent answer that Langflow could not parse."""
+    decisions, rejected = [], []
+    for row in rows:
+        candidates = [row] if "attendee_id" in row else _objects(str(row.get("content") or row.get("text") or ""))
+        found = []
+        for candidate in candidates:
+            try:
+                found.append(Decision.model_validate(candidate))
+            except ValidationError:
+                pass
+        decisions += found
+        if not found:
+            rejected.append(str(row)[:300])  # for example an agent error instead of a decision
+    return decisions, rejected
 
 
 def flag_field(flag: str) -> str | None:

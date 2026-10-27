@@ -95,3 +95,24 @@ def test_cli_dry_run_asks_nothing(run):
                          capture_output=True, text=True, check=True)
     result = json.loads(out.stdout)
     assert result["dry_run"] and len(result["questions"]) == 4
+
+
+def test_the_brief_waits_on_a_rate_limit_and_goes_on_after_a_failure(run):
+    from eventai.llm import DailyLimitReached
+
+    event, attendees = run
+    calls, waits = [], []
+    good = fake_ask({"": ["policies.csv#POL-DAT-02"]})
+
+    def ask(question, *args):
+        calls.append(question)
+        if "guest numbers" in question and len(calls) == 1:
+            raise DailyLimitReached("all providers are rate-limited")  # once: the retry works
+        if "Roundhay Hall" in question:
+            raise RuntimeError("provider down")
+        return good(question, *args)
+
+    brief = run_brief(event, attendees, ask_fn=ask, resources=None, policies=policy_table(), sleep=waits.append)
+    assert waits == [65]
+    assert [("error" in a) for a in brief["answers"]] == [False, False, True, False]
+    assert "No answer: RuntimeError: provider down" in brief_markdown(brief)

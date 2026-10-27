@@ -14,7 +14,7 @@ from lfx.schema import Data
 
 from eventai.config import ROOT
 
-TIMEOUT_SECONDS = 300
+TIMEOUT_SECONDS = 900  # 4 questions, each may wait for Groq's next minute
 
 
 class PlannerBrief(Component):

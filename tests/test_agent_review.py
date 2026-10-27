@@ -9,7 +9,7 @@ import yaml
 
 from eventai.agent import checks
 from eventai.agent.output import read_rows, write_outputs
-from eventai.agent.review import Decision, apply_decisions, flag_field, review_items
+from eventai.agent.review import Decision, apply_decisions, decisions_from_rows, flag_field, review_items
 from eventai.agent.schema import ExtractedRsvp
 from eventai.agent.tools.seed_files import SEED_DIR, load_crm, load_emails, load_event
 
@@ -109,3 +109,35 @@ def test_the_expected_decisions_score_full_marks(seed, tmp_path):
     assert scores["flags"]["precision"] == scores["flags"]["recall"] == 1.0
     assert scores["fields"]["accuracy"] == 1.0
     assert scores["resolutions"]["accuracy"] == 1.0
+
+
+# The agent answer of the run on 27 Oct: valid JSON except for the unquoted reason.
+MALFORMED = """{
+  "objects": [
+    {
+      "flag": "phone_invalid",
+      "attendee_id": "A06",
+      "action": "use_value",
+      "value": "+441134960712",
+      "source": "crm.csv#C007",
+      "reason": The CRM record for Sam Okoro (C007) lists the phone number as +441134960712, which is valid.
+    }
+  ]
+}"""
+
+
+def test_decisions_from_the_loop_rows():
+    rows = [
+        {"attendee_id": "A10", "flag": "attendance_unclear", "action": "human_review", "value": "", "source": "",
+         "reason": "not clear"},
+        {"content": MALFORMED},
+        {"content": '```json\n{"objects": [{"attendee_id": "A07", "flag": "company_differs_from_crm", '
+                    '"action": "use_value", "value": "Brightwyn Analytics Ltd", "source": "crm.csv#C008", "reason": "typo"}]}\n```'},
+        {"content": "", "error": "rate limit"},
+    ]
+    decisions, rejected = decisions_from_rows(rows)
+    assert [(d.attendee_id, d.action, d.value) for d in decisions] == [
+        ("A10", "human_review", ""), ("A06", "use_value", "+441134960712"),
+        ("A07", "use_value", "Brightwyn Analytics Ltd")]
+    assert decisions[1].reason.startswith("The CRM record for Sam Okoro")
+    assert len(rejected) == 1 and "rate limit" in rejected[0]

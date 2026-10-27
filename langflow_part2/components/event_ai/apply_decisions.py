@@ -6,10 +6,9 @@ from collections import Counter
 from lfx.custom import Component
 from lfx.io import HandleInput, Output
 from lfx.schema import Data
-from pydantic import ValidationError
 
 from eventai.agent.flow_io import records
-from eventai.agent.review import Decision, apply_decisions
+from eventai.agent.review import apply_decisions, decisions_from_rows
 from eventai.agent.schema import Attendee, Email, Event
 from eventai.agent.tools import seed_files
 
@@ -29,12 +28,7 @@ class ApplyDecisions(Component):
 
     def apply(self) -> Data:
         payload = self.checked.data
-        decisions, rejected = [], []
-        for row in records(self.decisions):
-            try:
-                decisions.append(Decision.model_validate(row))
-            except ValidationError:
-                rejected.append(str(row)[:300])  # for example an agent error instead of a decision
+        decisions, rejected = decisions_from_rows(records(self.decisions))
         attendees, audit = apply_decisions(
             [Attendee.model_validate(a) for a in payload["attendees"]], decisions,
             emails=[Email.model_validate(e) for e in payload["emails"]], crm=seed_files.load_crm(),
