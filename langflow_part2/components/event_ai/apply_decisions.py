@@ -29,19 +29,19 @@ class ApplyDecisions(Component):
 
     def apply(self) -> Data:
         payload = self.checked.data
-        decisions, rejected = [], 0
+        decisions, rejected = [], []
         for row in records(self.decisions):
             try:
                 decisions.append(Decision.model_validate(row))
             except ValidationError:
-                rejected += 1  # for example an agent error instead of a decision
+                rejected.append(str(row)[:300])  # for example an agent error instead of a decision
         attendees, audit = apply_decisions(
             [Attendee.model_validate(a) for a in payload["attendees"]], decisions,
             emails=[Email.model_validate(e) for e in payload["emails"]], crm=seed_files.load_crm(),
             event=Event.model_validate(payload["event"]))
         actions = Counter(r.split(":", 1)[1] for a in attendees for r in a.resolutions)
-        report = {**payload["report"], "agent_decisions": len(decisions), "agent_outputs_rejected": rejected,
-                  "resolutions": dict(actions)}
+        report = {**payload["report"], "agent_decisions": len(decisions), "agent_outputs_rejected": len(rejected),
+                  "agent_outputs_rejected_examples": rejected[:3], "resolutions": dict(actions)}
         self.status = ", ".join(f"{k}: {v}" for k, v in sorted(actions.items())) or "no flags to resolve"
         return Data(data={"attendees": [a.model_dump(mode="json") for a in attendees],
                           "audit": payload["audit"] + [x.model_dump(mode="json", exclude_none=True) for x in audit],

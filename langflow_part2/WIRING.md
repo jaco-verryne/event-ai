@@ -51,6 +51,7 @@ A suggested layout, from left to right:
 | 12 | Invitee Lookup | Event Ai | **Tool Mode on** |
 | 13 | Company Search | Event Ai | **Tool Mode on** |
 | 14 | Apply Decisions | Event Ai | none |
+| 17 | Agent Decision | Event Ai | none (added on 27 Oct: it closes the loop) |
 | 15 | Write Outputs | Event Ai | none (it writes to `outputs/`) |
 | 16 | Chat Output | Input & Output | none |
 
@@ -91,7 +92,8 @@ Click the output name first, where the step says so.
 | 14 | CRM Lookup · **Toolset** | Agent · **Tools** |
 | 15 | Invitee Lookup · **Toolset** | Agent · **Tools** |
 | 16 | Company Search · **Toolset** | Agent · **Tools** |
-| 17 | Agent · **Structured Response** (select this output) | Loop · the **looping** dot on the Item output |
+| 17 | Agent · **Structured Response** (select this output) | Agent Decision · **Structured Response** |
+| 22 | Agent Decision · **Decision** | Loop · the **looping** dot on the Item output |
 | 18 | Loop · **Done** | Apply Decisions · **Decisions** |
 | 19 | Check Records · **Checked records** | Apply Decisions · **Checked records** |
 | 20 | Apply Decisions · **Final records** | Write Outputs · **Final records** |
@@ -105,7 +107,9 @@ At first, Invitee Lookup had an Event input from Load Event, and this broke the 
 
 Now Load Event keeps the event in memory for the run, and Invitee Lookup reads it there. The rule: **a component inside the loop body (the Agent, its tools and its model) must have no input from before the Loop.**
 
-Connection 17 closes the loop. The Agent decides one flag at a time. Its decision goes back into the Loop, and the Loop then sends the next flagged record. When every record is done, **Done** passes all the decisions on.
+**Why the Agent Decision box.** The Loop collects the **first** output of the last box in its body. For the Agent, that is its text Response, not the Structured Response, even when only the Structured Response is connected (found on 27 Oct: the first full run lost all 5 decisions). Agent Decision has one output, so the Loop collects the decision. The Agent also runs once for each record, not twice.
+
+Connections 17 and 22 close the loop. The Agent decides one flag at a time. Its decision goes back into the Loop, and the Loop then sends the next flagged record. When every record is done, **Done** passes all the decisions on.
 
 ## Step 4: Set up the Agent
 

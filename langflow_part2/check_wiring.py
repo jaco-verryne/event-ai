@@ -19,7 +19,7 @@ COMPONENTS = {
     "Extract RSVPs": ("ExtractRsvps",), "Check Records": ("CheckRecords",), "Loop": ("LoopComponent",),
     "Type Convert": ("TypeConverterComponent",), "Agent": ("Agent",), "CRM Lookup": ("CrmLookup",),
     "Invitee Lookup": ("InviteeLookup",), "Company Search": ("CompanySearch",),
-    "Apply Decisions": ("ApplyDecisions",), "Write Outputs": ("WriteOutputs",), "Chat Output": ("ChatOutput",),
+    "Agent Decision": ("AgentDecision",), "Apply Decisions": ("ApplyDecisions",), "Write Outputs": ("WriteOutputs",), "Chat Output": ("ChatOutput",),
 }
 # (step in WIRING.md step 3, from component, output name, to component, input name)
 CONNECTIONS = [
@@ -38,7 +38,8 @@ CONNECTIONS = [
     (14, "CRM Lookup", "component_as_tool", "Agent", "tools"),
     (15, "Invitee Lookup", "component_as_tool", "Agent", "tools"),
     (16, "Company Search", "component_as_tool", "Agent", "tools"),
-    (17, "Agent", "structured_response", "Loop", "item"),
+    (17, "Agent", "structured_response", "Agent Decision", "decision"),
+    (22, "Agent Decision", "decision_out", "Loop", "item"),
     (18, "Loop", "done", "Apply Decisions", "decisions"),
     (19, "Check Records", "checked", "Apply Decisions", "checked"),
     (20, "Apply Decisions", "final", "Write Outputs", "final"),
