@@ -48,7 +48,8 @@ def name_key(name: str) -> str:
 
 def company_key(name: str) -> str:
     """Lower case, no punctuation, no suffix: 'Quillmere Events Ltd' and 'Quillmere Events' match."""
-    words = re.sub(r"[^\w\s&]", " ", name.lower()).replace("&", " and ").split()
+    # Drop dots first, so that "P.L.C." becomes "plc" and not "p l c".
+    words = re.sub(r"[^\w\s&]", " ", name.lower().replace(".", "")).replace("&", " and ").split()
     return " ".join(w for w in words if w not in _SUFFIX_WORDS)
 
 

@@ -89,6 +89,8 @@ def test_normalize_company(raw, expected):
 def test_company_key_ignores_case_punctuation_and_suffix():
     assert checks.company_key("Quillmere Events Ltd") == checks.company_key("quillmere events")
     assert checks.company_key("Smith & Co. Limited") == "smith and co"
+    # The register writes some suffixes with dots (found in the live check on 27 Oct).
+    assert checks.company_key("MARKS AND SPENCER GROUP P.L.C.") == checks.company_key("Marks and Spencer Group PLC")
 
 
 def test_normalize_phone():
