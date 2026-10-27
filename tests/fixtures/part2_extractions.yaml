@@ -1,0 +1,15 @@
+# The extraction a correct LLM gives for each seed email (seed/rsvp_emails.yaml). Values are copied
+# exactly as the email writes them; null when the email does not give a value.
+e01: {full_name: Amelia Hart, email: amelia.hart@tallowmere.example, phone: 0113 496 0101, company: Tallowmere Foods Ltd, job_title: Partnerships Director, dietary_needs: null, attending: true}
+e02: {full_name: priya shah, email: Priya.Shah@Vellanthe.example, phone: 0161 496 0202, company: Vellanthe Systems Ltd, job_title: Head of Procurement, dietary_needs: null, attending: true}
+e03: {full_name: Marcus Bell, email: marcus.bell@thistlewick.example, phone: 0113 496 0303, company: Thistlewick Hotels Ltd, job_title: Events Lead, dietary_needs: null, attending: true}
+e04: {full_name: Marcus Bell, email: marcus.bell@thistlewick.example, phone: null, company: null, job_title: null, dietary_needs: vegetarian, attending: null}
+e05: {full_name: Jonathon Reed, email: J.Reed@Quillmere.example, phone: 0113 496 0461, company: Quillmere Events Ltd, job_title: Head of Partnerships, dietary_needs: null, attending: true}
+e06: {full_name: Jonathan Reed, email: jon.reed@mailbox.example, phone: null, company: Quillmere Events, job_title: null, dietary_needs: no nuts, attending: true}
+e07: {full_name: Bob Harper, email: r.harper@ferrowdale.example, phone: 0113 496 0388, company: Ferrowdale Consulting Ltd, job_title: Data Lead, dietary_needs: null, attending: true}
+e08: {full_name: Grace Liu, email: grace.liu@brightwyn.example, phone: 020 7946 0808, company: Brightwyn Analytcs, job_title: Insights Manager, dietary_needs: null, attending: true}
+e09: {full_name: Oliver Grant, email: oliver.grant@lintwhistle.example, phone: null, company: Lintwhistle Media Ltd, job_title: Creative Director, dietary_needs: null, attending: true}
+e10: {full_name: Sam Okoro, email: sam.okoro@saltmere.example, phone: 0113 496 07, company: Saltmere Freight PLC, job_title: Operations Manager, dietary_needs: null, attending: true}
+e11: {full_name: Leah Morgan, email: leah.morgan@tallowmere.example, phone: 0113 496 0909, company: Tallowmere Foods Ltd, job_title: Marketing Manager, dietary_needs: null, attending: true}
+e12: {full_name: Chloe Adams, email: chloe.adams@thistlewick.example, phone: 0113 496 0510, company: Thistlewick Hotels Ltd, job_title: Sales Manager, dietary_needs: null, attending: null}
+e13: {full_name: Ewan Fraser, email: ewan.fraser@vellanthe.example, phone: 0161 496 0611, company: Vellanthe Systems Ltd, job_title: CTO, dietary_needs: null, attending: false}
