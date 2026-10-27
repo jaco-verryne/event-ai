@@ -7,7 +7,7 @@ This file gives Claude Code the agreed design for the Inference Group "AI Agent 
 - **Owner:** Jaco.
 - **Goal:** a well-rounded demo in two parts. It is not a full system.
   - **Part 1:** a RAG app on the web. It answers questions from three structured documents.
-  - **Part 2:** an agent. It reads a calendar event and RSVP emails, then makes a verified attendee list.
+  - **Part 2:** an agent. It reads a calendar event and RSVP emails, then makes a verified attendee list. It runs as a Langflow flow on the laptop (D16).
 - **Client (fictional):** a UK event company. Its sales planners answer client questions about venues, packages and booking terms.
 - **Target:** send the submission pack on Mon 2 Nov 2026. Tue 3 Nov is a buffer day.
 - **Source of truth:** the Notion workspace "Inference Group — AI Agent Technical Challenge".
@@ -40,7 +40,7 @@ Rules:
 
 | ID | Decision |
 | --- | --- |
-| D1 | Code-first build: Python, LangGraph and Streamlit. |
+| D1 | Code-first build: Python and Streamlit. Part 2 runs in Langflow (D16), with custom components that wrap the tested code. |
 | D2 | Free models only. Groq is the primary provider. OpenRouter free models are the fallback on a rate-limit error. One OpenAI-compatible client. Local embeddings with fastembed. |
 | D3 | BM25 plus vector search, on text fields only. Chroma is the vector database. It runs inside the app, with no server. |
 | D4 | Host Part 1 on Streamlit Community Cloud, from the GitHub repository. |
@@ -51,10 +51,11 @@ Rules:
 | D9 | DuckDB reads the files. The LLM writes the SQL (text-to-SQL), with guardrails (section 8). |
 | D10 | Langfuse Cloud (Hobby plan) for traces. A self-hosted server is a future improvement. |
 | D11 | Build in Claude Code. Use the claude.ai chat for design, Notion and reviews. |
-| D12 | Part 2 resolution is a bounded agent loop: read-only lookups (CRM, invitees, Companies House), at most 3 for each flagged record, then one decision for each flag. Code accepts a value only when it is in the evidence. Orchestrator: LangGraph in the approved plan; Langflow is under review (spike, 27 Oct). |
+| D12 | Part 2 resolution is a bounded agent loop: read-only lookups (CRM, invitees, Companies House), at most 3 for each flagged record, then one decision for each flag. Code accepts a value only when it is in the evidence. Orchestrator: the Langflow Agent in a Loop (D16). |
 | D13 | Fictional firms only. Companies House "not on the register" is an audit note, not a flag. A failed call gives `web_check_failed`. |
 | D14 | Own read-only Calendar and Gmail wrappers on `google-api-python-client`, not the `langchain-google-community` toolkit. |
-| D15 | Provider order for each step (section 9). Part 1 and Part 2 extraction: Groq first. Part 2 agent step: OpenRouter Nemotron first, Groq fallback. |
+| D15 | Provider order for each step (section 9). Part 1 and Part 2 extraction: Groq first. Part 2 agent step: OpenRouter Nemotron first, Groq fallback (in Langflow: OpenRouter only, see D16). |
+| D16 | Part 2 runs in Langflow 1.13 on the laptop, in its own venv (`.venv-langflow`, `langflow_part2/requirements.txt`). Custom components (category Event Ai) wrap the `eventai` modules; Jaco wires the canvas by hand (`langflow_part2/WIRING.md`). The Langflow Agent cannot fall back to another provider: a missing or invalid decision goes to human review. Part 1 stays plain Python on Streamlit Cloud. LangGraph is not used. |
 
 ## 4. Stack
 
@@ -65,7 +66,6 @@ Use these packages only, unless Jaco agrees to more:
 | Python 3.12 | Runtime |
 | `openai` | One client for Groq, OpenRouter and (later) Azure OpenAI |
 | `pydantic` | All schemas and the validation of LLM output |
-| `langgraph` | The Part 2 graph |
 | `fastembed` | Local embeddings, model `BAAI/bge-small-en-v1.5` |
 | `chromadb` | Vector search with metadata filters |
 | `rank-bm25` | Keyword search |
@@ -81,6 +81,8 @@ Use these packages only, unless Jaco agrees to more:
 | `pytest`, `pyyaml` | Tests and the evaluation files |
 
 Keep `requirements.txt` at the repository root, because Streamlit Community Cloud reads it.
+
+Part 2 runs in Langflow (D16), in its own venv `.venv-langflow` from `langflow_part2/requirements.txt` (`langflow==1.13.0`, `langchain-groq`). Langflow pins older `duckdb`, `langfuse` and `pydantic` than Part 1, so the two venvs stay apart. The `eventai` modules run in both.
 
 ## 5. Repository layout
 
@@ -127,12 +129,19 @@ Keep `requirements.txt` at the repository root, because Streamlit Community Clou
 │       │   ├── companies_house.py
 │       │   └── seed_files.py    # the seed files as a source (--source seed), the CRM, venue capacity
 │       ├── schema.py            # ExtractedRsvp, FieldValue, Attendee, Event, Email, Record, AuditEntry
-│       ├── extract.py           # LLM extraction node
+│       ├── extract.py           # LLM extraction: prompt, parse, one retry (any model)
 │       ├── checks.py            # grounding, normalization, deduplication, verification (plain code)
 │       ├── output.py            # attendees.csv, audit_log.json, run_report.json
-│       ├── resolve.py           # LLM resolution node (flagged records only)
-│       ├── graph.py             # LangGraph state graph
-│       └── run.py               # entry point: python -m eventai.agent.run
+│       ├── review.py            # the agent step: review queue, instructions, code check of decisions
+│       ├── lookups.py           # the agent tools: CRM, invitee list, Companies House
+│       └── flow_io.py           # Langflow tables and Data to plain dicts
+├── langflow_part2/              # Part 2 in Langflow (D16)
+│   ├── requirements.txt         # the Langflow venv (.venv-langflow)
+│   ├── serve.sh                 # start Langflow on http://localhost:7860
+│   ├── WIRING.md                # how to wire the flow by hand
+│   ├── components/event_ai/     # custom components, one file each
+│   ├── smoke.sh                 # smoke test of the components, no LLM call
+│   └── .data/                   # Langflow database (gitignored)
 ├── seed/
 │   ├── seed_google.py           # makes the event and inserts the RSVP emails
 │   ├── event.yaml               # the event, its invitees and its venue
@@ -354,18 +363,16 @@ Rules in `checks.py`, beyond the flow above:
 - Info flags (`phone_absent`, `web_check_failed`) go to the run report only. Every other flag sends the record to the agent step.
 - Attendee IDs follow the date of the first email.
 
-### 10.3 Graph (LangGraph)
+### 10.3 Flow (Langflow, D16)
 
-- Nodes: `fetch_event`, `fetch_emails`, `extract`, `ground`, `normalize`, `dedupe`, `verify`, `resolve`, `write_output`.
-- Conditional edges:
-  - `extract` back to `extract` once, for invalid output.
-  - `verify` to `resolve` only when records have flags. If not, `verify` goes to `write_output`.
-- The state holds the event, the emails, the attendees, the audit log and the errors.
-- Add the Langfuse callback handler to the graph run.
+- Components (`langflow_part2/WIRING.md` has the 21 connections): Chat Input → Load Event → Load RSVP Emails → Extract RSVPs (Groq primary, OpenRouter fallback) → Check Records → Loop over the review queue (Type Convert → Agent with CRM Lookup, Invitee Lookup and Company Search, on OpenRouter Nemotron) → Apply Decisions → Write Outputs → Chat Output.
+- The Loop runs the Agent once for each review flag (Max Iterations 4, no chat history). The Agent's Structured Response goes back into the Loop; Done passes all the decisions to Apply Decisions.
+- Extraction retries once on invalid output, then tries the fallback model. A failed email is in the run report.
+- The Langflow server sends one Langfuse trace for each run (environment `agent`), with a span for each component and the LLM calls. `lfx run` sends no trace, so the run command calls the server API.
 
 ### 10.4 Rules
 
-- The LLM works in two nodes only: `extract` and `resolve`. All other nodes are plain code.
+- The LLM works in two steps only: Extract RSVPs and the Agent. All other components are plain code.
 - Each tool call has a timeout and retries with backoff (`tenacity`).
 - A failed tool does not stop the run. The affected records get a flag, for example `web check failed`.
 - The audit log records the source of each value, each change, each rule result and each resolution reason.
@@ -459,7 +466,8 @@ pip install -r requirements.txt
 python data/generate_venues.py          # make venues.csv
 streamlit run streamlit_app.py          # Part 1
 python seed/seed_google.py              # one time: seed the demo account
-python -m eventai.agent.run --event-id <id>   # Part 2
+langflow_part2/serve.sh                # Part 2: Langflow on http://localhost:7860
+langflow_part2/smoke.sh                # Part 2 components, no LLM call
 pytest                                  # tests
 python eval/run_part1.py                # Part 1 scores
 python eval/run_part2.py                # Part 2 scores

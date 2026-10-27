@@ -1,0 +1,148 @@
+# Wire the Part 2 flow in Langflow
+
+This guide builds the Part 2 attendee-list flow by hand: 16 components and 21 connections. It takes about 30–45 minutes.
+
+## Before you start
+
+- Langflow runs at <http://localhost:7860>. Claude Code starts it with `langflow_part2/serve.sh`, or you can run that command yourself in a terminal.
+- You do not need an account (auto-login).
+- The keys come from `.env`. Langflow already shows `GROQ_API_KEY` and `OPENROUTER_API_KEY`.
+
+## How the editor works
+
+- The **left sidebar** lists the components. Type a name in **Search**. Our components are in the category **Event Ai**.
+- **Drag** a component onto the canvas.
+- **Inputs are on the left** of a component, and **outputs are on the right**. To connect, drag from an output dot to an input dot. The colours show the data type, and only matching types connect.
+- **Some outputs have a menu.** When a component has more than one output, click the output name and select the one you need, for example **Language Model** or **Structured Response**.
+- **Settings:** click a component to open its settings panel. Some settings are under **advanced** (the "Show advanced" or "Controls" view).
+- **Tool Mode:** a switch in the menu of a component (the "..." at the top of the box). With Tool Mode on, the output becomes **Toolset**.
+
+## Step 1: Create the flow
+
+1. Click **Create first flow** (or **New Flow**), then **Blank Flow**.
+2. Click the flow name at the top. Rename it to exactly **`Part 2 attendee list`**. The run command finds the flow by this name.
+
+## Step 2: Add the components
+
+A suggested layout, from left to right:
+
+| Column | Components |
+| --- | --- |
+| 1 | Chat Input, Load Event |
+| 2 | Load RSVP Emails, Language Model (Groq), Language Model (OpenRouter) |
+| 3 | Extract RSVPs, Check Records |
+| 4 | Loop, Type Convert |
+| 5 | Agent, CRM Lookup, Invitee Lookup, Company Search |
+| 6 | Apply Decisions, Write Outputs, Chat Output |
+
+| # | Component | Sidebar | Settings |
+| --- | --- | --- | --- |
+| 1 | Chat Input | Input & Output | none |
+| 2 | Load Event | Event Ai | **Source**: `seed` (`google` needs the demo account) |
+| 3 | Load RSVP Emails | Event Ai | none |
+| 4 | Language Model, rename it "Groq" | Models & Agents | See the note below the table. |
+| 5 | Language Model, rename it "OpenRouter" | Models & Agents | **Language Model**: OpenRouter `nvidia/nemotron-3.5-super-vl:free`. **Temperature**: `0` (advanced). |
+| 6 | Extract RSVPs | Event Ai | none |
+| 7 | Check Records | Event Ai | none |
+| 8 | Loop | Flow Control | none |
+| 9 | Type Convert | Processing | **Output Type**: `Message` |
+| 10 | Agent | Models & Agents | See step 4. |
+| 11 | CRM Lookup | Event Ai | **Tool Mode on** |
+| 12 | Invitee Lookup | Event Ai | **Tool Mode on** |
+| 13 | Company Search | Event Ai | **Tool Mode on** |
+| 14 | Apply Decisions | Event Ai | none |
+| 15 | Write Outputs | Event Ai | none (it writes to `outputs/`) |
+| 16 | Chat Output | Input & Output | none |
+
+**The Groq model (component 4).** The Groq model list in the dropdown is empty in this Langflow version, so this component uses the override fields:
+1. Select any model in the dropdown, for example the OpenRouter Nemotron model.
+2. Under advanced, set **Provider Override** to `Groq`.
+3. Set **Model Name Override** to `openai/gpt-oss-120b`.
+4. Set **Temperature** to `0`.
+
+This setting was tested on the server on 27 Oct.
+
+## Step 3: Connect the components
+
+Click the output name first, where the step says so.
+
+| # | From (output) | To (input) |
+| --- | --- | --- |
+| 1 | Chat Input · **Chat Message** | Load Event · **Event ID** |
+| 2 | Load Event · **Event** | Load RSVP Emails · **Event** |
+| 3 | Load Event · **Event** | Check Records · **Event** |
+| 4 | Load Event · **Event** | Invitee Lookup · **Event** |
+| 5 | Load RSVP Emails · **Emails** | Extract RSVPs · **Emails** |
+| 6 | Load RSVP Emails · **Emails** | Check Records · **Emails** |
+| 7 | Groq · **Language Model** (select this output) | Extract RSVPs · **Primary model** |
+| 8 | OpenRouter · **Language Model** (select this output) | Extract RSVPs · **Fallback model** |
+| 9 | OpenRouter · **Language Model** | Agent · **Language Model** |
+| 10 | Extract RSVPs · **Extractions** | Check Records · **Extractions** |
+| 11 | Check Records · **Review queue** | Loop · **Inputs** |
+| 12 | Loop · **Item** | Type Convert · **Input** |
+| 13 | Type Convert · **Message Output** | Agent · **Input** |
+| 14 | CRM Lookup · **Toolset** | Agent · **Tools** |
+| 15 | Invitee Lookup · **Toolset** | Agent · **Tools** |
+| 16 | Company Search · **Toolset** | Agent · **Tools** |
+| 17 | Agent · **Structured Response** (select this output) | Loop · the **looping** dot on the Item output |
+| 18 | Loop · **Done** | Apply Decisions · **Decisions** |
+| 19 | Check Records · **Checked records** | Apply Decisions · **Checked records** |
+| 20 | Apply Decisions · **Final records** | Write Outputs · **Final records** |
+| 21 | Write Outputs · **Summary** | Chat Output · **Inputs** |
+
+Connection 17 closes the loop. The Agent decides one flag at a time. Its decision goes back into the Loop, and the Loop then sends the next flagged record. When every record is done, **Done** passes all the decisions on.
+
+## Step 4: Set up the Agent
+
+1. **Agent Instructions:** paste this text:
+
+   ```text
+   You resolve one flag on one attendee record of a company event.
+   First call the CRM lookup tool with the attendee's email address. Use the invitee lookup tool for an invitation
+   question, and the company search tool for a company question. Make at most 3 tool calls.
+
+   Then decide the flag:
+   - use_value: replace the field with a value that a tool result or a source email shows. Copy the value exactly.
+   - keep: the current value is correct.
+   - human_review: the evidence does not settle the flag, or a person must decide (for example a substitute guest).
+   Never invent a value. Give the source of the value (for example crm.csv#C007) and one sentence as the reason.
+   ```
+
+   The same text is `AGENT_INSTRUCTIONS` in `eventai/agent/review.py`.
+
+2. **Advanced settings:**
+
+   | Setting | Value | Why |
+   | --- | --- | --- |
+   | Max Iterations | `4` | At most 3 lookups, then the decision. |
+   | Number of Chat History Messages | `0` | Each record starts with no memory of the last one. |
+   | Current Date | off | Not needed. |
+   | Calculator | off | Not needed. |
+
+3. **Output Schema** (advanced, **Open table**): add 6 rows. Each row has the type `str`, and **As List** is off.
+
+   | Name | Description |
+   | --- | --- |
+   | `attendee_id` | the record ID, for example A06 |
+   | `flag` | the flag you decide, exactly as given |
+   | `action` | use_value, keep or human_review |
+   | `value` | the new value for use_value, copied from the evidence; empty otherwise |
+   | `source` | where the value comes from, for example crm.csv#C007 |
+   | `reason` | one sentence |
+
+4. At the Agent's output, select **Structured Response** (connection 17).
+
+## Step 5: Run it
+
+1. Click **Playground** (top right).
+2. Type `partnersummit2026` and press Enter.
+3. Each component turns green when it finishes.
+4. The run takes about 1–3 minutes: 13 extraction calls on Groq, then about 5–15 agent calls on OpenRouter.
+5. The answer shows the summary: the emails, the attendees, the flags, the resolutions, the capacity and the invitees with no reply.
+
+If a component turns red, click it to see the error, and tell Claude Code. Claude Code can read your flow through the Langflow API, check each connection against this guide, run the flow, score it, and find its Langfuse trace.
+
+## The free limits
+
+- **OpenRouter:** 50 free requests a day. One run uses about 5–15, plus a fallback call when Groq gives a rate limit.
+- **Groq:** 8,000 tokens a minute. When Groq gives a rate limit, the run slows down. Extract RSVPs then uses the OpenRouter fallback for that email.
