@@ -20,3 +20,7 @@ __pycache__/
 
 # Local tool config
 .claude/launch.json
+
+# Part 2 Langflow: its venv, and its database (it holds the secret key and the API keys)
+.venv-langflow/
+langflow_part2/.data/

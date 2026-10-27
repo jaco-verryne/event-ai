@@ -1,0 +1,10 @@
+# Part 2 runs in Langflow, in its own venv (.venv-langflow), on the laptop (D6, D16).
+# Not in the root requirements.txt: Streamlit Community Cloud installs that file for Part 1.
+langflow==1.13.0
+langchain-groq==1.1.3
+phonenumbers==9.0.41
+rapidfuzz==3.14.6
+google-api-python-client  # version set by langflow
+google-auth-oauthlib  # version set by langflow
+tenacity  # version set by langflow
+pyyaml
