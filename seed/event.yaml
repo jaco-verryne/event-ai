@@ -1,0 +1,23 @@
+# The Part 2 calendar event. seed/seed_google.py creates it in the demo account with this ID.
+# All people, firms, email domains (.example) and phone numbers (Ofcom drama ranges) are fictional.
+event_id: partnersummit2026
+summary: Northern Partners Summit 2026
+start: "2026-11-26T14:00:00+00:00"
+end: "2026-11-26T18:00:00+00:00"
+time_zone: Europe/London
+description: |
+  An afternoon of talks and drinks for our partners in the north.
+  Venue: V113
+invitees:
+  - {name: Amelia Hart, email: amelia.hart@tallowmere.example}
+  - {name: Priya Shah, email: priya.shah@vellanthe.example}
+  - {name: Marcus Bell, email: marcus.bell@thistlewick.example}
+  - {name: Jonathan Reed, email: j.reed@quillmere.example}
+  - {name: Robert Harper, email: r.harper@ferrowdale.example}
+  - {name: Grace Liu, email: grace.liu@brightwyn.example}
+  - {name: Oliver Grant, email: oliver.grant@lintwhistle.example}
+  - {name: Sam Okoro, email: sam.okoro@saltmere.example}
+  - {name: Tom Price, email: tom.price@tallowmere.example}
+  - {name: Chloe Adams, email: chloe.adams@thistlewick.example}
+  - {name: Ewan Fraser, email: ewan.fraser@vellanthe.example}
+  - {name: Ravi Desai, email: ravi.desai@brackenlow.example}

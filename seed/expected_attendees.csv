@@ -1,0 +1,12 @@
+source_keys,full_name,email,phone,company,job_title,dietary_needs,attending,flags,resolution
+e01,Amelia Hart,amelia.hart@tallowmere.example,+441134960101,Tallowmere Foods Ltd,Partnerships Director,,yes,,
+e02,Priya Shah,priya.shah@vellanthe.example,+441614960202,Vellanthe Systems Ltd,Head of Procurement,,yes,,
+e03;e04,Marcus Bell,marcus.bell@thistlewick.example,+441134960303,Thistlewick Hotels Ltd,Events Lead,vegetarian,yes,,
+e05;e06,Jonathan Reed,j.reed@quillmere.example,+441134960461,Quillmere Events Ltd,Head of Partnerships,no nuts,yes,,
+e07,Robert Harper,r.harper@ferrowdale.example,+441134960388,Ferrowdale Consulting Ltd,Data Lead,,yes,name_differs_from_crm,name_differs_from_crm:use_value
+e08,Grace Liu,grace.liu@brightwyn.example,+442079460808,Brightwyn Analytics Ltd,Insights Manager,,yes,company_differs_from_crm,company_differs_from_crm:use_value
+e09,Oliver Grant,oliver.grant@lintwhistle.example,,Lintwhistle Media Ltd,Creative Director,,yes,phone_absent,
+e10,Sam Okoro,sam.okoro@saltmere.example,+441134960712,Saltmere Freight PLC,Operations Manager,,yes,phone_invalid,phone_invalid:use_value
+e11,Leah Morgan,leah.morgan@tallowmere.example,+441134960909,Tallowmere Foods Ltd,Marketing Manager,,yes,not_invited,not_invited:human_review
+e12,Chloe Adams,chloe.adams@thistlewick.example,+441134960510,Thistlewick Hotels Ltd,Sales Manager,,,attendance_unclear,attendance_unclear:human_review
+e13,Ewan Fraser,ewan.fraser@vellanthe.example,+441614960611,Vellanthe Systems Ltd,CTO,,no,,

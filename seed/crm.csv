@@ -1,0 +1,13 @@
+contact_id,full_name,email,phone,company,job_title
+C001,Amelia Hart,amelia.hart@tallowmere.example,+441134960101,Tallowmere Foods Ltd,Partnerships Director
+C002,Priya Shah,priya.shah@vellanthe.example,+441614960202,Vellanthe Systems Ltd,Head of Procurement
+C003,Marcus Bell,marcus.bell@thistlewick.example,+441134960303,Thistlewick Hotels Ltd,Events Lead
+C004,Helen Ward,helen.ward@tallowmere.example,+441134960404,Tallowmere Foods Ltd,Finance Manager
+C005,Jonathan Reed,j.reed@quillmere.example,+441134960461,Quillmere Events Ltd,Head of Partnerships
+C006,Robert Harper,r.harper@ferrowdale.example,+441134960388,Ferrowdale Consulting Ltd,Data Lead
+C007,Sam Okoro,sam.okoro@saltmere.example,+441134960712,Saltmere Freight PLC,Operations Manager
+C008,Grace Liu,grace.liu@brightwyn.example,+442079460808,Brightwyn Analytics Ltd,Insights Manager
+C009,Leah Morgan,leah.morgan@tallowmere.example,+441134960909,Tallowmere Foods Ltd,Marketing Manager
+C010,Chloe Adams,chloe.adams@thistlewick.example,+441134960510,Thistlewick Hotels Ltd,Sales Manager
+C011,Ewan Fraser,ewan.fraser@vellanthe.example,+441614960611,Vellanthe Systems Ltd,CTO
+C012,Tom Price,tom.price@tallowmere.example,+441134960612,Tallowmere Foods Ltd,Commercial Director

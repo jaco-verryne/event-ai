@@ -1,0 +1,140 @@
+# RSVP emails for the Part 2 event, with known defects (CLAUDE.md 10.7, D13).
+# The Message-ID carries the key, so the scorer can match a record to its emails after the Gmail round trip.
+- key: e01   # clean, in the CRM
+  from: "Amelia Hart <amelia.hart@tallowmere.example>"
+  date: "2026-11-02T09:15:00+00:00"
+  subject: "Re: Invitation: Northern Partners Summit 2026"
+  body: |
+    Hi,
+
+    Thanks for the invitation. I'm pleased to confirm that I will attend on 26 November.
+
+    Kind regards,
+    Amelia Hart
+    Partnerships Director | Tallowmere Foods Ltd
+    T: 0113 496 0101
+- key: e02   # lower-case name, mixed-case email
+  from: "priya shah <Priya.Shah@Vellanthe.example>"
+  date: "2026-11-02T11:40:00+00:00"
+  subject: "Northern Partners Summit 2026"
+  body: |
+    Hello, yes please count me in for the summit.
+
+    Thanks,
+    priya shah
+    Head of Procurement, Vellanthe Systems Ltd
+    0161 496 0202
+- key: e03   # first of two emails from the same address
+  from: "Marcus Bell <marcus.bell@thistlewick.example>"
+  date: "2026-11-02T14:02:00+00:00"
+  subject: "Re: Invitation: Northern Partners Summit 2026"
+  body: |
+    Happy to confirm my attendance at the Northern Partners Summit.
+
+    Marcus Bell
+    Events Lead, Thistlewick Hotels Ltd
+    0113 496 0303
+- key: e04   # same address again: adds a dietary need
+  from: "Marcus Bell <marcus.bell@thistlewick.example>"
+  date: "2026-11-03T08:40:00+00:00"
+  subject: "Re: Northern Partners Summit 2026"
+  body: |
+    Sorry, I forgot to mention: I'm vegetarian.
+
+    Marcus Bell
+- key: e05   # work email, typo in the first name
+  from: "Jonathon Reed <J.Reed@Quillmere.example>"
+  date: "2026-11-03T09:12:00+00:00"
+  subject: "RE: Northern Partners Summit 2026"
+  body: |
+    Hi team,
+
+    Thanks for the invite - I'll be there on the 26th.
+
+    Best,
+    Jonathon Reed
+    Head of Partnerships, Quillmere Events Ltd
+    Tel: 0113 496 0461
+- key: e06   # same person from a personal address, firm without its suffix
+  from: "Jonathan Reed <jon.reed@mailbox.example>"
+  date: "2026-11-05T19:30:00+00:00"
+  subject: "Northern Partners Summit 2026 - dietary note"
+  body: |
+    Hi, I'm writing from my personal email. Just to add: no nuts for me, please.
+    Looking forward to the summit.
+
+    Jonathan Reed
+    Quillmere Events
+- key: e07   # nickname: the CRM has Robert Harper
+  from: "Bob Harper <r.harper@ferrowdale.example>"
+  date: "2026-11-03T14:40:00+00:00"
+  subject: "Summit RSVP"
+  body: |
+    Count me in for the Northern Partners Summit.
+
+    Cheers,
+    Bob Harper
+    Data Lead | Ferrowdale Consulting Ltd
+    0113 496 0388
+- key: e08   # typo in the firm name
+  from: "Grace Liu <grace.liu@brightwyn.example>"
+  date: "2026-11-04T10:05:00+00:00"
+  subject: "Re: Invitation: Northern Partners Summit 2026"
+  body: |
+    I will attend. See you there.
+
+    Regards,
+    Grace Liu
+    Insights Manager, Brightwyn Analytcs
+    020 7946 0808
+- key: e09   # no phone number, not in the CRM
+  from: "Oliver Grant <oliver.grant@lintwhistle.example>"
+  date: "2026-11-04T11:20:00+00:00"
+  subject: "Northern Partners Summit 2026"
+  body: |
+    Yes, I'll be there.
+
+    Oliver Grant
+    Creative Director, Lintwhistle Media Ltd
+- key: e10   # phone number with too few digits
+  from: "Sam Okoro <sam.okoro@saltmere.example>"
+  date: "2026-11-04T08:05:00+00:00"
+  subject: "Re: Invitation: Northern Partners Summit 2026"
+  body: |
+    Yes, I will attend. My mobile is 0113 496 07 if you need me on the day.
+
+    Sam Okoro
+    Operations Manager
+    Saltmere Freight PLC
+- key: e11   # substitute for an invitee: not on the invitee list
+  from: "Leah Morgan <leah.morgan@tallowmere.example>"
+  date: "2026-11-05T16:45:00+00:00"
+  subject: "Northern Partners Summit 2026 - Tom Price"
+  body: |
+    Hi,
+
+    Tom Price can't make it, so I'll come in his place, if that's OK.
+
+    Leah Morgan
+    Marketing Manager, Tallowmere Foods Ltd
+    0113 496 0909
+- key: e12   # attendance not clear
+  from: "Chloe Adams <chloe.adams@thistlewick.example>"
+  date: "2026-11-06T09:00:00+00:00"
+  subject: "Re: Invitation: Northern Partners Summit 2026"
+  body: |
+    Thanks for the invite. I'll try to make it, but I can't promise yet.
+
+    Chloe Adams
+    Sales Manager, Thistlewick Hotels Ltd
+    0113 496 0510
+- key: e13   # declines
+  from: "Ewan Fraser <ewan.fraser@vellanthe.example>"
+  date: "2026-11-06T12:30:00+00:00"
+  subject: "Re: Invitation: Northern Partners Summit 2026"
+  body: |
+    Sadly I can't attend this time. Please keep me on the list for the next one.
+
+    Ewan Fraser
+    CTO, Vellanthe Systems Ltd
+    0161 496 0611
