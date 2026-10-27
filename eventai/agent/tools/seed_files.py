@@ -63,12 +63,14 @@ def venue_id_from(description: str) -> str | None:
     return None
 
 
-def venue_capacity(venue_id: str | None, path: Path = VENUES_CSV) -> int | None:
-    """Seated capacity from the Part 1 venues file: the link between the two parts."""
+def venue_row(venue_id: str | None, path: Path = VENUES_CSV) -> dict[str, str] | None:
+    """The venue's row in the Part 1 venues file: the link between the two parts."""
     if not venue_id:
         return None
     with path.open(newline="") as f:
-        for row in csv.DictReader(f):
-            if row["venue_id"] == venue_id:
-                return int(row["seated_capacity"])
-    return None
+        return next((row for row in csv.DictReader(f) if row["venue_id"] == venue_id), None)
+
+
+def venue_capacity(venue_id: str | None, path: Path = VENUES_CSV) -> int | None:
+    row = venue_row(venue_id, path)
+    return int(row["seated_capacity"]) if row else None
