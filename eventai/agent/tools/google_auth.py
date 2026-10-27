@@ -12,6 +12,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from eventai.agent.tools import TIMEOUT_SECONDS, ToolError, retrying
+from eventai.config import ROOT, load_settings
 
 # The agent reads only. The write scopes belong to seed/seed_google.py and its own token file.
 AGENT_SCOPES = [
@@ -40,6 +41,13 @@ def load_credentials(client_secret_file: str | Path, token_file: str | Path, sco
         creds = InstalledAppFlow.from_client_secrets_file(str(client_secret_file), scopes).run_local_server(port=0)
     token_file.write_text(creds.to_json())
     return creds
+
+
+def agent_credentials() -> Credentials:
+    """The read-only token for the agent, with the file paths from the config (relative to the repository)."""
+    settings = load_settings()
+    return load_credentials(ROOT / settings.google_client_secret_file, ROOT / settings.google_token_file,
+                            AGENT_SCOPES)
 
 
 def build_service(api: str, version: str, credentials: Credentials, timeout: int = TIMEOUT_SECONDS):

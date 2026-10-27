@@ -103,16 +103,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--outputs", type=Path, default=OUTPUTS, help="folder with attendees.csv")
     parser.add_argument("--expected", type=Path, default=EXPECTED)
+    parser.add_argument("--no-save", action="store_true", help="print the scores only (for a smoke test)")
     args = parser.parse_args()
 
     report = score(read_rows(args.expected), read_rows(args.outputs / "attendees.csv"))
     run_report = args.outputs / "run_report.json"
     if run_report.exists():
         report["run"] = json.loads(run_report.read_text())
-    RESULTS.mkdir(parents=True, exist_ok=True)
-    out = RESULTS / f"{date.today().isoformat()}_part2.json"
-    out.write_text(json.dumps(report, indent=2, default=str) + "\n")
-
     f, fl, d, r = report["flags"], report["fields"], report["deduplication"], report["resolutions"]
     print(f"Flags        precision {f['precision']:.0%}  recall {f['recall']:.0%}  "
           f"(TP {f['true_positives']}, FP {f['false_positives']}, FN {f['false_negatives']}; "
@@ -123,7 +120,11 @@ def main() -> None:
     print(f"Resolutions  accuracy {r['accuracy']:.0%}  ({r['correct']} of {r['total']})")
     for miss in f["misses"] + fl["misses"] + r["misses"]:
         print("  miss:", miss)
-    print(f"Wrote {out.relative_to(ROOT)}")
+    if not args.no_save:
+        RESULTS.mkdir(parents=True, exist_ok=True)
+        out = RESULTS / f"{date.today().isoformat()}_part2.json"
+        out.write_text(json.dumps(report, indent=2, default=str) + "\n")
+        print(f"Wrote {out.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
