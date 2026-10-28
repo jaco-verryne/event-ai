@@ -59,6 +59,7 @@ Rules:
 | D16 | Part 2 runs in Langflow 1.13 on the laptop, in its own venv (`.venv-langflow`, `langflow_part2/requirements.txt`). Custom components (category Event Ai) wrap the `eventai` modules; Jaco wires the canvas by hand (`langflow_part2/WIRING.md`). The Langflow Agent cannot fall back to another provider: a missing or invalid decision goes to human review. Part 1 stays plain Python on Streamlit Cloud. LangGraph is not used. |
 | D17 | Planner brief: after the list is final, Part 2 asks Part 1's `ask()` (in the Part 1 venv, as a subprocess) about the event: guest numbers, dietary needs, venue and access, and data retention. The answers keep their sources; code computes the dates from the cited policy rules. |
 | D18 | Part 2 starts itself: `python -m eventai.agent.run` finds the upcoming events in Calendar and runs the saved Langflow flow through the server API (so the server traces each run). With `--watch`, it runs again when an event's RSVP emails change in Gmail. Publishing the outputs to the website stays a deliberate commit and push. |
+| D19 | Inbox noise: the Gmail search finds the emails that name the event, without the account's own mail (`-from:me`). The extraction call also returns `is_rsvp`; code keeps an email that is not an RSVP (an auto-reply, a supplier) off the list, with an audit entry and a line in the run report. Only an explicit `false` skips an email. |
 
 ## 4. Stack
 
@@ -153,6 +154,7 @@ Part 2 runs in Langflow (D16), in its own venv `.venv-langflow` from `langflow_p
 │   ├── event.yaml               # the event, its invitees and its venue
 │   ├── rsvp_emails.yaml         # the seed emails, with known defects
 │   ├── late_rsvp.yaml           # a late reply for the watcher demo (seed_google.py --late)
+│   ├── noise_emails.yaml        # emails that are not RSVPs (seed_google.py --noise, D19)
 │   ├── crm.csv                  # reference data
 │   ├── expected_attendees.csv   # expected output for the Part 2 score
 │   └── expected_late.csv        # expected row of the late reply (scored when the run has it)
@@ -316,8 +318,8 @@ The debug panel shows the SQL and the result rows.
 One command starts a full run: `python -m eventai.agent.run` (D18). It finds the upcoming events in Calendar (a `Venue: V…` line in the description), or takes `--event-id <id>`, and runs the saved Langflow flow through the server API. `--watch` checks Gmail every few minutes and runs an event again when its RSVP emails change (state in `.watch_state.json`). The run has no human step; the trigger (`command` or `watch`, with the reason) goes into the run report.
 
 1. **Calendar tool:** get the event, the invitee list and the venue ID (from the event description).
-2. **Email tool:** get the RSVP emails for the event.
-3. **Extraction (LLM):** one call per email, into `ExtractedRsvp`. One retry on invalid output.
+2. **Email tool:** get the emails that name the event (a Gmail search, without the account's own mail).
+3. **Extraction (LLM):** one call per email, into `ExtractedRsvp`. One retry on invalid output. The call also says whether the email is an RSVP; code keeps a non-RSVP off the list, with an audit entry (D19).
 4. **Grounding check (code):** each extracted value must appear in its source email (fuzzy match). A value with no support gets a flag.
 5. **Normalization (code):** name case, lower-case emails, E.164 phone numbers (default region GB), standard company suffixes (Ltd, Limited, PLC).
 6. **Deduplication (code):** exact match on email first, then fuzzy match on name and company. Keep the source of each value.
@@ -329,6 +331,7 @@ One command starts a full run: `python -m eventai.agent.run` (D18). It finds the
 
 ```python
 class ExtractedRsvp(BaseModel):
+    is_rsvp: bool | None = True   # D19: only an explicit False skips the email
     full_name: str | None
     email: str | None
     phone: str | None
@@ -406,6 +409,7 @@ Rules in `checks.py`, beyond the flow above:
 - One calendar event, about 12 RSVP emails, and `seed/crm.csv`.
 - Known defects: duplicates, typos, a nickname, mixed-case emails, an absent phone number, a substitute attendee who is not on the invitee list, and a company name that differs from the CRM (D13).
 - Synthetic only: invented names, fictional firms, `.example` email domains, and phone numbers from the Ofcom drama ranges. Use the geographic ranges (for example 0113 496 0xxx); `phonenumbers` rejects the mobile range 07700 900xxx as invalid.
+- Inbox noise (`seed/noise_emails.yaml`, D19): an out-of-office reply and a supplier quote that name the event (the extraction marks them not RSVPs), and a newsletter and an advert that do not (the search leaves them out). `eval/run_part2.py` checks that they stay off the list and that no RSVP is skipped.
 - Write `seed/expected_attendees.csv` by hand. `eval/run_part2.py` measures the precision and recall of the flags against it.
 
 ## 11. Evaluation
@@ -482,6 +486,7 @@ langflow_part2/smoke.sh                # Part 2 components, no LLM call
 python -m eventai.agent.run            # Part 2: find the events in Calendar and run the flow (D18)
 python -m eventai.agent.run --watch --every 60   # run again when RSVP emails change
 python seed/seed_google.py --late       # the watcher demo: insert the late RSVP (once)
+python seed/seed_google.py --noise      # insert the emails that are not RSVPs (once, D19)
 pytest                                  # tests
 python eval/run_part1.py                # Part 1 scores
 python eval/run_part2.py                # Part 2 scores
