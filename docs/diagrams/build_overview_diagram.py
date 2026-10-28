@@ -36,8 +36,8 @@ p.e("ask-data", "ask", "data", "reads", extra="exitX=0.5;exitY=0;entryX=0.5;entr
 # Part 2: the agent on the laptop.
 p.v("p2", "Part 2 · attendee-list agent · Langflow on the laptop", LANE + "fillColor=#ffffff;strokeColor=#9673a6;",
     880, 70, 520, 550)
-p.v("trig", "<b>Planner starts a run</b> · Langflow Playground: partnersummit2026", BOX + META, 20, 45, 480, 50, "p2")
-p.v("goog", "<b>Google Calendar + Gmail</b> (demo account, read-only)<br>event · invitees · venue ID V113 · 13 RSVP emails",
+p.v("trig", "<b>Run command</b> or <b>Gmail watcher</b> · python -m eventai.agent.run → Langflow server API", BOX + META, 20, 45, 480, 50, "p2")
+p.v("goog", "<b>Google Calendar + Gmail</b> (demo account, read-only)<br>event · invitees · venue ID V113 · emails that name the event",
     BOX + META, 20, 120, 480, 60, "p2")
 p.v("flow", "<b>Extract RSVPs</b> (LLM) → <b>Check Records</b> (code)<br>→ <b>Loop: Agent</b> with 3 read-only tools (LLM)<br>"
     "→ <b>Apply Decisions</b> (code)", BOX + LLM, 20, 210, 480, 80, "p2")
@@ -62,7 +62,7 @@ p.v("pkg", "<b>eventai package</b><br>rag/ (Part 1) · agent/ (Part 2)<br>llm.py
     BOX + CODE, 20, 40, 420, 70, "sh")
 p.v("lf", "<b>Langfuse Cloud</b> · one project<br>Part 1: a trace for each question<br>Part 2: a trace for each run; the brief shares its session ID",
     BOX + META, 470, 40, 420, 70, "sh")
-p.v("ev", "<b>Tests and scores</b><br>pytest (276 tests, offline)<br>eval/run_part1.py · eval/run_part2.py", BOX + CODE, 920, 40, 420, 70, "sh")
+p.v("ev", "<b>Tests and scores</b><br>pytest (offline, no LLM call)<br>eval/run_part1.py · eval/run_part2.py", BOX + CODE, 920, 40, 420, 70, "sh")
 
 p.v("n1", "<b>Connected:</b> one client (the event company), one event at Part 1 venue V113, one code base, "
     "one Langfuse project, and one web app that shows the results of both parts.", NOTE, 40, 820, 660, 80)

@@ -36,10 +36,10 @@ p1.v("ref", "Reference data", LANE + FILE, 40, 460, 220, 200)
 p1.v("ven", "<b>venues.csv</b><br>seated capacity (Part 1 data)", BOX + FILE, 20, 40, 180, 60, "ref")
 p1.v("crm", "<b>crm.csv</b><br>known contacts", BOX + FILE, 20, 120, 180, 60, "ref")
 
-p1.v("run", "Langflow 1.13 flow on the laptop · own venv · Playground or API", LANE + "fillColor=#ffffff;strokeColor=#6c8ebf;", 330, 70, 420, 700)
+p1.v("run", "Langflow 1.13 flow on the laptop · own venv · run command", LANE + "fillColor=#ffffff;strokeColor=#6c8ebf;", 330, 70, 420, 700)
 p1.v("fetch", "<b>Load Event · Load RSVP Emails</b> (code)<br>event, invitees, venue ID<br>emails with Date and Message-ID<br>10 s timeout · 3 retries", BOX + CODE, 40, 50, 340, 170, "run")
 p1.v("extract", "<b>Extract RSVPs</b> (LLM, one call per email)<br>free text → ExtractedRsvp · one retry, then the fallback model", BOX + LLM, 40, 260, 340, 60, "run")
-p1.v("checks", "<b>Check Records</b> (code)<br>ground · normalize · dedupe · verify<br>CRM · invitees · capacity · Companies House", BOX + CODE, 40, 360, 340, 90, "run")
+p1.v("checks", "<b>Check Records</b> (code)<br>skip non-RSVPs · ground · normalize · dedupe · verify<br>CRM · invitees · capacity · Companies House", BOX + CODE, 40, 360, 340, 90, "run")
 p1.v("agent", "<b>Loop → Agent → Agent Decision</b> (flagged records only)<br>3 read-only tools · ≤ 3 calls for each flag<br><b>Apply Decisions</b> (code) checks each fix", BOX + LLM, 40, 490, 340, 90, "run")
 p1.v("write", "<b>Planner Brief → Write Outputs</b> (code)<br>Part 1 answers with sources · status and source for each field", BOX + CODE, 40, 620, 340, 60, "run")
 

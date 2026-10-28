@@ -93,7 +93,7 @@ Part 2 runs in Langflow (D16), in its own venv `.venv-langflow` from `langflow_p
 ```
 .
 ├── CLAUDE.md
-├── README.md                    # also the technical summary (export to PDF)
+├── README.md                    # also the technical summary: the part above <!-- end of summary --> is the PDF
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore                   # .env, token*.json, credentials.json, .chroma/, *.duckdb
@@ -163,6 +163,10 @@ Part 2 runs in Langflow (D16), in its own venv `.venv-langflow` from `langflow_p
 │   ├── run_part1.py
 │   └── run_part2.py
 ├── outputs/                     # last Part 2 run: attendees.csv, audit_log.json, run_report.json
+├── docs/
+│   ├── diagrams/                # draw.io files, the Python scripts that build them, and the PNG exports
+│   ├── build_summary_pdf.py     # README summary -> PDF (markdown-it-py and headless Chrome)
+│   └── Event-AI-technical-summary.pdf   # the 2-page summary (S2), committed
 └── tests/
 ```
 
@@ -490,6 +494,7 @@ python seed/seed_google.py --noise      # insert the emails that are not RSVPs (
 pytest                                  # tests
 python eval/run_part1.py                # Part 1 scores
 python eval/run_part2.py                # Part 2 scores
+python docs/build_summary_pdf.py        # the 2-page summary PDF from README.md
 ```
 
 ## 15. Definition of done
