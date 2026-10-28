@@ -50,8 +50,11 @@ def brief_questions(event: Event, attendees: list[Attendee]) -> list[dict[str, s
         questions.append({"topic": "venue and access", "question":
                           f"Does {venue['name']} ({venue['venue_id']}) have step-free access and in-house catering, "
                           "how many seats does it have, and what can we arrange for guests with access needs?"})
+    # Name the policy area: on 28 Oct "dietary and access information" alone sent the router to the dietary
+    # and access rules, which do not say how long the data is kept.
     questions.append({"topic": "data retention", "question":
-                      "How long may we keep our guests' dietary and access information after the event?"})
+                      "Under our data retention rules, how long may we keep our guests' dietary and access "
+                      "information after the event?"})
     return questions
 
 
