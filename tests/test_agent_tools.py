@@ -1,6 +1,7 @@
 """Part 2 tools, offline: fake Google requests and a fake requests session."""
 
 import base64
+from datetime import datetime, timezone
 from types import SimpleNamespace
 
 import httplib2
@@ -11,9 +12,9 @@ from tenacity import wait_none
 
 from eventai.agent import tools
 from eventai.agent.tools import ToolError
-from eventai.agent.tools.calendar import event_from_api, get_event
+from eventai.agent.tools.calendar import event_from_api, get_event, upcoming_events
 from eventai.agent.tools.companies_house import CompaniesHouse
-from eventai.agent.tools.gmail import email_from_api, list_rsvp_emails, rsvp_query
+from eventai.agent.tools.gmail import email_from_api, list_rsvp_emails, rsvp_message_ids, rsvp_query
 from eventai.agent.tools.google_auth import execute, load_credentials
 
 
@@ -103,6 +104,25 @@ def test_get_event_calls_the_api_with_the_id():
     assert seen == {"calendarId": "primary", "eventId": "partnersummit2026"}
 
 
+def test_upcoming_events_keeps_the_events_that_name_a_venue():
+    team_lunch = {**RAW_EVENT, "id": "lunch", "description": "No venue here."}
+    cancelled = {**RAW_EVENT, "id": "old", "status": "cancelled"}
+    pages = [{"items": [team_lunch, RAW_EVENT], "nextPageToken": "t2"}, {"items": [cancelled]}]
+    calls = []
+
+    def list_(**kwargs):
+        calls.append(kwargs)
+        return FakeRequest(pages.pop(0))
+
+    service = SimpleNamespace(events=lambda: SimpleNamespace(list=list_))
+    now = datetime(2026, 10, 28, tzinfo=timezone.utc)
+    events = upcoming_events(service, days=60, now=now)
+    assert [e.event_id for e in events] == ["partnersummit2026"]
+    assert calls[0]["timeMin"] == "2026-10-28T00:00:00+00:00"
+    assert calls[0]["timeMax"] == "2026-12-27T00:00:00+00:00"
+    assert calls[0]["singleEvents"] is True and calls[1]["pageToken"] == "t2"
+
+
 # Gmail
 
 def b64(text):
@@ -159,6 +179,14 @@ def test_list_rsvp_emails_pages_through_the_search():
     assert [e.message_id for e in emails] == ["a", "b"]
     assert queries == [(rsvp_query(event), None), (rsvp_query(event), "t2")]
     assert rsvp_query(event) == '"Northern Partners Summit"'
+
+
+def test_rsvp_message_ids_reads_no_message_bodies():
+    pages = [{"messages": [{"id": "a"}, {"id": "b"}], "nextPageToken": "t2"}, {"messages": [{"id": "c"}]}]
+    messages = SimpleNamespace(list=lambda **kw: FakeRequest(pages.pop(0)),
+                               get=lambda **kw: pytest.fail("the watcher must not fetch bodies"))
+    service = SimpleNamespace(users=lambda: SimpleNamespace(messages=lambda: messages))
+    assert rsvp_message_ids(service, event_from_api(RAW_EVENT)) == ["a", "b", "c"]
 
 
 # Companies House

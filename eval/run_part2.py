@@ -11,6 +11,9 @@ Metrics:
 - resolution accuracy: the expected "<flag>:<action>" decisions that the run made
 - planner brief: the expected Part 1 sources that the brief cites, and its deadlines
 
+A late RSVP (seed/late_rsvp.yaml, the watcher demo of D18) is in the inbox only after the demo, so its
+expected row (seed/expected_late.csv) counts only when the run has that email.
+
 Writes eval/results/<date>_part2.json.
 """
 
@@ -27,6 +30,7 @@ from eventai.agent.checks import TOOL_FLAGS  # noqa: E402
 from eventai.agent.output import read_rows  # noqa: E402
 
 EXPECTED = ROOT / "seed" / "expected_attendees.csv"
+EXPECTED_LATE = ROOT / "seed" / "expected_late.csv"
 OUTPUTS = ROOT / "outputs"
 RESULTS = ROOT / "eval" / "results"
 SCORED_FIELDS = ("full_name", "email", "phone", "company", "job_title", "dietary_needs", "attending")
@@ -45,6 +49,12 @@ def same_value(field: str, expected: str, actual: str) -> bool:
 
 def ratio(part: int, whole: int) -> float:
     return round(part / whole, 3) if whole else 1.0
+
+
+def with_late_rows(expected_rows: list[dict], late_rows: list[dict], output_rows: list[dict]) -> list[dict]:
+    """Add the expected row of each late RSVP that the run read."""
+    keys = {k for r in output_rows for k in split(r["source_keys"])}
+    return expected_rows + [r for r in late_rows if set(split(r["source_keys"])) <= keys]
 
 
 def score(expected_rows: list[dict], output_rows: list[dict]) -> dict:
@@ -118,7 +128,9 @@ def main() -> None:
     parser.add_argument("--no-save", action="store_true", help="print the scores only (for a smoke test)")
     args = parser.parse_args()
 
-    report = score(read_rows(args.expected), read_rows(args.outputs / "attendees.csv"))
+    output_rows = read_rows(args.outputs / "attendees.csv")
+    late_rows = read_rows(EXPECTED_LATE) if EXPECTED_LATE.exists() else []
+    report = score(with_late_rows(read_rows(args.expected), late_rows, output_rows), output_rows)
     run_report = args.outputs / "run_report.json"
     if run_report.exists():
         report["run"] = json.loads(run_report.read_text())

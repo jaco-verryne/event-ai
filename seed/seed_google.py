@@ -2,6 +2,7 @@
 
     python seed/seed_google.py            # sign in as the demo account in the browser the first time
     python seed/seed_google.py --dry-run  # show what it would create, with no sign-in
+    python seed/seed_google.py --late     # the watcher demo (D18): insert only the late RSVP (seed/late_rsvp.yaml)
 
 It has its own token (token_seed.json) with the write scopes; the agent never uses them. It sends nothing:
 the event is created with sendUpdates="none", and the emails are inserted into the inbox, not sent.
@@ -27,6 +28,7 @@ from eventai.agent.tools.seed_files import SEED_DIR, load_emails, load_event  # 
 from eventai.config import load_settings  # noqa: E402
 
 SEED_TOKEN = ROOT / "token_seed.json"
+LATE_EMAILS = SEED_DIR / "late_rsvp.yaml"
 
 
 def time_zone(path: Path = SEED_DIR / "event.yaml") -> str:
@@ -89,8 +91,10 @@ def seed_emails(gmail, emails: list[Email], to: str) -> tuple[int, int]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--dry-run", action="store_true", help="show what it would create, with no sign-in")
+    parser.add_argument("--late", action="store_true", help="insert only the late RSVP, for the watcher demo")
     args = parser.parse_args()
-    event, emails, zone = load_event(), load_emails(), time_zone()
+    event, zone = load_event(), time_zone()
+    emails = load_emails(LATE_EMAILS) if args.late else load_emails()
     if args.dry_run:
         print(f"Event {event.event_id}: {event.summary}, {event.start:%a %d %b %Y %H:%M} {zone}, "
               f"{len(event.invitees)} invitees, no invitations sent")
@@ -103,7 +107,8 @@ def main() -> None:
     gmail = build_service("gmail", "v1", credentials)
     to = execute(gmail.users().getProfile(userId="me"), "read the profile")["emailAddress"]
     print(f"Signed in as {to}.")
-    print(f"Event {event.event_id}: {seed_event(calendar, event, zone)} (no invitations sent).")
+    if not args.late:  # the late RSVP needs only the inbox
+        print(f"Event {event.event_id}: {seed_event(calendar, event, zone)} (no invitations sent).")
     inserted, skipped = seed_emails(gmail, emails, to)
     print(f"RSVP emails: {inserted} inserted, {skipped} already there.")
 

@@ -24,3 +24,6 @@ __pycache__/
 # Part 2 Langflow: its venv, and its database (it holds the secret key and the API keys)
 .venv-langflow/
 langflow_part2/.data/
+
+# Part 2 watcher state (D18)
+.watch_state.json

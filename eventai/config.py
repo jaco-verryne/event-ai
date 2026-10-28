@@ -21,6 +21,8 @@ class Settings(BaseModel):
     langfuse_host: str = "https://cloud.langfuse.com"
     google_client_secret_file: str = "credentials.json"
     google_token_file: str = "token.json"
+    langflow_url: str = "http://127.0.0.1:7860"
+    langflow_api_key: str | None = None
 
 
 def read_dotenv(path: Path) -> dict[str, str]:

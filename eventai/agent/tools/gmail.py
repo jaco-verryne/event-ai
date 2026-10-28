@@ -16,7 +16,8 @@ def rsvp_query(event: Event) -> str:
     return f'"{re.sub(r"\s+(19|20)\d{2}$", "", event.summary.strip())}"'
 
 
-def list_rsvp_emails(service, event: Event, query: str | None = None, limit: int = 200) -> list[Email]:
+def rsvp_message_ids(service, event: Event, query: str | None = None, limit: int = 200) -> list[str]:
+    """The IDs of the event's RSVP emails, with no message bodies. The watcher compares these."""
     ids, token = [], None
     while len(ids) < limit:
         page = execute(service.users().messages().list(userId="me", q=query or rsvp_query(event), pageToken=token,
@@ -25,9 +26,13 @@ def list_rsvp_emails(service, event: Event, query: str | None = None, limit: int
         token = page.get("nextPageToken")
         if not token:
             break
+    return ids[:limit]
+
+
+def list_rsvp_emails(service, event: Event, query: str | None = None, limit: int = 200) -> list[Email]:
     emails = [email_from_api(execute(service.users().messages().get(userId="me", id=i, format="full"),
                                      f"Gmail message {i}"))
-              for i in ids[:limit]]
+              for i in rsvp_message_ids(service, event, query, limit)]
     return sorted(emails, key=lambda e: e.date)
 
 

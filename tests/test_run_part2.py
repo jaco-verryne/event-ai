@@ -36,6 +36,15 @@ def test_a_perfect_run_scores_full_marks(expected):
     assert report["resolutions"]["accuracy"] == 1.0 and report["resolutions"]["total"] == 5
 
 
+def test_the_late_rsvp_counts_only_when_the_run_read_it(expected):
+    late = read_rows(SEED_DIR / "expected_late.csv")
+    assert run_part2.with_late_rows(expected, late, copy.deepcopy(expected)) == expected
+    after_demo = copy.deepcopy(expected) + copy.deepcopy(late)
+    rows = run_part2.with_late_rows(expected, late, after_demo)
+    assert [r["source_keys"] for r in rows][-1] == "e14"
+    assert run_part2.score(rows, after_demo)["deduplication"]["exact_groups"] == 12
+
+
 def test_flag_precision_and_recall(expected):
     output = copy.deepcopy(expected)
     by_key = {r["source_keys"]: r for r in output}

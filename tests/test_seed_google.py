@@ -78,3 +78,18 @@ def test_seed_emails_skips_the_emails_already_there():
     gmail = SimpleNamespace(users=lambda: SimpleNamespace(messages=lambda: messages))
     assert seed_google.seed_emails(gmail, load_emails(), "demo@gmail.example") == (12, 1)
     assert all(kwargs["labelIds"] == ["INBOX", "UNREAD"] for _, kwargs in inserted_bodies)
+
+
+def test_the_late_rsvp_is_a_separate_invited_reply_that_the_search_finds():
+    from eventai.agent.tools.gmail import rsvp_query
+    from eventai.agent.tools.seed_files import SEED_DIR, load_crm
+
+    late = load_emails(seed_google.LATE_EMAILS)
+    assert [e.key for e in late] == ["e14"]
+    assert "e14" not in {e.key for e in load_emails()}  # the seed-file source stays at 13 emails
+    event = load_event()
+    assert late[0].sender_email in {i.email for i in event.invitees}
+    assert late[0].sender_email not in {c.email for c in load_crm()}
+    assert rsvp_query(event).strip('"').lower() in f"{late[0].subject} {late[0].body}".lower()
+    expected = (SEED_DIR / "expected_late.csv").read_text()
+    assert "e14,Ravi Desai,ravi.desai@brackenlow.example,+441614960714" in expected

@@ -1,0 +1,16 @@
+# A late RSVP for the watcher demo (D18). It is not in rsvp_emails.yaml, so the seed-file source stays at 13
+# emails. Insert it into the demo inbox with: python seed/seed_google.py --late
+# Ravi Desai is invited but has not replied yet. Synthetic data only (D13).
+- key: e14   # a late reply; clean, with no flags
+  from: "Ravi Desai <ravi.desai@brackenlow.example>"
+  date: "2026-11-07T08:20:00+00:00"
+  subject: "Re: Invitation: Northern Partners Summit 2026"
+  body: |
+    Hello,
+
+    Sorry for the late reply. I'm glad to confirm that I will attend the Northern Partners Summit on 26 November.
+
+    Best regards,
+    Ravi Desai
+    Head of Operations | Brackenlow Logistics Ltd
+    T: 0161 496 0714
