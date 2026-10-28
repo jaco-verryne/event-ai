@@ -13,3 +13,6 @@ e10: {full_name: Sam Okoro, email: sam.okoro@saltmere.example, phone: 0113 496 0
 e11: {full_name: Leah Morgan, email: leah.morgan@tallowmere.example, phone: 0113 496 0909, company: Tallowmere Foods Ltd, job_title: Marketing Manager, dietary_needs: null, attending: true}
 e12: {full_name: Chloe Adams, email: chloe.adams@thistlewick.example, phone: 0113 496 0510, company: Thistlewick Hotels Ltd, job_title: Sales Manager, dietary_needs: null, attending: null}
 e13: {full_name: Ewan Fraser, email: ewan.fraser@vellanthe.example, phone: 0161 496 0611, company: Vellanthe Systems Ltd, job_title: CTO, dietary_needs: null, attending: false}
+# The inbox noise (seed/noise_emails.yaml, D19) that the Gmail search finds: a correct LLM marks it not an RSVP.
+e15: {is_rsvp: false, full_name: Ravi Desai, email: ravi.desai@brackenlow.example, phone: 0161 496 0700, company: Brackenlow Logistics Ltd, job_title: null, dietary_needs: null, attending: null}
+e16: {is_rsvp: false, full_name: Hannah Wilde, email: hannah.wilde@fenwickrowe.example, phone: 0113 496 0855, company: Fenwick & Rowe Catering Ltd, job_title: Events Coordinator, dietary_needs: null, attending: null}

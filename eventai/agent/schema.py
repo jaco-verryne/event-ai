@@ -68,6 +68,9 @@ class CrmContact(BaseModel):
 
 
 class ExtractedRsvp(BaseModel):
+    # An email that names the event is not always an RSVP (an auto-reply, a supplier). Only an explicit
+    # False skips the email (D19): a missing or null value keeps it, so a guest is never dropped by default.
+    is_rsvp: bool | None = True
     full_name: str | None
     email: str | None
     phone: str | None
@@ -119,8 +122,8 @@ class Attendee(BaseModel):
 
 
 class AuditEntry(BaseModel):
-    step: str                    # ground, normalize, dedupe, verify or resolve
-    action: str                  # removed, changed, merged, filled, rule, flagged or note
+    step: str                    # filter, ground, normalize, dedupe, verify or resolve
+    action: str                  # skipped, removed, changed, merged, filled, rule, flagged or note
     attendee_id: str | None = None
     email_key: str | None = None
     field: str | None = None

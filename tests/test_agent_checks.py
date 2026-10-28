@@ -333,3 +333,34 @@ def test_seed_run_report(seed_run):
     assert sorted(by_key[k] for k in ("e07", "e08", "e10", "e11", "e12")) == report["for_review"]
     assert by_key["e10"] == "A06"
     assert all(entry.step in {"ground", "normalize", "dedupe", "verify"} for entry in audit)
+    assert report["not_rsvp"] == []
+
+
+def test_emails_that_are_not_rsvps_stay_off_the_list_but_in_the_audit_and_the_report():
+    canned = yaml.safe_load((FIXTURES / "part2_extractions.yaml").read_text())
+    noise = [e for e in load_emails(SEED_DIR / "noise_emails.yaml") if e.key in canned]  # what the search finds
+    pairs = [(e, ExtractedRsvp(**canned[e.key])) for e in load_emails() + noise]
+    attendees, audit, report = checks.check_all(pairs, event=load_event(), crm=load_crm(),
+                                                companies=lambda name: NOT_FOUND, seated_capacity=100)
+    assert {k for a in attendees for k in a.source_keys} == {f"e{i:02d}" for i in range(1, 14)}
+    assert (report["emails"], report["attendees"], report["merged_emails"]) == (13, 11, 2)
+    assert report["not_rsvp"] == [
+        {"email_key": "e15", "from": "ravi.desai@brackenlow.example",
+         "subject": "Automatic reply: Invitation: Northern Partners Summit 2026"},
+        {"email_key": "e16", "from": "hannah.wilde@fenwickrowe.example",
+         "subject": "Catering quote: Northern Partners Summit, 26 November"},
+    ]
+    assert "ravi.desai@brackenlow.example" in report["no_reply"]  # an auto-reply is not a reply
+    skipped = [e for e in audit if e.step == "filter"]
+    assert [(e.action, e.email_key, e.source) for e in skipped] == [("skipped", "e15", "seed:e15"),
+                                                                    ("skipped", "e16", "seed:e16")]
+    assert skipped[0].note == "not an RSVP: Automatic reply: Invitation: Northern Partners Summit 2026"
+
+
+@pytest.mark.parametrize("is_rsvp", [True, None])
+def test_only_an_explicit_false_skips_an_email(is_rsvp):
+    event = Event(event_id="x", summary="X", start=datetime(2026, 11, 26, tzinfo=timezone.utc),
+                  invitees=[Invitee(email="jo@acme.example")])
+    attendees, _, report = checks.check_all([(email(), extracted(is_rsvp=is_rsvp))], event=event, crm=[],
+                                            companies=None, seated_capacity=None)
+    assert len(attendees) == 1 and report["not_rsvp"] == []

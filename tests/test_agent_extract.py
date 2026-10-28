@@ -34,6 +34,17 @@ def test_messages_hold_the_rules_the_schema_and_the_email(email):
     assert user["content"] == email.text
 
 
+def test_the_prompt_asks_whether_the_email_is_an_rsvp(email):
+    system, _ = messages_for(email)
+    assert "is_rsvp" in system["content"] and "out of office" in system["content"]
+    assert "a substitute is an RSVP" in system["content"]  # e11 must stay on the list
+
+
+def test_is_rsvp_reads_false_and_defaults_to_true():
+    assert parse(json.dumps({**json.loads(GOOD), "is_rsvp": False})).is_rsvp is False
+    assert parse(GOOD).is_rsvp is True  # a reply without the field keeps the email
+
+
 def test_parse_accepts_a_code_fence():
     assert parse(f"```json\n{GOOD}\n```").full_name == "Sam Okoro"
 

@@ -10,6 +10,7 @@ Metrics:
 - deduplication: the expected groups of emails that the run merged exactly
 - resolution accuracy: the expected "<flag>:<action>" decisions that the run made
 - planner brief: the expected Part 1 sources that the brief cites, and its deadlines
+- inbox noise (D19): the emails in seed/noise_emails.yaml stay off the list, and no RSVP is skipped
 
 A late RSVP (seed/late_rsvp.yaml, the watcher demo of D18) is in the inbox only after the demo, so its
 expected row (seed/expected_late.csv) counts only when the run has that email.
@@ -23,6 +24,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))  # so that "python eval/run_part2.py" finds the eventai package
 
@@ -31,6 +34,7 @@ from eventai.agent.output import read_rows  # noqa: E402
 
 EXPECTED = ROOT / "seed" / "expected_attendees.csv"
 EXPECTED_LATE = ROOT / "seed" / "expected_late.csv"
+NOISE = ROOT / "seed" / "noise_emails.yaml"
 OUTPUTS = ROOT / "outputs"
 RESULTS = ROOT / "eval" / "results"
 SCORED_FIELDS = ("full_name", "email", "phone", "company", "job_title", "dietary_needs", "attending")
@@ -121,6 +125,20 @@ def score_brief(brief: dict | None) -> dict:
             "deadlines": [f"{d['policy_id']} {d['date']}" for d in brief["deadlines"]]}
 
 
+def score_not_rsvp(noise: list[dict], run_report: dict, output_rows: list[dict]) -> dict:
+    """The noise emails that the run read must be skipped, not listed; a skipped email that is not noise
+    is an RSVP lost by mistake. A run from before D19 has no not_rsvp in its report, so it is not scored."""
+    if "not_rsvp" not in run_report:
+        return {"ran": False}
+    expect = {n["key"]: n["expect"] for n in noise}
+    skipped = {s["email_key"] for s in run_report["not_rsvp"]}
+    listed = {k for r in output_rows for k in split(r["source_keys"])}
+    read = (skipped | listed | set(run_report.get("extraction_failed") or [])) & expect.keys()
+    return {"ran": True, "read": sorted(read), "kept_out": sorted(skipped & expect.keys()),
+            "in_list": sorted(listed & expect.keys()), "dropped_by_mistake": sorted(skipped - expect.keys()),
+            "found_in_error": sorted(k for k in read if expect[k] == "not_found")}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--outputs", type=Path, default=OUTPUTS, help="folder with attendees.csv")
@@ -135,6 +153,8 @@ def main() -> None:
     if run_report.exists():
         report["run"] = json.loads(run_report.read_text())
         report["brief"] = score_brief(report["run"].get("brief"))
+        noise = yaml.safe_load(NOISE.read_text()) if NOISE.exists() else []
+        report["not_rsvp"] = score_not_rsvp(noise, report["run"], output_rows)
     f, fl, d, r = report["flags"], report["fields"], report["deduplication"], report["resolutions"]
     print(f"Flags        precision {f['precision']:.0%}  recall {f['recall']:.0%}  "
           f"(TP {f['true_positives']}, FP {f['false_positives']}, FN {f['false_negatives']}; "
@@ -147,6 +167,11 @@ def main() -> None:
     if b.get("ran"):
         print(f"Brief        {len(b['expected_sources_cited'])} of {len(BRIEF_SOURCES)} expected sources cited; "
               f"deadlines {', '.join(b['deadlines']) or 'none'}")
+    n = report.get("not_rsvp", {})
+    if n.get("ran"):
+        print(f"Not RSVPs    {len(n['kept_out'])} of {len(n['read'])} noise emails kept out; "
+              f"in the list: {', '.join(n['in_list']) or 'none'}; "
+              f"RSVPs skipped by mistake: {', '.join(n['dropped_by_mistake']) or 'none'}")
     for miss in f["misses"] + fl["misses"] + r["misses"]:
         print("  miss:", miss)
     if not args.no_save:

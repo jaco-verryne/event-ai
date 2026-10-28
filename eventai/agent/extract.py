@@ -11,10 +11,14 @@ from eventai.agent.schema import Email, ExtractedRsvp
 
 Complete = Callable[[list[dict[str, str]]], str]
 
-PROMPT = """You read one RSVP email for a company event. Return one JSON object with the keys full_name, email,
-phone, company, job_title, dietary_needs (each a string or null) and attending (true, false or null).
+PROMPT = """You read one email that names a company event. Most of them are RSVPs. Return one JSON object with the
+keys is_rsvp (true or false), full_name, email, phone, company, job_title, dietary_needs (each a string or null)
+and attending (true, false or null).
 
 Rules:
+- is_rsvp is false only when the email is not from a guest about this event: an automatic reply (for example
+  out of office), a message from a supplier or a venue, a newsletter or an advert. A guest's reply, change,
+  question, or note about a dietary need or a substitute is an RSVP (true).
 - Copy each value exactly as the email writes it. Do not correct the spelling, the case or the format.
 - Use null when the email does not give a value. Do not infer a value, and do not invent one.
 - full_name and email belong to the person who writes the email.

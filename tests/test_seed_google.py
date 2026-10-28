@@ -81,7 +81,7 @@ def test_seed_emails_skips_the_emails_already_there():
 
 
 def test_the_late_rsvp_is_a_separate_invited_reply_that_the_search_finds():
-    from eventai.agent.tools.gmail import rsvp_query
+    from eventai.agent.tools.gmail import event_phrase
     from eventai.agent.tools.seed_files import SEED_DIR, load_crm
 
     late = load_emails(seed_google.LATE_EMAILS)
@@ -90,6 +90,15 @@ def test_the_late_rsvp_is_a_separate_invited_reply_that_the_search_finds():
     event = load_event()
     assert late[0].sender_email in {i.email for i in event.invitees}
     assert late[0].sender_email not in {c.email for c in load_crm()}
-    assert rsvp_query(event).strip('"').lower() in f"{late[0].subject} {late[0].body}".lower()
+    assert event_phrase(event).lower() in f"{late[0].subject} {late[0].body}".lower()
     expected = (SEED_DIR / "expected_late.csv").read_text()
     assert "e14,Ravi Desai,ravi.desai@brackenlow.example,+441614960714" in expected
+
+
+def test_noise_dry_run_lists_only_the_emails_that_are_not_rsvps(monkeypatch, capsys):
+    monkeypatch.setattr("sys.argv", ["seed_google.py", "--noise", "--dry-run"])
+    seed_google.main()
+    out = capsys.readouterr().out
+    assert [line.split()[1].rstrip(":") for line in out.splitlines() if line.startswith("  email")] == [
+        "e15", "e16", "e17", "e18"]
+    assert not {e.key for e in load_emails(seed_google.NOISE_EMAILS)} & {e.key for e in load_emails()}

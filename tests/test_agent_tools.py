@@ -178,7 +178,7 @@ def test_list_rsvp_emails_pages_through_the_search():
     emails = list_rsvp_emails(service, event)
     assert [e.message_id for e in emails] == ["a", "b"]
     assert queries == [(rsvp_query(event), None), (rsvp_query(event), "t2")]
-    assert rsvp_query(event) == '"Northern Partners Summit"'
+    assert rsvp_query(event) == '"Northern Partners Summit" -from:me'
 
 
 def test_rsvp_message_ids_reads_no_message_bodies():
@@ -265,8 +265,13 @@ def test_a_client_error_is_not_retried():
     assert len(session.calls) == 1
 
 
-def test_the_gmail_search_finds_every_seed_email():
-    from eventai.agent.tools.seed_files import load_emails, load_event
+def test_the_gmail_search_finds_every_seed_email_and_only_the_noise_that_names_the_event():
+    import yaml
 
-    phrase = rsvp_query(load_event()).strip('"').lower()
+    from eventai.agent.tools.gmail import event_phrase
+    from eventai.agent.tools.seed_files import SEED_DIR, load_emails, load_event
+
+    phrase = event_phrase(load_event()).lower()
     assert all(phrase in f"{e.subject} {e.body}".lower() for e in load_emails())
+    for raw in yaml.safe_load((SEED_DIR / "noise_emails.yaml").read_text()):
+        assert (phrase in f"{raw['subject']} {raw['body']}".lower()) == (raw["expect"] == "skipped"), raw["key"]

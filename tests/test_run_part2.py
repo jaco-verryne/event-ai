@@ -103,3 +103,19 @@ def test_brief_score():
     assert result["expected_sources_missed"] == ["policies.csv#POL-DAT-02"]
     assert result["deadlines"] == ["POL-GST-01 2026-11-12"]
     assert run_part2.score_brief({"error": "timeout"}) == {"ran": False, "error": "timeout"}
+
+
+NOISE = yaml.safe_load((SEED_DIR / "noise_emails.yaml").read_text())
+
+
+def test_the_noise_score(expected):
+    both = {"not_rsvp": [{"email_key": "e15"}, {"email_key": "e16"}]}
+    assert run_part2.score_not_rsvp(NOISE, both, expected) == {
+        "ran": True, "read": ["e15", "e16"], "kept_out": ["e15", "e16"], "in_list": [], "dropped_by_mistake": [],
+        "found_in_error": []}
+    leak = copy.deepcopy(expected) + [{**expected[0], "source_keys": "e16"}]
+    leaked = run_part2.score_not_rsvp(NOISE, {"not_rsvp": [{"email_key": "e15"}]}, leak)
+    assert (leaked["read"], leaked["kept_out"], leaked["in_list"]) == (["e15", "e16"], ["e15"], ["e16"])
+    lost = run_part2.score_not_rsvp(NOISE, {"not_rsvp": [{"email_key": "e12"}, {"email_key": "e17"}]}, expected)
+    assert (lost["dropped_by_mistake"], lost["found_in_error"]) == (["e12"], ["e17"])
+    assert run_part2.score_not_rsvp(NOISE, {"emails": 13}, expected) == {"ran": False}  # a run from before D19

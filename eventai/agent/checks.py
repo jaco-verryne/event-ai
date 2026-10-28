@@ -418,8 +418,13 @@ def no_reply(event: Event, attendees: list[Attendee]) -> list[str]:
 def check_all(extractions: list[tuple[Email, ExtractedRsvp]], *, event: Event, crm: list[CrmContact],
               companies: CompanyCheck | None, seated_capacity: int | None) -> tuple[list[Attendee], list[AuditEntry], dict]:
     """All the code steps after extraction, in order. One call for a test or a single flow component."""
-    records, audit = [], []
+    records, audit, not_rsvp = [], [], []
     for email, extracted in extractions:
+        if extracted.is_rsvp is False:  # D19: kept off the list, but in the audit log and the run report
+            not_rsvp.append({"email_key": email.key, "from": email.sender_email, "subject": email.subject})
+            audit.append(AuditEntry(step="filter", action="skipped", email_key=email.key, source=email.source,
+                                    note=f"not an RSVP: {email.subject}"))
+            continue
         record, entries = ground(extracted, email)
         audit += entries
         record, entries = normalize(record)
@@ -430,9 +435,10 @@ def check_all(extractions: list[tuple[Email, ExtractedRsvp]], *, event: Event, c
     attendees, entries = verify(attendees, crm=crm, event=event, companies=companies)
     audit += entries
     report = {
-        "emails": len(extractions),
+        "emails": len(records),  # the RSVPs; the Write Outputs summary adds this up with the merges
+        "not_rsvp": not_rsvp,
         "attendees": len(attendees),
-        "merged_emails": len(extractions) - len(attendees),
+        "merged_emails": len(records) - len(attendees),
         "for_review": [a.attendee_id for a in attendees if needs_review(a)],
         "no_reply": no_reply(event, attendees),
         "capacity": capacity_check(attendees, seated_capacity),

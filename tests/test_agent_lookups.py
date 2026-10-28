@@ -49,6 +49,15 @@ def test_records_from_each_flow_type():
     assert records(None) == []
 
 
+def test_a_table_round_trip_keeps_is_rsvp_a_bool():
+    from eventai.agent.schema import ExtractedRsvp
+
+    rows = [ExtractedRsvp(is_rsvp=flag, full_name="Jo", email=None, phone=None, company=None, job_title=None,
+                          dietary_needs=None, attending=None).model_dump() for flag in (False, True)]
+    back = [ExtractedRsvp.model_validate(r) for r in records(pd.DataFrame(rows))]
+    assert [r.is_rsvp for r in back] == [False, True]
+
+
 def test_the_tool_reads_the_event_that_load_event_remembered(monkeypatch):
     monkeypatch.setattr(flow_io, "_event", None)
     assert flow_io.remembered_event().event_id == "partnersummit2026"  # no run yet: the seed event

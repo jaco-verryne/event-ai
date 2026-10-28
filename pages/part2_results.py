@@ -71,6 +71,9 @@ st.markdown(f"Each value is coloured by its status: {LEGEND}", unsafe_allow_html
 st.dataframe(results.attendee_table(run.rows), hide_index=True, width="stretch")
 if report.get("no_reply"):
     st.caption(f"Invited, with no reply: {', '.join(report['no_reply'])}")
+skipped = results.not_rsvp_line(report)
+if skipped:
+    st.caption(skipped)
 if report.get("extraction_failed"):
     st.warning(f"Extraction failed for: {', '.join(map(str, report['extraction_failed']))}")
 
@@ -113,7 +116,8 @@ for column, (name, mime) in zip(st.columns(len(files)), files):
 with st.expander("How the run works"):
     st.markdown(
         "1. **Load Event** and **Load RSVP Emails** read Google Calendar and Gmail with read-only access.\n"
-        "2. **Extract RSVPs** (LLM) turns each email into fields. **Check Records** (code) checks each value "
+        "2. **Extract RSVPs** (LLM) turns each email into fields and says whether it is an RSVP; **Check Records** "
+        "(code) keeps an email that is not an RSVP off the list (an auto-reply, a supplier), checks each value "
         "against its email, normalizes it, merges duplicates, and verifies it against the CRM, the invitee list, "
         "Companies House and the venue capacity.\n"
         "3. A **Loop** sends each flag to the **Agent** (LLM), which can look up the CRM, the invitee list and "

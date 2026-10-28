@@ -1,0 +1,54 @@
+# Inbox noise (D19): emails that are not RSVPs. They are not in rsvp_emails.yaml, so the seed-file source
+# stays at 13 emails. Insert them into the demo inbox with: python seed/seed_google.py --noise
+# expect: skipped   - the Gmail search finds it (it names the event); extraction marks it not an RSVP; code skips it
+# expect: not_found - the Gmail search does not find it, so no LLM reads it
+# Synthetic data only (D13).
+- key: e15   # out-of-office auto-reply from an invitee with no reply yet (his real reply is e14)
+  expect: skipped
+  from: "Ravi Desai <ravi.desai@brackenlow.example>"
+  date: "2026-11-02T09:01:00+00:00"
+  subject: "Automatic reply: Invitation: Northern Partners Summit 2026"
+  body: |
+    Thank you for your email. I am out of the office until Friday 6 November, with limited access to email.
+
+    For urgent matters, please contact our operations desk on 0161 496 0700.
+
+    Ravi Desai
+    Brackenlow Logistics Ltd
+- key: e16   # a supplier quote that names the event and asks for numbers and dietary needs
+  expect: skipped
+  from: "Hannah Wilde <hannah.wilde@fenwickrowe.example>"
+  date: "2026-11-04T15:10:00+00:00"
+  subject: "Catering quote: Northern Partners Summit, 26 November"
+  body: |
+    Hello,
+
+    Thank you for your enquiry. Here is our quote for the Northern Partners Summit at Roundhay Hall:
+    a two-course lunch for up to 100 guests at £38 per head (excluding VAT).
+
+    Please send us your final numbers and any dietary needs two weeks before the event.
+
+    Kind regards,
+    Hannah Wilde
+    Events Coordinator | Fenwick & Rowe Catering Ltd
+    T: 0113 496 0855
+- key: e17   # a newsletter that does not name the event
+  expect: not_found
+  from: "Leeds Venues Weekly <news@leedsvenues.example>"
+  date: "2026-11-03T07:00:00+00:00"
+  subject: "Five rooftop venues for winter parties"
+  body: |
+    This week: five rooftop venues in Leeds with heaters and city views, ready for your winter party.
+
+    Book before 30 November for a free drinks reception.
+
+    You receive this newsletter because you signed up at leedsvenues.example.
+- key: e18   # an advert for another event with a similar name
+  expect: not_found
+  from: "SummitPass <tickets@summitpass.example>"
+  date: "2026-11-05T12:00:00+00:00"
+  subject: "Early-bird tickets: Northern Leaders Summit 2027"
+  body: |
+    Early-bird tickets for the Northern Leaders Summit 2027 are now on sale.
+
+    Save 30% until 31 December. Two days of talks, workshops and networking in Manchester.

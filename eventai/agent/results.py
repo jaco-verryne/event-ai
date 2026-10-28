@@ -86,8 +86,12 @@ def summary_metrics(report: dict) -> list[tuple[str, str, str]]:
     capacity, resolutions = report.get("capacity") or {}, report.get("resolutions") or {}
     review = report.get("for_review") or []
     seats = capacity.get("seated_capacity")
+    skipped = len(report.get("not_rsvp") or [])
+    emails_help = "The replies that the Gmail search found for the event."
+    if skipped:
+        emails_help += f" {skipped} other email(s) named the event and were skipped: not an RSVP."
     return [
-        ("RSVP emails", str(report.get("emails", 0)), "The replies that the Gmail search found for the event."),
+        ("RSVP emails", str(report.get("emails", 0)), emails_help),
         ("Attendees", str(report.get("attendees", 0)),
          f"{report.get('merged_emails', 0)} emails were merged as duplicates of another reply."),
         ("Attending", f"{capacity.get('attending', 0)} of {seats}" if seats else str(capacity.get("attending", 0)),
@@ -116,7 +120,19 @@ def score_metrics(score: dict) -> list[tuple[str, str]]:
     if brief.get("ran"):
         cited, missed = brief["expected_sources_cited"], brief["expected_sources_missed"]
         metrics.append(("Brief sources cited", f"{len(cited)} of {len(cited) + len(missed)}"))
+    noise = score.get("not_rsvp") or {}
+    if noise.get("read"):
+        metrics.append(("Non-RSVPs kept out", f"{len(noise['kept_out'])} of {len(noise['read'])}"))
     return metrics
+
+
+def not_rsvp_line(report: dict) -> str | None:
+    """The emails that named the event but were not RSVPs (D19): off the list, but shown."""
+    skipped = report.get("not_rsvp") or []
+    if not skipped:
+        return None
+    items = "; ".join(f"{s['email_key']} \"{s['subject']}\" from {s['from']}" for s in skipped)
+    return f"Skipped, not an RSVP: {items}."
 
 
 def _style(status: str | None) -> str:

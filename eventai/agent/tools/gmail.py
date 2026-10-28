@@ -10,10 +10,16 @@ from eventai.agent.schema import Email, Event
 from eventai.agent.tools.google_auth import execute
 
 
+def event_phrase(event: Event) -> str:
+    """The event name as replies write it: a reply seldom repeats the year (seed email e07: "the Northern
+    Partners Summit"), so the phrase leaves out a final year."""
+    return re.sub(r"\s+(19|20)\d{2}$", "", event.summary.strip())
+
+
 def rsvp_query(event: Event) -> str:
-    """Gmail search: each RSVP names the event in its subject or body, but a reply seldom repeats the
-    year (seed email e07: "the Northern Partners Summit"), so the search leaves out a final year."""
-    return f'"{re.sub(r"\s+(19|20)\d{2}$", "", event.summary.strip())}"'
+    """Gmail search: each RSVP names the event in its subject or body. Mail that the account sent itself
+    (a reminder to all invitees) names it too, so the search leaves that out (D19)."""
+    return f'"{event_phrase(event)}" -from:me'
 
 
 def rsvp_message_ids(service, event: Event, query: str | None = None, limit: int = 200) -> list[str]:

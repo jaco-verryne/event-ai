@@ -101,3 +101,16 @@ def test_expected_flags_and_resolutions(expected):
             flag, action = resolution.split(":")
             assert flag in row["flags"].split(";")
             assert action in {"use_value", "keep", "human_review"}
+
+
+def test_the_noise_emails_are_synthetic_with_new_keys(emails):
+    import yaml
+
+    noise = load_emails(SEED_DIR / "noise_emails.yaml")
+    keys = [e.key for e in emails + load_emails(SEED_DIR / "late_rsvp.yaml") + noise]
+    assert len(set(keys)) == len(keys) and [e.key for e in noise] == ["e15", "e16", "e17", "e18"]
+    assert [r["expect"] for r in yaml.safe_load((SEED_DIR / "noise_emails.yaml").read_text())] == [
+        "skipped", "skipped", "not_found", "not_found"]
+    assert all(e.sender_email.endswith(".example") for e in noise)
+    phones = [p for e in noise for p in re.findall(r"0\d{2,3} \d{3,4} ?\d{0,4}", e.body)]
+    assert len(phones) == 2 and all(DRAMA.match(national_digits(p)) for p in phones)

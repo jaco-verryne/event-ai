@@ -132,6 +132,21 @@ def test_score_metrics():
         "Decisions as expected": "4 of 5", "Brief sources cited": "3 of 4"}
 
 
+def test_the_emails_that_are_not_rsvps_are_shown(run):
+    assert results.not_rsvp_line(run.outputs.report) is None
+    report = {"emails": 13, "not_rsvp": [{"email_key": "e16", "from": "hannah.wilde@fenwickrowe.example",
+                                          "subject": "Catering quote"}]}
+    assert results.not_rsvp_line(report) == (
+        'Skipped, not an RSVP: e16 "Catering quote" from hannah.wilde@fenwickrowe.example.')
+    help_text = {label: h for label, _, h in results.summary_metrics(report)}["RSVP emails"]
+    assert help_text.endswith("1 other email(s) named the event and were skipped: not an RSVP.")
+    score = {"flags": {"precision": 1.0, "recall": 1.0}, "fields": {"correct": 77, "total": 77},
+             "deduplication": {"exact_groups": 11, "expected_groups": 11}, "resolutions": {"correct": 5, "total": 5}}
+    assert "Non-RSVPs kept out" not in dict(results.score_metrics({**score, "not_rsvp": {"ran": False}}))
+    noise = {"ran": True, "read": ["e15", "e16"], "kept_out": ["e15", "e16"]}
+    assert dict(results.score_metrics({**score, "not_rsvp": noise}))["Non-RSVPs kept out"] == "2 of 2"
+
+
 def test_brief_view_has_three_shapes(run):
     assert results.brief_view(run.outputs.report)[0] == "ok"
     assert results.brief_view({"brief": {"error": "DailyLimitReached"}}) == ("error", "DailyLimitReached")
