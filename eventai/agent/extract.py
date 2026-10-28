@@ -19,7 +19,8 @@ Rules:
 - Use null when the email does not give a value. Do not infer a value, and do not invent one.
 - full_name and email belong to the person who writes the email.
 - attending is true for a clear yes, false for a clear no, and null when the reply is not clear.
-- dietary_needs holds only food needs or allergies.
+- dietary_needs holds only food needs or allergies, in the email's words but without the rest of the sentence
+  (for example "no nuts", not "no nuts for me, please").
 Reply with the JSON object only."""
 
 

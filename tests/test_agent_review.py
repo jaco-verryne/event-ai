@@ -141,3 +141,13 @@ def test_decisions_from_the_loop_rows():
         ("A07", "use_value", "Brightwyn Analytics Ltd")]
     assert decisions[1].reason.startswith("The CRM record for Sam Okoro")
     assert len(rejected) == 1 and "rate limit" in rejected[0]
+
+
+def test_an_answer_with_empty_schema_fields_is_read_from_its_content():
+    # The runs on 28 Oct: Langflow could not parse one answer, so it set each schema field to None
+    # and kept the agent's text in content. The text must still be read.
+    row = {"flag": None, "attendee_id": None, "action": None, "value": None, "source": None, "reason": None,
+           "content": MALFORMED}
+    decisions, rejected = decisions_from_rows([row])
+    assert [(d.attendee_id, d.action, d.value) for d in decisions] == [("A06", "use_value", "+441134960712")]
+    assert rejected == []

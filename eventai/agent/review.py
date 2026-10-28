@@ -69,7 +69,8 @@ def decisions_from_rows(rows: list[dict]) -> tuple[list["Decision"], list[str]]:
     """Decisions from the Loop's rows: a structured row, or an agent answer that Langflow could not parse."""
     decisions, rejected = [], []
     for row in rows:
-        candidates = [row] if "attendee_id" in row else _objects(str(row.get("content") or row.get("text") or ""))
+        # When Langflow cannot parse the answer, it sets each schema field to None and keeps the text in content.
+        candidates = [row] if row.get("attendee_id") else _objects(str(row.get("content") or row.get("text") or ""))
         found = []
         for candidate in candidates:
             try:
