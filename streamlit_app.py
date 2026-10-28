@@ -104,7 +104,8 @@ def chat_page() -> None:
     st.title("Event AI: venues, packages and booking terms")
     st.caption(
         "A demo for the sales planners of a fictional UK event company. "
-        "All data is synthetic. Prices exclude VAT. The Knowledge base page shows the data."
+        "All data is synthetic. Prices exclude VAT. The Knowledge base page shows the data; "
+        "the Part 2 results page shows the last run of the attendee-list agent."
     )
 
     for message in st.session_state.messages:
@@ -141,4 +142,5 @@ def chat_page() -> None:
 st.navigation([
     st.Page(chat_page, title="Chat", icon="💬", default=True),
     st.Page("pages/knowledge_base.py", title="Knowledge base", icon="📚", url_path="knowledge-base"),
+    st.Page("pages/part2_results.py", title="Part 2 results", icon="✅", url_path="part2-results"),
 ]).run()
