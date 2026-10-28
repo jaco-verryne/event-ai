@@ -84,6 +84,11 @@ if decisions:
     st.dataframe(decisions, hide_index=True, width="stretch")
 else:
     st.caption("No record needed the agent in this run.")
+if report.get("agent_outputs_rejected"):
+    examples = " ".join(report.get("agent_outputs_rejected_examples", []))
+    cause = " (the free model's daily limit)" if "free-models-per-day" in examples else ""
+    st.caption(f"{report['agent_outputs_rejected']} agent answer(s) could not be used{cause}. "
+               "Code sent those flags to human review, and the run went on.")
 
 st.header("One record in detail")
 ids = [r["attendee_id"] for r in run.rows]

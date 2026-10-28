@@ -95,7 +95,7 @@ def summary_metrics(report: dict) -> list[tuple[str, str, str]]:
         ("Flagged for review", str(len(review)), ", ".join(review) or "No record needed the agent."),
         ("Agent fixes accepted", str(resolutions.get("use_value", 0)),
          "Values that the agent proposed and that code found in the evidence."),
-        ("Sent to human review", str(resolutions.get("human_review", 0)),
+        ("Human review", str(resolutions.get("human_review", 0)),
          "Flags that the evidence does not settle, or that a person must decide."),
     ]
 

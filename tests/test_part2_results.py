@@ -80,7 +80,7 @@ def test_event_and_trigger_lines(run):
 def test_summary_metrics(run):
     metrics = {label: value for label, value, _ in results.summary_metrics(run.outputs.report)}
     assert metrics == {"RSVP emails": "13", "Attendees": "11", "Attending": "9 of 100", "Flagged for review": "5",
-                       "Agent fixes accepted": "1", "Sent to human review": "4"}
+                       "Agent fixes accepted": "1", "Human review": "4"}
 
 
 def test_decision_rows_pair_each_flag_with_its_code_check(run):
