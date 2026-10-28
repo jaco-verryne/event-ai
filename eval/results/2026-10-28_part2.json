@@ -1,0 +1,225 @@
+{
+  "flags": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "true_positives": 6,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "tool_failure_flags": 0,
+    "misses": []
+  },
+  "fields": {
+    "accuracy": 1.0,
+    "correct": 77,
+    "total": 77,
+    "misses": []
+  },
+  "deduplication": {
+    "expected_groups": 11,
+    "exact_groups": 11,
+    "output_records": 11,
+    "wrong_groups": []
+  },
+  "resolutions": {
+    "accuracy": 1.0,
+    "correct": 5,
+    "total": 5,
+    "misses": []
+  },
+  "run": {
+    "emails": 13,
+    "attendees": 11,
+    "merged_emails": 2,
+    "for_review": [
+      "A05",
+      "A06",
+      "A07",
+      "A09",
+      "A10"
+    ],
+    "no_reply": [
+      "tom.price@tallowmere.example",
+      "ravi.desai@brackenlow.example"
+    ],
+    "capacity": {
+      "attending": 9,
+      "seated_capacity": 100,
+      "over_capacity": false
+    },
+    "extraction_failed": [],
+    "companies_house_requests": 8,
+    "agent_decisions": 4,
+    "agent_outputs_rejected": 1,
+    "agent_outputs_rejected_examples": [
+      "{'flag': None, 'attendee_id': None, 'action': None, 'value': None, 'source': None, 'reason': None, 'content': '', 'error': \"Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'header"
+    ],
+    "resolutions": {
+      "use_value": 3,
+      "human_review": 2
+    },
+    "brief": {
+      "event_id": "partnersummit2026",
+      "event_summary": "Northern Partners Summit 2026",
+      "event_date": "2026-11-26",
+      "answers": [
+        {
+          "topic": "guest numbers",
+          "question": "When are final guest numbers due for an event on 26 November 2026, and what happens if guest numbers rise after that?",
+          "answer": "Final guest numbers are due 10 working days before the 26 November 2026 event. If guest numbers rise after that, extra guests can be accepted (subject to venue capacity) and each extra guest is charged the price per head plus 10%.",
+          "facts": [
+            {
+              "label": "Final guest numbers due",
+              "value": "10 working days before the event",
+              "source_id": "policies.csv#POL-GST-01"
+            },
+            {
+              "label": "Extra guest cost",
+              "value": "price per head plus 10% (if venue capacity allows)",
+              "source_id": "policies.csv#POL-GST-04"
+            }
+          ],
+          "source_ids": [
+            "policies.csv#POL-GST-01",
+            "policies.csv#POL-GST-04"
+          ],
+          "confidence": "high",
+          "trace_id": "5f14265cb6c2b7fad9d82a7a474e6d98"
+        },
+        {
+          "topic": "dietary needs",
+          "question": "When must we send our guests' dietary needs, and what applies to a guest with these needs: no nuts; vegetarian?",
+          "answer": "You must send each guest\u2019s dietary needs and allergies 14 days before the event. For a guest who requires no nuts and is vegetarian, the standard policy applies \u2013 the caterer will try to accommodate the request, but if the information is sent after the deadline they cannot guarantee a separate meal.",
+          "facts": [
+            {
+              "label": "Send deadline",
+              "value": "14 days before the event",
+              "source_id": "policies.csv#POL-DIE-01"
+            },
+            {
+              "label": "Late submission consequence",
+              "value": "Caterer tries to meet them but cannot promise a separate meal",
+              "source_id": "policies.csv#POL-DIE-02"
+            }
+          ],
+          "source_ids": [
+            "policies.csv#POL-DIE-01",
+            "policies.csv#POL-DIE-02"
+          ],
+          "confidence": "high",
+          "trace_id": "1aeef222c028ef899a870637b4d3da94"
+        },
+        {
+          "topic": "venue and access",
+          "question": "Does Roundhay Hall (V113) have step-free access and in-house catering, how many seats does it have, and what can we arrange for guests with access needs?",
+          "answer": "Roundhay Hall (V113) has step\u2011free access and offers in\u2011house catering. It provides 100 seats. For guests with access needs we can arrange reserved seats, hearing loops and accessible parking at no cost, and assistance dogs are welcome.",
+          "facts": [
+            {
+              "label": "Step-free access",
+              "value": "True",
+              "source_id": "venues.csv#V113"
+            },
+            {
+              "label": "Catering",
+              "value": "in-house",
+              "source_id": "venues.csv#V113"
+            },
+            {
+              "label": "Seated capacity",
+              "value": "100",
+              "source_id": "venues.csv#V113"
+            },
+            {
+              "label": "Access arrangements",
+              "value": "reserved seats, hearing loops, accessible parking at no cost",
+              "source_id": "policies.csv#POL-ACC-02"
+            },
+            {
+              "label": "Assistance dogs",
+              "value": "welcome",
+              "source_id": "policies.csv#POL-ACC-03"
+            }
+          ],
+          "source_ids": [
+            "venues.csv#V113",
+            "policies.csv#POL-ACC-02",
+            "policies.csv#POL-ACC-03"
+          ],
+          "confidence": "high",
+          "trace_id": "4fcae9271f9a6af03d3e5dbd9fb3f179"
+        },
+        {
+          "topic": "data retention",
+          "question": "Under our data retention rules, how long may we keep our guests' dietary and access information after the event?",
+          "answer": "We may keep guests' dietary and access information for 30 days after the event, after which it must be deleted.",
+          "facts": [
+            {
+              "label": "Retention period for dietary and access information",
+              "value": "30 days after the event",
+              "source_id": "policies.csv#POL-DAT-02"
+            }
+          ],
+          "source_ids": [
+            "policies.csv#POL-DAT-02"
+          ],
+          "confidence": "high",
+          "trace_id": "da61001c3164dff1f5a382291b33da6c"
+        }
+      ],
+      "deadlines": [
+        {
+          "source": "policies.csv#POL-GST-01",
+          "policy_id": "POL-GST-01",
+          "area": "guest numbers",
+          "condition": "Final guest numbers",
+          "rule": "Final guest numbers are due 10 working days before the event.",
+          "date": "2026-11-12"
+        },
+        {
+          "source": "policies.csv#POL-DIE-01",
+          "policy_id": "POL-DIE-01",
+          "area": "dietary needs",
+          "condition": "Dietary needs and allergies",
+          "rule": "Send the dietary needs and allergies of each guest 14 days before the event.",
+          "date": "2026-11-12"
+        },
+        {
+          "source": "policies.csv#POL-DAT-02",
+          "policy_id": "POL-DAT-02",
+          "area": "data retention",
+          "condition": "Dietary and access information of guests",
+          "rule": "We delete this health information 30 days after the event.",
+          "date": "2026-12-26"
+        }
+      ],
+      "todo": [
+        "Send the final guest numbers (9 attending) by Thu 12 Nov 2026 (policies.csv#POL-GST-01)",
+        "Send the dietary needs and allergies (no nuts; vegetarian) by Thu 12 Nov 2026 (policies.csv#POL-DIE-01)",
+        "Delete the guests' dietary and access information by Sat 26 Dec 2026 (policies.csv#POL-DAT-02)"
+      ]
+    },
+    "trigger": {
+      "started_by": "command",
+      "reason": "started by hand",
+      "event_id": "partnersummit2026",
+      "session_id": "partnersummit2026-20261028T060910Z",
+      "started_at": "2026-10-28T06:09:10+00:00",
+      "finished_at": "2026-10-28T06:11:41+00:00"
+    }
+  },
+  "brief": {
+    "ran": true,
+    "answers": 4,
+    "expected_sources_cited": [
+      "policies.csv#POL-DAT-02",
+      "policies.csv#POL-DIE-01",
+      "policies.csv#POL-GST-01",
+      "venues.csv#V113"
+    ],
+    "expected_sources_missed": [],
+    "deadlines": [
+      "POL-GST-01 2026-11-12",
+      "POL-DIE-01 2026-11-12",
+      "POL-DAT-02 2026-12-26"
+    ]
+  }
+}

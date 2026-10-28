@@ -1,0 +1,314 @@
+[
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e01",
+    "field": "phone",
+    "before": "0113 496 0101",
+    "after": "+441134960101",
+    "source": "gmail:1a17e34d56c1a7c8"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e02",
+    "field": "full_name",
+    "before": "priya shah",
+    "after": "Priya Shah",
+    "source": "gmail:1a17e34d8e2a4392"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e02",
+    "field": "email",
+    "before": "Priya.Shah@vellanthe.example",
+    "after": "priya.shah@vellanthe.example",
+    "source": "gmail:1a17e34d8e2a4392"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e02",
+    "field": "phone",
+    "before": "0161 496 0202",
+    "after": "+441614960202",
+    "source": "gmail:1a17e34d8e2a4392"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e03",
+    "field": "phone",
+    "before": "0113 496 0303",
+    "after": "+441134960303",
+    "source": "gmail:1a17e34da159190b"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e05",
+    "field": "email",
+    "before": "J.Reed@quillmere.example",
+    "after": "j.reed@quillmere.example",
+    "source": "gmail:1a17e34e0f0cc7ea"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e05",
+    "field": "phone",
+    "before": "0113 496 0461",
+    "after": "+441134960461",
+    "source": "gmail:1a17e34e0f0cc7ea"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e07",
+    "field": "phone",
+    "before": "0113 496 0388",
+    "after": "+441134960388",
+    "source": "gmail:1a17e34e759faabc"
+  },
+  {
+    "step": "normalize",
+    "action": "flagged",
+    "email_key": "e10",
+    "field": "phone",
+    "before": "0113 496 07",
+    "note": "not a valid UK phone number"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e08",
+    "field": "phone",
+    "before": "020 7946 0808",
+    "after": "+442079460808",
+    "source": "gmail:1a17e34e9c172c77"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e11",
+    "field": "phone",
+    "before": "0113 496 0909",
+    "after": "+441134960909",
+    "source": "gmail:1a17e34f1efcd253"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e12",
+    "field": "phone",
+    "before": "0113 496 0510",
+    "after": "+441134960510",
+    "source": "gmail:1a17e34f35b41d34"
+  },
+  {
+    "step": "normalize",
+    "action": "changed",
+    "email_key": "e13",
+    "field": "phone",
+    "before": "0161 496 0611",
+    "after": "+441614960611",
+    "source": "gmail:1a17e34f576ff937"
+  },
+  {
+    "step": "dedupe",
+    "action": "merged",
+    "attendee_id": "A03",
+    "source": "gmail:1a17e34da159190b + gmail:1a17e34dd900b9d4",
+    "note": "2 emails from one person"
+  },
+  {
+    "step": "dedupe",
+    "action": "flagged",
+    "attendee_id": "A04",
+    "field": "full_name",
+    "note": "candidates: Jonathon Reed (gmail:1a17e34e0f0cc7ea) | Jonathan Reed (gmail:1a17e34e340c3077)"
+  },
+  {
+    "step": "dedupe",
+    "action": "flagged",
+    "attendee_id": "A04",
+    "field": "email",
+    "note": "candidates: j.reed@quillmere.example (gmail:1a17e34e0f0cc7ea) | jon.reed@mailbox.example (gmail:1a17e34e340c3077)"
+  },
+  {
+    "step": "dedupe",
+    "action": "merged",
+    "attendee_id": "A04",
+    "source": "gmail:1a17e34e0f0cc7ea + gmail:1a17e34e340c3077",
+    "note": "2 emails from one person"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A01",
+    "field": "company_number",
+    "note": "'Tallowmere Foods Ltd' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A02",
+    "field": "company_number",
+    "note": "'Vellanthe Systems Ltd' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A03",
+    "field": "company_number",
+    "note": "'Thistlewick Hotels Ltd' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "rule",
+    "attendee_id": "A04",
+    "field": "full_name",
+    "after": "Jonathan Reed",
+    "source": "crm.csv#C005",
+    "note": "the CRM settles the conflict; other: Jonathon Reed (gmail:1a17e34e0f0cc7ea)"
+  },
+  {
+    "step": "verify",
+    "action": "rule",
+    "attendee_id": "A04",
+    "field": "email",
+    "after": "j.reed@quillmere.example",
+    "source": "crm.csv#C005",
+    "note": "the CRM settles the conflict; other: jon.reed@mailbox.example (gmail:1a17e34e340c3077)"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A04",
+    "field": "company_number",
+    "note": "'Quillmere Events Ltd' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "flagged",
+    "attendee_id": "A05",
+    "field": "full_name",
+    "before": "Bob Harper",
+    "source": "crm.csv#C006",
+    "note": "name_differs_from_crm: the CRM has 'Robert Harper'"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A05",
+    "field": "company_number",
+    "note": "'Ferrowdale Consulting Ltd' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A06",
+    "field": "company_number",
+    "note": "'Saltmere Freight PLC' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "flagged",
+    "attendee_id": "A07",
+    "field": "company",
+    "before": "Brightwyn Analytcs",
+    "source": "crm.csv#C008",
+    "note": "company_differs_from_crm: the CRM has 'Brightwyn Analytics Ltd'"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A07",
+    "field": "company_number",
+    "note": "'Brightwyn Analytcs' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A08",
+    "note": "not in the CRM"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A08",
+    "field": "company_number",
+    "note": "'Lintwhistle Media Ltd' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "flagged",
+    "attendee_id": "A09",
+    "note": "not_invited: no email of this record is on the invitee list"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A09",
+    "field": "company_number",
+    "note": "'Tallowmere Foods Ltd' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A10",
+    "field": "company_number",
+    "note": "'Thistlewick Hotels Ltd' is not on the register"
+  },
+  {
+    "step": "verify",
+    "action": "note",
+    "attendee_id": "A11",
+    "field": "company_number",
+    "note": "'Vellanthe Systems Ltd' is not on the register"
+  },
+  {
+    "step": "resolve",
+    "action": "use_value",
+    "attendee_id": "A05",
+    "field": "full_name",
+    "before": "Bob Harper",
+    "after": "Robert Harper",
+    "source": "crm.csv#C006",
+    "note": "CRM lookup confirms the registered full name is Robert Harper, so the record should match the CRM value."
+  },
+  {
+    "step": "resolve",
+    "action": "use_value",
+    "attendee_id": "A06",
+    "field": "phone",
+    "before": "0113 496 07",
+    "after": "+441134960712",
+    "source": "crm.csv#C007",
+    "note": "The CRM record C007 contains a valid UK phone number +441134960712, while the current value 0113 496 07 is not a valid UK phone number."
+  },
+  {
+    "step": "resolve",
+    "action": "use_value",
+    "attendee_id": "A07",
+    "field": "company",
+    "before": "Brightwyn Analytcs",
+    "after": "Brightwyn Analytics Ltd",
+    "source": "crm.csv#C008",
+    "note": "The CRM record C008 lists the company as Brightwyn Analytics Ltd, which differs from the current record value Brightwyn Analytcs, so the CRM value should be used."
+  },
+  {
+    "step": "resolve",
+    "action": "human_review",
+    "attendee_id": "A09",
+    "note": "Leah Morgan is not in the invitee list; she is attending as a substitute for Tom Price, which requires a person to decide whether to accept the substitution."
+  },
+  {
+    "step": "resolve",
+    "action": "human_review",
+    "attendee_id": "A10",
+    "field": "attending",
+    "note": "no decision from the agent"
+  }
+]
