@@ -57,6 +57,8 @@ Rules:
 | D14 | Own read-only Calendar and Gmail wrappers on `google-api-python-client`, not the `langchain-google-community` toolkit. |
 | D15 | Provider order for each step (section 9). Part 1 and Part 2 extraction: Groq first. Part 2 agent step: OpenRouter Nemotron first, Groq fallback (in Langflow: OpenRouter only, see D16). |
 | D16 | Part 2 runs in Langflow 1.13 on the laptop, in its own venv (`.venv-langflow`, `langflow_part2/requirements.txt`). Custom components (category Event Ai) wrap the `eventai` modules; Jaco wires the canvas by hand (`langflow_part2/WIRING.md`). The Langflow Agent cannot fall back to another provider: a missing or invalid decision goes to human review. Part 1 stays plain Python on Streamlit Cloud. LangGraph is not used. |
+| D17 | Planner brief: after the list is final, Part 2 asks Part 1's `ask()` (in the Part 1 venv, as a subprocess) about the event: guest numbers, dietary needs, venue and access, and data retention. The answers keep their sources; code computes the dates from the cited policy rules. |
+| D18 | Part 2 starts itself: `python -m eventai.agent.run` finds the upcoming events in Calendar and runs the saved Langflow flow through the server API (so the server traces each run). With `--watch`, it runs again when an event's RSVP emails change in Gmail. Publishing the outputs to the website stays a deliberate commit and push. |
 
 ## 4. Stack
 
@@ -134,6 +136,9 @@ Part 2 runs in Langflow (D16), in its own venv `.venv-langflow` from `langflow_p
 │       ├── checks.py            # grounding, normalization, deduplication, verification (plain code)
 │       ├── output.py            # attendees.csv, audit_log.json, run_report.json
 │       ├── review.py            # the agent step: review queue, instructions, code check of decisions
+│       ├── brief.py             # the planner brief: Part 2 asks Part 1 (D17)
+│       ├── run.py               # the run command and the Gmail watcher (D18)
+│       ├── results.py           # helpers for the Part 2 results page
 │       ├── lookups.py           # the agent tools: CRM, invitee list, Companies House
 │       └── flow_io.py           # Langflow tables and Data to plain dicts
 ├── langflow_part2/              # Part 2 in Langflow (D16)
@@ -147,8 +152,10 @@ Part 2 runs in Langflow (D16), in its own venv `.venv-langflow` from `langflow_p
 │   ├── seed_google.py           # makes the event and inserts the RSVP emails
 │   ├── event.yaml               # the event, its invitees and its venue
 │   ├── rsvp_emails.yaml         # the seed emails, with known defects
+│   ├── late_rsvp.yaml           # a late reply for the watcher demo (seed_google.py --late)
 │   ├── crm.csv                  # reference data
-│   └── expected_attendees.csv   # expected output for the Part 2 score
+│   ├── expected_attendees.csv   # expected output for the Part 2 score
+│   └── expected_late.csv        # expected row of the late reply (scored when the run has it)
 ├── eval/
 │   ├── part1_questions.yaml
 │   ├── run_part1.py
@@ -306,7 +313,7 @@ The debug panel shows the SQL and the result rows.
 
 ### 10.1 Flow
 
-One command starts a full run: `python -m eventai.agent.run --event-id <id>`. The run has no human step.
+One command starts a full run: `python -m eventai.agent.run` (D18). It finds the upcoming events in Calendar (a `Venue: V…` line in the description), or takes `--event-id <id>`, and runs the saved Langflow flow through the server API. `--watch` checks Gmail every few minutes and runs an event again when its RSVP emails change (state in `.watch_state.json`). The run has no human step; the trigger (`command` or `watch`, with the reason) goes into the run report.
 
 1. **Calendar tool:** get the event, the invitee list and the venue ID (from the event description).
 2. **Email tool:** get the RSVP emails for the event.
@@ -442,6 +449,8 @@ LANGFUSE_SECRET_KEY=
 LANGFUSE_HOST=https://cloud.langfuse.com
 GOOGLE_CLIENT_SECRET_FILE=credentials.json
 GOOGLE_TOKEN_FILE=token.json
+LANGFLOW_URL=http://127.0.0.1:7860
+LANGFLOW_API_KEY=
 ```
 
 `config.py` reads `st.secrets` first, then the environment.
@@ -470,6 +479,9 @@ streamlit run streamlit_app.py          # Part 1
 python seed/seed_google.py              # one time: seed the demo account
 langflow_part2/serve.sh                # Part 2: Langflow on http://localhost:7860
 langflow_part2/smoke.sh                # Part 2 components, no LLM call
+python -m eventai.agent.run            # Part 2: find the events in Calendar and run the flow (D18)
+python -m eventai.agent.run --watch --every 60   # run again when RSVP emails change
+python seed/seed_google.py --late       # the watcher demo: insert the late RSVP (once)
 pytest                                  # tests
 python eval/run_part1.py                # Part 1 scores
 python eval/run_part2.py                # Part 2 scores
