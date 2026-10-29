@@ -32,16 +32,16 @@ Before each event, a planner also makes the attendee list by hand from the calen
 
 ## Results
 
-| Part 1: 12 test questions (26 Oct) | Score | Part 2: the seed inbox (28 Oct) | Score |
+| Part 1: 12 test questions (26 Oct) | Score | Part 2: the seed inbox (29 Oct) | Score |
 | --- | --- | --- | --- |
 | Expected facts in the answer | 97% | Data problems flagged | 6 of 6, no false flag |
 | SQL result rows correct | 11 of 11 | Field values correct | 77 of 77 |
-| Search hit in the top 5 | 5 of 5 | Duplicates merged (13 emails, 11 people) | 11 of 11 |
+| Search hit in the top 5 | 5 of 5 | Duplicates merged (13 RSVPs, 11 people) | 11 of 11 |
 | Answer cites an expected record | 10 of 10 | Agent decisions correct | 5 of 5 |
 | Cited facts removed by the code check | 0 of 28 | Planner-brief answers with a source | 4 of 4 |
-| Router tool choice as expected | 10 of 12 | RSVP or not, on 17 emails (prompt check) | 17 of 17 |
+| Router tool choice as expected | 10 of 12 | Other mail kept off the list | 4 of 4, no RSVP lost |
 
-Part 1 is scored against 12 questions with the expected tools, rows and facts (the two router misses gave correct data). Part 2 is scored against an answer key, written by hand, for a seed inbox with known defects.
+Part 1 is scored against 12 questions with the expected tools, rows and facts (the two router misses gave correct data). Part 2 is scored against an answer key, written by hand, for a seed inbox with known defects and other mail.
 
 **Why you can trust the output:** each fact and each value has a source (a record ID, an email or a CRM row). The LLM reads and proposes; code checks, decides and records. Nothing is invented: an absent value stays empty, and a doubt goes to human review, with a reason. Each question and each run has a Langfuse trace.
 
@@ -160,11 +160,13 @@ The first full run on the same day gave 85% answer accuracy. Two changes followe
 
 ### Part 2
 
-The last scored run was on 28 Oct 2026 at 08:09, started with the run command on the Google demo account (2 min 31 s). The results are in `eval/results/2026-10-28_part2.json` and `outputs/`.
+The last scored run was on 29 Oct 2026 at 06:48, started with the run command on the Google demo account (3 min 29 s). The results are in `eval/results/2026-10-29_part2.json` and `outputs/`.
 
-- Flags: precision 100% and recall 100% (6 of 6). Field values: 77 of 77. Merges: 11 of 11. Agent decisions: 5 of 5. Planner brief: 4 of 4 answers with sources, and the three dates (12 Nov, 12 Nov, 26 Dec).
-- In this run the OpenRouter daily limit ran out before the last flag. Code sent that flag to human review, which is the expected result for that record.
-- Three earlier runs on the same day found three faults: the agent answer parser, one extraction rule and one planner-brief question. Each fault has a fix.
+- Flags: precision 100% and recall 100% (6 of 6). Field values: 77 of 77. Merges: 11 of 11. Agent decisions: 5 of 5, with no agent answer rejected. Planner brief: 4 of 4 answers with sources, and the three dates (12 Nov, 12 Nov, 26 Dec).
+- Other mail (D19): the inbox has 17 emails. The Gmail search found 15 and left out the newsletter and the advert. The extraction marked the out-of-office reply and the supplier quote as not RSVPs, and code kept them off the list. No RSVP was skipped.
+- One miss that the score does not count: in the planner brief, the venue-and-access answer cited only the venue record. It said that the data does not give the access arrangements, but policy POL-ACC-02 gives them. The run of 28 Oct cited that policy. The answer invented nothing.
+- The run of 28 Oct, before the other mail was in the inbox, gave the same scores. In that run the OpenRouter daily limit ran out before the last flag, and code sent that flag to human review.
+- Three earlier runs on 28 Oct found three faults: the agent answer parser, one extraction rule and one planner-brief question. Each fault has a fix.
 
 ## Repository map
 

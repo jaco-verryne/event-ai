@@ -1,5 +1,12 @@
 [
   {
+    "step": "filter",
+    "action": "skipped",
+    "email_key": "e15",
+    "source": "gmail:1a1819e72bd16d22",
+    "note": "not an RSVP: Automatic reply: Invitation: Northern Partners Summit 2026"
+  },
+  {
     "step": "normalize",
     "action": "changed",
     "email_key": "e01",
@@ -87,6 +94,13 @@
     "before": "020 7946 0808",
     "after": "+442079460808",
     "source": "gmail:1a17e34e9c172c77"
+  },
+  {
+    "step": "filter",
+    "action": "skipped",
+    "email_key": "e16",
+    "source": "gmail:1a1819e77332dd20",
+    "note": "not an RSVP: Catering quote: Northern Partners Summit, 26 November"
   },
   {
     "step": "normalize",
@@ -276,7 +290,7 @@
     "before": "Bob Harper",
     "after": "Robert Harper",
     "source": "crm.csv#C006",
-    "note": "CRM lookup confirms the registered full name is Robert Harper, so the record should match the CRM value."
+    "note": "The CRM lookup for r.harper@ferrowdale.example returns full_name \"Robert Harper\" in crm.csv#C006, which should replace the conflicting \"Bob Harper\" from the source email to align the record with CRM."
   },
   {
     "step": "resolve",
@@ -286,7 +300,7 @@
     "before": "0113 496 07",
     "after": "+441134960712",
     "source": "crm.csv#C007",
-    "note": "The CRM record C007 contains a valid UK phone number +441134960712, while the current value 0113 496 07 is not a valid UK phone number."
+    "note": "The CRM record C007 provides a valid phone number +441134960712, replacing the invalid current value."
   },
   {
     "step": "resolve",
@@ -296,19 +310,19 @@
     "before": "Brightwyn Analytcs",
     "after": "Brightwyn Analytics Ltd",
     "source": "crm.csv#C008",
-    "note": "The CRM record C008 lists the company as Brightwyn Analytics Ltd, which differs from the current record value Brightwyn Analytcs, so the CRM value should be used."
+    "note": "The CRM record C008 lists the company as \"Brightwyn Analytics Ltd\", which corrects the typo in the current record's \"Brightwyn Analytcs\"."
   },
   {
     "step": "resolve",
     "action": "human_review",
     "attendee_id": "A09",
-    "note": "Leah Morgan is not in the invitee list; she is attending as a substitute for Tom Price, which requires a person to decide whether to accept the substitution."
+    "note": "The invitee lookup shows Leah Morgan is not on the event invitee list, but her email states she is attending as a substitute for Tom Price, which requires a person to decide whether to accept the substitution."
   },
   {
     "step": "resolve",
     "action": "human_review",
     "attendee_id": "A10",
     "field": "attending",
-    "note": "no decision from the agent"
+    "note": "Chloe Adams said she will try to make it but cannot promise yet, so the evidence does not settle whether she will attend and a person must follow up for a definite yes/no."
   }
 ]
