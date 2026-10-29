@@ -3,7 +3,7 @@
 Event AI is a demo in two parts for a fictional UK event company, built for the Inference Group AI Agent Technical Challenge. All names, firms, emails and phone numbers are synthetic.
 
 - **Part 1, ask the knowledge base:** [event-ai-xyp3apsfydznwqktuhvxhu.streamlit.app](https://event-ai-xyp3apsfydznwqktuhvxhu.streamlit.app/)
-- **Part 2, the last agent run (read-only):** [the same app, page "Part 2 results"](https://event-ai-xyp3apsfydznwqktuhvxhu.streamlit.app/part2-results)
+- **Part 2, the last agent run (read-only):** [the same app, page "Part 2 results"](https://event-ai-xyp3apsfydznwqktuhvxhu.streamlit.app/part2-results), and [its Langfuse trace](https://us.cloud.langfuse.com/project/cmvo7e3e700xqad0kxm38qu0d/traces/cba8c85152abbb79412edfd361be9275) (each step, LLM call and tool call)
 - **Code, tests and the Langflow flow:** [github.com/jaco-verryne/event-ai](https://github.com/jaco-verryne/event-ai)
 
 The free host puts the app to sleep when nobody uses it. If the page shows a wake-up button, click it and wait about one minute.
@@ -160,7 +160,7 @@ The first full run on the same day gave 85% answer accuracy. Two changes followe
 
 ### Part 2
 
-The last scored run was on 29 Oct 2026 at 06:48, started with the run command on the Google demo account (3 min 29 s). The results are in `eval/results/2026-10-29_part2.json` and `outputs/`.
+The last scored run was on 29 Oct 2026 at 06:48, started with the run command on the Google demo account (3 min 29 s). The results are in `eval/results/2026-10-29_part2.json` and `outputs/`. The [Langfuse trace of this run](https://us.cloud.langfuse.com/project/cmvo7e3e700xqad0kxm38qu0d/traces/cba8c85152abbb79412edfd361be9275) is public.
 
 - Flags: precision 100% and recall 100% (6 of 6). Field values: 77 of 77. Merges: 11 of 11. Agent decisions: 5 of 5, with no agent answer rejected. Planner brief: 4 of 4 answers with sources, and the three dates (12 Nov, 12 Nov, 26 Dec).
 - Other mail (D19): the inbox has 17 emails. The Gmail search found 15 and left out the newsletter and the advert. The extraction marked the out-of-office reply and the supplier quote as not RSVPs, and code kept them off the list. No RSVP was skipped.
